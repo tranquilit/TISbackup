@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
 #
@@ -16,14 +18,32 @@
 #
 # -----------------------------------------------------------------------
 
+import os
+import datetime
+from common import *
 
-Le script tisbackup se base sur un fichier de configuration .ini. Cf le fichier d'exemple pour le format
 
-Pour lancer le backup, lancer la commande
-./tisbackup.py -c fichierconf.ini 
+class backup_null(backup_generic):
+    """Null backup to register servers which don't need any backups 
+    but we still want to know they are taken in account"""
+    type = 'null'
+    
+    required_params = ['type','server_name','backup_name']
+    optional_params = []
 
-Pour lancer une section particulière du fichier .ini
-./tisbackup.py -c fichierconf.ini -s section_choisi
+    def do_backup(self,stats):
+        pass
+    def process_backup(self):
+        pass
+    def cleanup_backup(self):
+        pass
+    def export_latestbackup(self,destdir):
+        return {}
+    def checknagios(self,maxage_hours=30):
+        return (nagiosStateOk,"No backups needs to be performed")
+         
+register_driver(backup_null)
 
-Pour mettre le mode debug
-./tisbackup.py -c fichierconf.ini -l debug 
+if __name__=='__main__':
+    pass
+    

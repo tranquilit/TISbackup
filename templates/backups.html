@@ -1,0 +1,161 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+{% if backup_list['rsync_ssh_list']|count != 0 %}
+    <h2 class="title">Rsync+ssh</h2>
+    <table id="table-design">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+	        <th>Directory</th>
+        </thead>
+        </tbody>
+	        {% for entry in backup_list['rsync_ssh_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	            <td>{{ entry[3] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+
+{% if backup_list['rsync_list']|count != 0 %}
+    <h2 class="title">Rsync</h2>
+    <table id="table-design">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+	        <th>Directory</th>
+        </thead>
+        </tbody>
+	        {% for entry in backup_list['rsync_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	            <td>{{ entry[3] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+
+{% if backup_list['pgsql_list']|count != 0 %}
+    <h2 class="title">pgSQL</h2>
+    <table id="table-design">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+	        <th>Database</th>
+        </thead>
+        <tbody>
+	        {% for entry in backup_list['pgsql_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	            <td>{{ entry[3] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+
+{% if backup_list['mysql_list']|count != 0 %}
+    <h2 class="title">MySQL</h2>
+    <table id="table-design">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+	        <th>Database</th>
+        </thead>
+        <tbody>
+	        {% for entry in backup_list['mysql_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	            <td>{{ entry[3] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+
+{% if backup_list['xva_list']|count != 0 %}
+    <h2 class="title">XVA</h2>
+    <table id="table-design">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+        </thead>
+        <tbody>
+	        {% for entry in backup_list['xva_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if backup_list['metadata_list']|count != 0 %}
+    <h2 class="title">XCP Metadata</h2>
+    <table id="table-design">
+        <thead>
+            <th>Server</th>
+            <th>Backup</th>
+        </thead>
+        <tbody>
+            {% for entry in backup_list['metadata_list'] %}
+            <tr>
+                <td>{{ entry[0] }}</td>
+                <td>{{ entry[1] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if backup_list['switch_list']|count != 0 %}
+    <h2 class="title">Switchs</h2>
+    <table id="table-design">
+        <thead>
+            <th>Server</th>
+            <th>Backup</th>
+        </thead>
+        <tbody>
+            {% for entry in backup_list['switch_list'] %}
+            <tr>
+                <td>{{ entry[0] }}</td>
+                <td>{{ entry[1] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if backup_list['null_list']|count != 0 %}
+    <h2 class="title">Null</h2>
+    <table id="table-design">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+        </thead>
+        <tbody>
+	        {% for entry in backup_list['null_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% endblock %}

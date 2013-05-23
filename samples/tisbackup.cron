@@ -1,0 +1,7 @@
+#SHELL=/bin/sh
+#PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# m h dom mon dow user  command
+30 22   * * *   root  /opt/tisbackup/tisbackup.py -c /etc/tis/tisbackup-config.ini backup >> /var/log/tisbackup.log 2>&1
+30 12   * * *   root  /opt/tisbackup/tisbackup.py -c /etc/tis/tisbackup-config.ini cleanup >> /var/log/tisbackup.log 2>&1
+

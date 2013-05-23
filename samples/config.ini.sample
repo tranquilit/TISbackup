@@ -1,0 +1,55 @@
+[global]
+backup_base_dir = /root/tisbackup/backup_dir
+
+# backup retention in days
+backup_retention_time=90
+
+# for nagios check in hours
+maximum_backup_age=30
+
+;[srvopenerp-slash]
+;type=rsync+ssh
+;server_name=srvopenerp
+;remote_dir=/
+;compression=True
+;exclude_list="/proc/**","/sys/**","/dev/**"
+;private_key=/root/.ssh/id_dsa
+;ssh_port = 22
+
+;[srvzimbra-slash]
+;type=rsync+ssh
+;server_name=srvzimbra
+;remote_dir=/
+;exclude_list="/proc/**","/sys/**","/dev/**" 
+;private_key=/root/.ssh/id_dsa
+;ssh_port = 22
+
+;[backup_mysql_srvintranet]
+;type=mysql+ssh
+;server_name=srvintranet
+;private_keys=/root/.ssh/id_dsa
+;db_name=*
+;db_user=root
+;db_passwd=mypassword
+
+;[srvopenerp-pgsql]
+;type=pgsql+ssh
+;server_name=srvopenerp
+;db_name=tranquil-production
+;private_key=/root/.ssh/id_dsa
+;ssh_port = 22
+
+;[test-backup-xva2]
+;type=xen-xva
+;xcphost=srvxen1-test
+;server_name=test-backup-xva2
+;password_file=/root/xen_passwd
+
+;[sw-serveur]
+;type=switch
+;server_name=sw-serveur
+;switch_ip=192.168.149.253
+;switch_user=admin
+;switch_password=toto
+;switch_type=LINKSYS-SRW2024
+

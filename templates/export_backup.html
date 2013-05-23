@@ -1,0 +1,78 @@
+
+{% extends "layout.html" %}
+{% block content %}
+    <h2 class="title">Hard drive verifications:</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <h4>{{ message }} <img src="/static/images/check.png" width="15" height="15"/></h4>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+      {% if error %}
+        <p>
+        <div class=error><img class="center-img" src='/static/images/important.gif' title="Notice" width="24" height="24"/> <strong>Error:</strong> {{ error }}</div>
+        <div class=info><img class="center-img" src='/static/images/info.gif' title="Notice" width="24" height="24"/> <strong>Notice:</strong> {{ info }}</div>
+        <h4>Also, you can contact your <a href="mailto:{{ email }}?Subject=TISBACKUP%20Export"> System Administrator</a> for more details </h4>
+        </p>
+      {% elif not start %}
+        <script>
+        $(document).ready( function() {
+            $("#confirm_button").click( function() {
+                jConfirm('Do you want to proced backup now ?', 'Confirmation Dialog', function(r) {
+                    if(r == true ){
+                        $("#backup").submit();
+                    };
+                });
+            }); 
+        });
+        </script>
+        <form id="backup" action='/export_backup'>
+            <input type="hidden" name="start" value="true" />
+            <input type="button" id="confirm_button" value="Launch Backup" style="margin-left: 400px;"  />
+        </form>
+    {% else %}
+    <h2 class="title">Backups is running: </h2>
+    <table id="table-design">
+        <thead>
+            <th>Server</th>
+            <th>Backup</th>
+            <th>Status</th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+<script>
+//Refresh periode in seconds
+var refresh = 10;
+var done = false;
+function status(){
+    $.getJSON("/status.json",  function(data) {
+        $("#table-design tbody").remove();
+        $.each(data.data, function(key,val){
+            $('#table-design').append('<tr>');
+            $('tbody').append('<td>'+val.server_name+'</td>');
+            $('tbody').append('<td>'+val.backup_name+'</td>');
+            if(val.status == 'Running'){
+                $('tbody').append('<td class=loading><img src="/static/images/loader.gif" width="15" height="15"/></td>');
+                done = false;
+            }else{
+                $('tbody').append('<td>'+val.status+'</td>');
+                done = true;
+            }
+            $('#table-design').append('</tr>');
+        });
+    });
+    if (done){
+        jAlert('Backup finished', 'TIS Backup');
+        window.clearInterval(timer);
+    };
+};
+var timer = window.setInterval(function(){
+    status();
+}, refresh * 1000);
+status();
+</script>
+  {% endif %}
+{% endblock %}

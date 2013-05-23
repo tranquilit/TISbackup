@@ -1,0 +1,18 @@
+#!/bin/sh
+. /frontview/bin/functions
+
+target=$(/frontview/bin/get_front_panel_usb_hdd)
+
+echo $(date +%Y-%m-%d\ %H:%M:%S) : Export TISBackup sur Disque USB : $target >> /var/log/tisbackup.log
+if [ -n "$target" ]; then
+  hotplug_lcd "Start TISBackup export"
+  /usr/local/bin/tisbackup -x /$target/export exportbackup >> /var/log/tisbackup.log 2>&1
+  hotplug_lcd "Finish TISBackup export"
+  sleep 3
+else
+  hotplug_lcd "Error, no USB disk"
+  sleep 3
+fi
+echo $(date +%Y-%m-%d\ %H:%M:%S) : Fin Export TISBackup sur Disque USB : $target >> /var/log/tisbackup.log
+
+
