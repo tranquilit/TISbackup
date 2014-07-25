@@ -43,7 +43,8 @@ class copy_vm_xcp(backup_generic):
     optional_params = backup_generic.optional_params + ['start_vm','max_copies']
     
     start_vm = "no"
-    max_copies = 1    
+    max_copies = 1
+    
     
     def read_config(self,iniconf):
         assert(isinstance(iniconf,ConfigParser))
@@ -54,8 +55,7 @@ class copy_vm_xcp(backup_generic):
             self.max_copies = iniconf.getint('global','max_copies')         
             
     
-    def copy_vm_to_sr(self, vm_name, storage_name, dry_run):
-    
+    def copy_vm_to_sr(self, vm_name, storage_name, dry_run):        
             user_xen, password_xen, null = open(self.password_file).read().split('\n')
             session = XenAPI.Session('https://'+self.server_name)
             try:
@@ -76,20 +76,25 @@ class copy_vm_xcp(backup_generic):
             try:
                 storage = session.xenapi.SR.get_by_name_label(storage_name)[0]
             except IndexError,error:
-                return("error get storage opaqueref %s"%(error))
+                result = (1,"error get VM opaqueref %s"%(error))
+                return result
+            
             
             #get vm to copy opaqueRef    
             try:
                 vm = session.xenapi.VM.get_by_name_label(vm_name)[0]
             except IndexError,error:
-                return("error get VM opaqueref %s"%(error))
+                result = (1,"error get VM opaqueref %s"%(error))
+                return result
             
             #do the snapshot    
             self.logger.debug("[%s] Snapshot in progress",self.backup_name)
             try:
                 snapshot = session.xenapi.VM.snapshot(vm,"tisbackup-%s"%(vm_name))
             except XenAPI.Failure, error:
-                return("error when snapshot %s"%(error))            
+                result = (1,"error when snapshot %s"%(error))
+                return result
+            
             
             #get snapshot opaqueRef    
             snapshot = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vm_name))[0]
@@ -128,20 +133,25 @@ class copy_vm_xcp(backup_generic):
                         try:
                             self.logger.debug("[%s] Deleting old vm : %s", self.backup_name, list_backups[i])
                             for vbd in session.xenapi.VM.get_VBDs(oldest_backup_vm):
-                                vdi = session.xenapi.VBD.get_VDI(vbd)
-                                if not 'NULL' in  vdi:
-                                    session.xenapi.VDI.destroy(vdi)
+                                if session.xenapi.VBD.get_type(vbd) == 'CD'and session.xenapi.VBD.get_record(vbd)['empty'] == False:
+                                    session.xenapi.VBD.eject(vbd)                                   
+                                else:
+                                    vdi = session.xenapi.VBD.get_VDI(vbd)
+                                    if not 'NULL' in  vdi:
+                                        session.xenapi.VDI.destroy(vdi)
                                 
                             session.xenapi.VM.destroy(oldest_backup_vm)                
                         except XenAPI.Failure, error:
-                            return("error when destroy old backup vm %s"%(error))               
+                            result = (1,"error when destroy old backup vm %s"%(error))
+                            return result
                     
                     
             self.logger.debug("[%s] Copy %s in progress on %s",self.backup_name,vm_name,storage_name)
             try:
                 backup_vm = session.xenapi.VM.copy(snapshot,vm_backup_name+now.strftime("%Y-%m-%d %H:%M"),storage)
             except XenAPI.Failure, error:
-                return("error when copy %s"%(error))
+                result = (1,"error when copy %s"%(error))
+                return result
             
             
             # define VM as a template
@@ -151,7 +161,9 @@ class copy_vm_xcp(backup_generic):
             try:
                 vifDestroy = session.xenapi.VM.get_VIFs(backup_vm)
             except IndexError,error:
-                return("error get VIF opaqueref %s"%(error))
+                result = (1,"error get VIF opaqueref %s"%(error))
+                return result
+            
             
             for i in vifDestroy:
                 vifRecord = session.xenapi.VIF.get_record(i)
@@ -179,46 +191,62 @@ class copy_vm_xcp(backup_generic):
                 try:
                     session.xenapi.VIF.create(data)
                 except Exception, error:
-                    return(error)
+                    result = (1,error)
+                    return result
             
             
             if self.start_vm in ['true', '1', 't', 'y', 'yes', 'oui']:
                 session.xenapi.VM.start(backup_vm,False,True)
             
             session.xenapi.VM.set_name_description(backup_vm,"snapshot created by tisbackup on : %s"%(now.strftime("%Y-%m-%d %H:%M")))
+            
+            size_backup = 0
+            for vbd in session.xenapi.VM.get_VBDs(backup_vm):
+                if session.xenapi.VBD.get_type(vbd) == 'CD' and session.xenapi.VBD.get_record(vbd)['empty'] == False:
+                    session.xenapi.VBD.eject(vbd)
+                else:
+                    vdi = session.xenapi.VBD.get_VDI(vbd)
+                    if not 'NULL' in  vdi:
+                        size_backup = size_backup + int(session.xenapi.VDI.get_record(vdi)['physical_utilisation'])
+                
             #delete the snapshot
             try:
-                session.xenapi.VM.destroy(snapshot)                
+                for vbd in session.xenapi.VM.get_VBDs(snapshot):
+                    if session.xenapi.VBD.get_type(vbd) == 'CD' and session.xenapi.VBD.get_record(vbd)['empty'] == False:
+                        session.xenapi.VBD.eject(vbd)
+                    else:
+                        vdi = session.xenapi.VBD.get_VDI(vbd)
+                        if not 'NULL' in  vdi:
+                            session.xenapi.VDI.destroy(vdi)
+                session.xenapi.VM.destroy(snapshot)
             except XenAPI.Failure, error:
-                return("error when destroy snapshot %s"%(error))             
+                result = (1,"error when destroy snapshot %s"%(error))
+                return result
             
-            return(0)
+            result = (0,size_backup)
+            return result
         
         
     def do_backup(self,stats):
         try:
             timestamp = int(time.time())
             cmd = self.copy_vm_to_sr(self.vm_name, self.storage_name, self.dry_run)
-            if cmd == 0:
+            
+            if cmd[0] == 0:
                 timeExec = int(time.time()) - timestamp
                 stats['log']='copy of %s to an other storage OK' % (self.backup_name)
                 stats['status']='OK'
                 stats['total_files_count'] = 1
+                stats['total_bytes'] = cmd[1]
+                
                 stats['backup_location'] = self.storage_name
             else:
                 stats['status']='ERROR'
-                stats['log']=cmd
+                stats['log']=cmd[1]
 
         except BaseException,e:
             stats['status']='ERROR'
             stats['log']=str(e)
             raise
 
-                
-        
 register_driver(copy_vm_xcp)            
-            
-            
-    
-    
-    

@@ -17,7 +17,7 @@
 #    along with TISBackup.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -----------------------------------------------------------------------
-
+from __future__ import with_statement
 import os
 import datetime
 from common import *
@@ -29,20 +29,42 @@ import os.path
 import os
 import datetime
 import select
-import urllib2
-import base64
+import urllib
 import socket
+import tarfile
+import hashlib
 from stat import *
 
 
 class backup_xva(backup_generic):
     """Backup a VM running on a XCP server as a XVA file (requires xe tools and XenAPI)"""
     type = 'xen-xva'
-    
+
     required_params = backup_generic.required_params + ['xcphost','password_file','server_name']
-    optional_params = backup_generic.optional_params + ['excluded_vbds','remote_user','private_key']
-    
-    def export_xva(self, vdi_name, filename, dry_run):
+    optional_params = backup_generic.optional_params + ['enable_https', 'halt_vm', 'verify_export']
+
+    enable_https = "no"
+    halt_vm = "no"
+    verify_export = "no"
+
+
+    def str2bool(self,v):
+        if type(v) != bool:
+            return v.lower() in ("yes", "true", "t", "1")
+
+    def verify_export_xva(self,filename):
+        self.logger.debug("[%s] Verify xva export integrity",self.server_name)
+        tar  = tarfile.open(filename)
+        members = tar.getmembers()
+        for tarinfo in members:
+            if re.search('^[0-9]*$',os.path.basename(tarinfo.name)):
+                sha1sum = hashlib.sha1(tar.extractfile(tarinfo).read()).hexdigest()
+                sha1sum2 = tar.extractfile(tarinfo.name+'.checksum').read()
+                if not sha1sum == sha1sum2:
+                    raise Exception("File corrupt")
+        tar.close()
+
+    def export_xva(self, vdi_name, filename, halt_vm,dry_run,enable_https=True):
 
         user_xen, password_xen, null = open(self.password_file).read().split('\n')
         session = XenAPI.Session('https://'+self.xcphost)
@@ -50,79 +72,125 @@ class backup_xva(backup_generic):
             session.login_with_password(user_xen,password_xen)
         except XenAPI.Failure, error:
             msg,ip = error.details
-        
+
             if msg == 'HOST_IS_SLAVE':
                 xcphost = ip
                 session = XenAPI.Session('https://'+xcphost)
                 session.login_with_password(user_xen,password_xen)
-        
+
+        if not session.xenapi.VM.get_by_name_label(vdi_name):                              
+            return "bad VM name: %s" % vdi_name                 
+
         vm = session.xenapi.VM.get_by_name_label(vdi_name)[0]
         status_vm = session.xenapi.VM.get_power_state(vm)
-        
-        self.logger.debug("[%s] Status of VM: %s",self.backup_name,status_vm)
-        if status_vm == "Running":
-            self.logger.debug("[%s] Shudown in progress",self.backup_name)
-            if dry_run:
-                print "session.xenapi.VM.clean_shutdown(vm)"
-                
-            else:
-                session.xenapi.VM.clean_shutdown(vm)
-        
+
+        self.logger.debug("[%s] Check if previous fail backups exist",vdi_name)
+        backups_fail  =  files = [f for f in os.listdir(self.backup_dir) if f.startswith(vdi_name) and f.endswith(".tmp")]
+        for backup_fail in backups_fail:
+            self.logger.debug('[%s] Delete backup "%s"', vdi_name, backup_fail)
+            os.unlink(os.path.join(self.backup_dir, backup_fail))
+
+
+
+        #add snapshot option
+        if self.str2bool(halt_vm) == False:
+            self.logger.debug("[%s] Check if previous tisbackups snapshots exist",vdi_name)
+            old_snapshots =  session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))
+            for old_snapshot in old_snapshots:
+
+                self.logger.debug("[%s] Destroy snapshot %s",vdi_name,session.xenapi.VM.get_name_description(old_snapshot))
+                try:
+                    for vbd in session.xenapi.VM.get_VBDs(old_snapshot):
+                        if session.xenapi.VBD.get_type(vbd) == 'CD' and session.xenapi.VBD.get_record(vbd)['empty'] == False:
+                            session.xenapi.VBD.eject(vbd)
+                        else:
+                            vdi = session.xenapi.VBD.get_VDI(vbd)
+                            if not 'NULL' in  vdi:
+                                session.xenapi.VDI.destroy(vdi)                    
+                    session.xenapi.VM.destroy(old_snapshot)                
+                except XenAPI.Failure, error:
+                    return("error when destroy snapshot %s"%(error))                
+
+            now = datetime.datetime.now()
+            self.logger.debug("[%s] Snapshot in progress",vdi_name)
+            try:
+                snapshot = session.xenapi.VM.snapshot(vm,"tisbackup-%s"%(vdi_name))
+            except XenAPI.Failure, error:
+                return("error when snapshot %s"%(error))
+            #get snapshot opaqueRef    
+            vm = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))[0]
+            session.xenapi.VM.set_name_description(snapshot,"snapshot created by tisbackup on : %s"%(now.strftime("%Y-%m-%d %H:%M")))            
+        else:    
+            self.logger.debug("[%s] Status of VM: %s",self.backup_name,status_vm)
+            if status_vm == "Running":
+                self.logger.debug("[%s] Shudown in progress",self.backup_name)
+                if dry_run:
+                    print "session.xenapi.VM.clean_shutdown(vm)" 
+                else:
+                    session.xenapi.VM.clean_shutdown(vm)
         try:
             try:
+                filename_temp = filename+".tmp"
                 self.logger.debug("[%s] Copy in progress",self.backup_name)
-                
                 socket.setdefaulttimeout(120)
-                auth = base64.encodestring("%s:%s" % (user_xen, password_xen)).strip()
-                url = "https://"+self.xcphost+"/export?uuid="+session.xenapi.VM.get_uuid(vm)
-                request = urllib2.Request(url)
-                request.add_header("Authorization", "Basic %s" % auth)
-                result = urllib2.urlopen(request)
-                
-                if dry_run:
-                    print "request = urllib2.Request(%s)" % url
-                    print 'outputfile = open(%s, "wb")' % filename
+                if self.str2bool(enable_https) == True:
+                    url = "https://"+user_xen+":"+password_xen+"@"+self.xcphost+"/export?uuid="+session.xenapi.VM.get_uuid(vm)
                 else:
-                    outputfile = open(filename, "wb")
-                    for line in result:
-                        outputfile.write(line)
-                    outputfile.close()
+                    url = "http://"+user_xen+":"+password_xen+"@"+self.xcphost+"/export?uuid="+session.xenapi.VM.get_uuid(vm)                
+                urllib.urlretrieve(url, filename_temp)
+                urllib.urlcleanup()
 
             except:
-                if os.path.exists(filename):
-                    os.unlink(filename)
+                if os.path.exists(filename_temp):
+                    os.unlink(filename_temp)
                 raise 
-        
+
         finally:
-            if status_vm == "Running":
+            if self.str2bool(halt_vm) == False:
+                self.logger.debug("[%s] Destroy snapshot",'tisbackup-%s'%(vdi_name))
+                try:
+                    for vbd in session.xenapi.VM.get_VBDs(snapshot):
+                        if session.xenapi.VBD.get_type(vbd) == 'CD' and session.xenapi.VBD.get_record(vbd)['empty'] == False:
+                            session.xenapi.VBD.eject(vbd)
+                        else:
+                            vdi = session.xenapi.VBD.get_VDI(vbd)
+                            if not 'NULL' in  vdi:
+                                session.xenapi.VDI.destroy(vdi)                    
+                    session.xenapi.VM.destroy(snapshot)                
+                except XenAPI.Failure, error:
+                    return("error when destroy snapshot %s"%(error))                
+
+            elif status_vm == "Running":
                 self.logger.debug("[%s] Starting in progress",self.backup_name)
                 if dry_run:
                     print "session.xenapi.Async.VM.start(vm,False,True)"
                 else:
                     session.xenapi.Async.VM.start(vm,False,True)
-        
+
             session.logout()
-        
-        if os.path.exists(filename):
-            import tarfile
-            tar = tarfile.open(filename)
+
+        if os.path.exists(filename_temp):
+            tar = tarfile.open(filename_temp)
             if not tar.getnames():
-                unlink(filename)
+                unlink(filename_temp)
                 return("Tar error")
             tar.close()
+            if self.str2bool(self.verify_export):
+                self.verify_export_xva(filename_temp)
+            os.rename(filename_temp,filename)
 
         return(0)
 
-        
-    
+
+
 
     def do_backup(self,stats):
         try:
             dest_filename = os.path.join(self.backup_dir,"%s-%s.%s" % (self.backup_name,self.backup_start_date,'xva'))
-            
+
             options = []               
             options_params = " ".join(options)
-            cmd = self.export_xva( self.server_name, dest_filename, self.dry_run)
+            cmd = self.export_xva( vdi_name= self.server_name,filename= dest_filename, halt_vm= self.halt_vm, enable_https=self.enable_https, dry_run= self.dry_run)
             if os.path.exists(dest_filename):
                 stats['written_bytes'] = os.stat(dest_filename)[ST_SIZE]
                 stats['total_files_count'] = 1
@@ -136,10 +204,7 @@ class backup_xva(backup_generic):
                 stats['log']='XVA backup from %s OK, %d bytes written' % (self.server_name,stats['written_bytes'])
                 stats['status']='OK'    
             else:
-                stats['status']='ERROR'
-                stats['log']=cmd
-
-
+                raise Exception(cmd)
 
         except BaseException , e:
             stats['status']='ERROR'
@@ -162,4 +227,3 @@ if __name__=='__main__':
     cp.read('/opt/tisbackup/configtest.ini')
     b = backup_xva()
     b.read_config(cp)
-
