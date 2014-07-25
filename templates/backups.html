@@ -22,6 +22,25 @@
     </table>
 {% endif %}
 
+{% if backup_list['rsync_btrfs_list']|count != 0 %}
+    <h2 class="title">rsync+btrfs+ssh</h2>
+    <table id="table-design">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+	        <th>Directory</th>
+        </thead>
+        </tbody>
+	        {% for entry in backup_list['rsync_btrfs_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	            <td>{{ entry[3] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
 
 {% if backup_list['rsync_list']|count != 0 %}
     <h2 class="title">Rsync</h2>
@@ -66,7 +85,7 @@
 
 
 {% if backup_list['mysql_list']|count != 0 %}
-    <h2 class="title">MySQL</h2>
+    <h2 class="title">SQL Server</h2>
     <table id="table-design">
 	    <thead>
 	        <th>Server</th>
@@ -85,6 +104,25 @@
     </table>
 {% endif %}
 
+{% if backup_list['sqlserver_list']|count != 0 %}
+    <h2 class="title">SQL Server</h2>
+    <table id="table-design">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+	        <th>Database</th>
+        </thead>
+        <tbody>
+	        {% for entry in backup_list['sqlserver_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	            <td>{{ entry[3] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
 
 {% if backup_list['xva_list']|count != 0 %}
     <h2 class="title">XVA</h2>

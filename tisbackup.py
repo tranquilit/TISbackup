@@ -32,12 +32,15 @@ from libtisbackup.common import *
 from libtisbackup.backup_mysql import backup_mysql 
 from libtisbackup.backup_rsync import backup_rsync
 from libtisbackup.backup_rsync import backup_rsync_ssh
+from libtisbackup.backup_rsync_btrfs import backup_rsync_btrfs
+from libtisbackup.backup_rsync_btrfs import backup_rsync__btrfs_ssh
 from libtisbackup.backup_pgsql import backup_pgsql
 from libtisbackup.backup_xva import backup_xva
 #from libtisbackup.backup_switch import backup_switch
 from libtisbackup.backup_null import backup_null
 from libtisbackup.backup_xcp_metadata import backup_xcp_metadata
 from libtisbackup.copy_vm_xcp import copy_vm_xcp
+from libtisbackup.backup_sqlserver import backup_sqlserver
 
 usage="""\
 %prog -c configfile action

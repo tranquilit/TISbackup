@@ -18,6 +18,10 @@
 #
 # -----------------------------------------------------------------------
 import os,sys
+tisbackup_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+sys.path.append(os.path.join(tisbackup_root_dir,'lib'))
+
+
 from shutil import *
 from iniparse import ConfigParser
 from libtisbackup.common import *
@@ -32,11 +36,11 @@ import logging
 import re
 
 
-CONFIG = uwsgi.opt['config']
+CONFIG = uwsgi.opt['config_tisbackup']
 SECTIONS = uwsgi.opt['sections']
 ADMIN_EMAIL = uwsgi.opt.get('ADMIN_EMAIL',uwsgi.opt.get('admin_email'))
 spooler =  uwsgi.opt['spooler']
-tisbackup_config_file= uwsgi.opt['config']
+tisbackup_config_file= uwsgi.opt['config_tisbackup']
 
 cp = ConfigParser()
 cp.read(tisbackup_config_file)
@@ -82,10 +86,12 @@ def read_config():
 
     backup_dict = {}
     backup_dict['rsync_ssh_list'] = []
+    backup_dict['rsync_btrfs_list'] = []
     backup_dict['rsync_list'] = []
     backup_dict['null_list'] = []
     backup_dict['pgsql_list'] = []
     backup_dict['mysql_list'] = []
+    backup_dict['sqlserver_list'] = []
     backup_dict['xva_list'] = []
     backup_dict['metadata_list'] = []
     backup_dict['switch_list'] = []
@@ -98,6 +104,9 @@ def read_config():
         if backup_type == "rsync+ssh":
             remote_dir = row['remote_dir']
             backup_dict['rsync_ssh_list'].append([server_name, backup_name, backup_type,remote_dir])
+        if backup_type == "rsync+btrfs+ssh":
+            remote_dir = row['remote_dir']
+            backup_dict['rsync_btrfs_list'].append([server_name, backup_name, backup_type,remote_dir])
         if backup_type == "rsync":
             remote_dir = row['remote_dir']
             backup_dict['rsync_list'].append([server_name, backup_name, backup_type,remote_dir])
@@ -109,6 +118,9 @@ def read_config():
         if backup_type == "mysql+ssh":
             db_name = row['db_name']
             backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
+        if backup_type == "sqlserver+ssh":
+            db_name = row['db_name']
+            backup_dict['sqlserver_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "xen-xva":
             backup_dict['xva_list'].append([server_name, backup_name, backup_type, ""])
         if backup_type == "switch":
@@ -123,37 +135,7 @@ def backup_all():
 @app.route('/json')
 def backup_json():
     backup_dict = read_config()
-    return json.dumps(backup_dict['rsync_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+  backup_dict['switch_list'])
-
-#def check_usb_disk():
-#    """This method returns the mounts point of FIRST external disk"""
-#    disk_name = []
-#    for name in glob.glob('/dev/sd[a-z]'):
-#        for line in os.popen("udevinfo --query=env --name %s" % name):
-#            if "ID_BUS=usb" in line:
-#                disk_name += [ name ]
-#    if len(disk_name) == 0:
-#        raise_error("cannot find external usb disk", "You should plug the usb hard drive into the server")
-#        return ""
-#    elif len(disk_name) > 1:
-#        raise_error("There are many usb disk", "You should plug remove one of them")
-#        return ""
-#    else:
-#        disk_name = disk_name[0]
-#        flash("The first usb media is: %s" % disk_name)
-#    if os.path.exists(disk_name+"1"):
-#        flash("partition found: %s1" % disk_name)
-#        partition_name = disk_name+"1"
-#    else:
-#        raise_error("No partition exist", "You should initialize the usb drive")
-#        return ""
-#    if not "tisbackup" in os.popen("/sbin/dumpe2fs -h %s 2>&1 |/bin/grep 'volume name'" % partition_name).read():
-#        raise_error("the label is not vaid", "You should use 'TISBACKUP' label")
-#        return ""
-#    if not "ext4" in os.popen("/sbin/fsck -N %s 2>&1" % partition_name).read():
-#        raise_error("bad file system", "You should format usb drive into ext4")
-#        return ""
-#    return partition_name
+    return json.dumps(backup_dict['rsync_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+  backup_dict['switch_list'])
 
 
 def check_usb_disk():
@@ -256,10 +238,19 @@ def last_backup():
 @app.route('/export_backup')
 def export_backup():
     raise_error("", "")
-
+    backup_dict = read_config()
+    sections = []
+    for  backup_types in backup_dict:
+        for section in backup_dict[backup_types]:
+            if section.count > 0:
+                sections.append(section[1])
+    
     noJobs = ( len(os.listdir(spooler)) == 0 ) 
     if "start" in request.args.keys() or not noJobs:
         start=True
+        if "sections" in request.args.keys():
+            backup_sections = request.args.getlist('sections')
+            
     else:
         start=False
     cp.read(tisbackup_config_file)
@@ -274,9 +265,9 @@ def export_backup():
         global mindate 
         mindate =  datetime2isodate(datetime.datetime.now())
         if not error and start:
-            run_export_backup.spool(base=backup_base_dir, config_file=tisbackup_config_file, mount_point=mount_point)
+            run_export_backup.spool(base=backup_base_dir, config_file=tisbackup_config_file, mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections]))
 
-    return render_template("export_backup.html", error=error, start=start, info=info, email=ADMIN_EMAIL)
+    return render_template("export_backup.html", error=error, start=start, info=info, email=ADMIN_EMAIL, sections=sections)
 
 
 def raise_error(strError, strInfo):
@@ -303,8 +294,11 @@ def run_export_backup(args):
     # Main
     logger.info("Running export....")
     
-
-    backup_sections = []
+    if args['backup_sections']:
+        backup_sections = args['backup_sections'].split(",")
+    else:
+        backup_sections = []
+    
     backup = tis_backup(dry_run=False,verbose=True,backup_base_dir=args['base'])
     backup.read_ini_file(args['config_file'])
     mount_point = args['mount_point']

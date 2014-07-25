@@ -28,9 +28,15 @@
         });
         </script>
         <form id="backup" action='/export_backup'>
+			<p> Select backups to save : <br />
+			{% for entry in sections %}
+	        <input type="checkbox" name="sections" value="{{entry}}" checked="true">{{entry}} <br />
+	        {% endfor %}
+			<p>
             <input type="hidden" name="start" value="true" />
             <input type="button" id="confirm_button" value="Launch Backup" style="margin-left: 400px;"  />
         </form>
+        
     {% else %}
     <h2 class="title">Backups is running: </h2>
     <table id="table-design">

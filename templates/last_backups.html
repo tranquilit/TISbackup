@@ -7,7 +7,7 @@
                     "sAjaxDataProp": "data",
                     "sAjaxSource": "/backups.json",
                     "iDisplayLength": 25,
-                    "aLengthMenu": [[25, 50, 100, 200, 500, -1], [25, 50, 100, 200, 500, "All"]],
+//                 "aLengthMenu": [[25, 50, 100, 200, 500, -1], [25, 50, 100, 200, 500, "All"]],
                     "aaSorting": [[ 0, "desc" ]],
                     "aoColumnDefs": [
                         {
@@ -32,6 +32,13 @@
                                 var d = new Date(data);    
                                 return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+" "+d.toLocaleTimeString();
                               }
+                        },
+                        {
+                              "aTargets": [ 6 ],
+                              "mData": "written_bytes",
+                              "mRender": function ( data, type, full ) {
+                                return humanFileSize(data, false);
+                              }
                         }
                     ],
                     "aoColumns": [
@@ -41,7 +48,7 @@
                         { "mData":"backup_name" },
                         { "mData":"backup_duration"},
                         { "mData":"status" },
-                        { "mData":"written_bytes"  , "bVisible": false},
+                        { "mData":"written_bytes"},
                         { "mData":"written_files_count"  , "bVisible": false},
                         { "mData":"total_files_count"  , "bVisible": false},
                         { "mData":"total_bytes" , "bVisible": false },
@@ -49,9 +56,40 @@
                         { "mData":"description" , "bVisible": false },
                         { "mData":"log" , "bVisible": false },
                         { "mData":"TYPE" , "bVisible": false }
-                    ]
+                    ],
+		    "fnFooterCallback": function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
+//humanFileSize(aaData[1]['written_bytes'], true)
+			var total_bytes = 0;
+			var total_time = 0;
+                        for (var i = iStart; i < iEnd; i++) {
+                            total_bytes += aaData[i]['written_bytes'];
+                            total_time += aaData[i]['backup_duration'];
+                        }
+
+                        var cells_data = nRow.getElementsByTagName('th');
+	                cells_data[1].innerHTML = humanFileSize(total_bytes, true);
+
+
+                        var cells_time =  nRow.nextElementSibling.cells;
+	                cells_time[1].innerHTML = secondsToHms(total_time * 3600);
+			}
                 } );
+		$('#inputDatabaseName').keyup(function () { delay(function(){ oTable.fnLengthChange($('#inputDatabaseName').val() ); }, 300 )});
+		$(".dataTables_length").remove()
+		var nb_row  = GetURLParameter('row');
+		if (nb_row ){ 
+			oTable.fnLengthChange( nb_row)  ;
+			$('#inputDatabaseName').val(nb_row);
+		}
+
             } );
+	    var delay = (function(){
+		  var timer = 0;
+		  return function(callback, ms){
+		    clearTimeout (timer);
+		    timer = setTimeout(callback, ms);
+		  };
+            })();
             function fnShowHide( iCol )
             {
                 /* Get the DataTables object again - this is not a recreation, just a get of the object */
@@ -67,6 +105,57 @@
                 var s = Math.floor(d % 3600 % 60);
                 return ((h > 0 ? h + ":" : "0:") + (m > 0 ? (m < 10 ? "0" : "") + m + ":" : "00:") + (s < 10 ? "0" : "") + s);
             }
+	    function GetURLParameter(sParam)
+		{
+		    var sPageURL = window.location.search.substring(1);
+		    var sURLVariables = sPageURL.split('&');
+		    for (var i = 0; i < sURLVariables.length; i++) 
+		    {
+			var sParameterName = sURLVariables[i].split('=');
+			if (sParameterName[0] == sParam) 
+			{
+			    return sParameterName[1];
+			}
+		    }
+	    }
+	    function humanFileSize(bytes, si) {
+		    var thresh = si ? 1000 : 1024;
+		    if(bytes < thresh) return bytes + ' B';
+		    var units = si ? ['kB','MB','GB','TB','PB','EB','ZB','YB'] : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+		    var u = -1;
+		    do {
+			bytes /= thresh;
+			++u;
+		    } while(bytes >= thresh);
+		    return bytes.toFixed(1)+' '+units[u];
+	    };
+		$.fn.dataTableExt.oApi.fnLengthChange = function ( oSettings, iDisplay )
+		{
+		    oSettings._iDisplayLength = iDisplay;
+		    oSettings.oApi._fnCalculateEnd( oSettings );
+		      
+		    /* If we have space to show extra rows (backing up from the end point - then do so */
+		    if ( oSettings._iDisplayEnd == oSettings.aiDisplay.length )
+		    {
+			oSettings._iDisplayStart = oSettings._iDisplayEnd - oSettings._iDisplayLength;
+			if ( oSettings._iDisplayStart < 0 )
+			{
+			    oSettings._iDisplayStart = 0;
+			}
+		    }
+		      
+		    if ( oSettings._iDisplayLength == -1 )
+		    {
+			oSettings._iDisplayStart = 0;
+		    }
+		      
+		    oSettings.oApi._fnDraw( oSettings );
+		      
+		    if ( oSettings.aanFeatures.l )
+		    {
+			$('select', oSettings.aanFeatures.l).val( iDisplay );
+		    }
+		};
         </script>
             <table style='text-align: center;' cellpadding="0" cellspacing="0" border="0" class="display" id="table-design">
     <thead style='text-align: center;'>
@@ -90,8 +179,19 @@
     <tbody>
         
     </tbody>
+    <tfoot>
+	<tr>
+		<th style="text-align:right" colspan="4" rowspan="1">Total Written Bytes</th>
+	 	<th rowspan="1" colspan="1"></th>
+	</tr>
+	<tr>
+		<th style="text-align:right" colspan="4" rowspan="1">Total Duration time</th>
+	 	<th rowspan="1" colspan="1"></th>
+	</tr>
+    </tfoot>
 </table>
-<br />
+<br / >
+<p>Nomber of rows per page : <input id="inputDatabaseName" value=25 size=4 style="text-align:center" ></p>
  <p>
     Backup start<input type="checkbox" onclick="fnShowHide( 0 );"/>
     Backup end<input type="checkbox" onclick="fnShowHide( 1 );"/>
@@ -117,5 +217,6 @@ $('input:checkbox:eq(2)').attr('checked', true);
 $('input:checkbox:eq(3)').attr('checked', true);
 $('input:checkbox:eq(4)').attr('checked', true);
 $('input:checkbox:eq(5)').attr('checked', true);
+$('input:checkbox:eq(6)').attr('checked', true);
 </script>
 {% endblock %}

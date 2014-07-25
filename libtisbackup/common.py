@@ -325,7 +325,9 @@ create table stats (
 create index idx_stats_backup_name on stats(backup_name);""")
         self.db.execute("""
 create index idx_stats_backup_location on stats(backup_location);""")
-        self.db.commit()
+        self.db.execute("""
+CREATE INDEX idx_stats_backup_name_start on stats(backup_name,backup_start);""")
+        self.db.commit()        
 
     def start(self,backup_name,server_name,TYPE,description='',backup_location=None):
         """ Add in stat DB a record for the newly running backup"""
@@ -743,6 +745,8 @@ class backup_generic:
                                 return (nagiosStateCritical,"CRITICAL Backup %s (%s), %s seems older than start of backup" % (self.backup_name,isodate2datetime(b['backup_end']),b['log']))
                         elif os.path.isdir(b['backup_location']):
                             return (nagiosStateOk,"OK Backup %s (%s), %s" % (self.backup_name,isodate2datetime(b['backup_end']),b['log']))
+                        elif self.type == 'copy-vm-xcp':
+                            return (nagiosStateOk,"OK Backup %s (%s), %s" % (self.backup_name,isodate2datetime(b['backup_end']),b['log']))
                         else:
                             return (nagiosStateCritical,"CRITICAL Backup %s (%s), %s has disapeared from backup location %s" % (self.backup_name,isodate2datetime(b['backup_end']),b['log'],b['backup_location']))
 
@@ -768,7 +772,18 @@ class backup_generic:
                         if os.path.isdir(oldbackup_location) and self.backup_dir in oldbackup_location :
                             self.logger.info('[%s] removing directory "%s"',self.backup_name,oldbackup_location)
                             if not self.dry_run:
-                                shutil.rmtree(oldbackup_location.encode('ascii'))
+                                if self.type =="rsync+btrfs+ssh" or self.type == "rsync+btrfs":
+                                    cmd = "/sbin/btrfs subvolume delete %s"%oldbackup_location.encode('ascii')
+                                    process = subprocess.Popen(cmd, shell=True,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+                                    log = monitor_stdout(process,'',self)
+                                    returncode = process.returncode
+                                    if (returncode != 0):
+                                        self.logger.error("[" + self.backup_name + "] shell program exited with error code: %s"%log)
+                                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)                      
+                                    else:
+                                        self.logger.info("[" + self.backup_name + "] deleting snapshot volume: %s"%oldbackup_location.encode('ascii'))                                    
+                                else:
+                                    shutil.rmtree(oldbackup_location.encode('ascii'))
                         if os.path.isfile(oldbackup_location) and self.backup_dir in oldbackup_location :
                             self.logger.debug('[%s] removing file "%s"',self.backup_name,oldbackup_location)
                             if not self.dry_run:
@@ -860,13 +875,13 @@ class backup_generic:
 
                     for l in log.splitlines():
                         if l.startswith('Number of files:'):
-                            stats['total_files_count'] += int(l.split(':')[1])
+                            stats['total_files_count'] += int(re.findall('[0-9]+', l.split(':')[1])[0])
                         if l.startswith('Number of files transferred:'):
                             stats['written_files_count'] += int(l.split(':')[1])
                         if l.startswith('Total file size:'):
-                            stats['total_bytes'] += int(l.split(':')[1].split()[0])
+                            stats['total_bytes'] += float(l.replace(',','').split(':')[1].split()[0])
                         if l.startswith('Total transferred file size:'):
-                            stats['written_bytes'] += int(l.split(':')[1].split()[0])
+                            stats['written_bytes'] += float(l.replace(',','').split(':')[1].split()[0])
                     returncode = process.returncode
                     ## deal with exit code 24 (file vanished)
                     if (returncode == 24):
@@ -884,7 +899,6 @@ class backup_generic:
                 
                 endtime = time.time()
                 duration = (endtime-starttime)/3600.0
-
                 if not self.dry_run and self.dbstat:
                     self.dbstat.finish(stat_rowid,
                                        backup_end=datetime2isodate(datetime.datetime.now()),
@@ -895,7 +909,7 @@ class backup_generic:
                                        written_bytes=stats['written_bytes'],
                                        status=stats['status'],
                                        log=stats['log'],
-                                       backup_location=backup_dest)
+                                       backup_location=backup_dest)             
                 return stats
 
 
