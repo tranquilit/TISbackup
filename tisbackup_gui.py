@@ -28,7 +28,7 @@ from libtisbackup.common import *
 import time 
 from flask import request, Flask,  session, g, redirect, url_for, abort, render_template, flash, jsonify
 from urlparse import urlparse
-import simplejson as json
+import json
 import glob
 from uwsgidecorators import *
 from tisbackup import tis_backup
