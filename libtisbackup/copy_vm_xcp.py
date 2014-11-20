@@ -40,11 +40,11 @@ class copy_vm_xcp(backup_generic):
     type = 'copy-vm-xcp'
 
     required_params = backup_generic.required_params + ['server_name','storage_name','password_file','vm_name','network_name']
-    optional_params = backup_generic.optional_params + ['start_vm','max_copies']
+    optional_params = backup_generic.optional_params + ['start_vm','max_copies', 'delete_snapshot']
     
     start_vm = "no"
     max_copies = 1
-    
+    delete_snapshot = "yes"
     
     def read_config(self,iniconf):
         assert(isinstance(iniconf,ConfigParser))
@@ -53,9 +53,11 @@ class copy_vm_xcp(backup_generic):
             self.start_vm = iniconf.get('global','start_vm')    
         if self.max_copies == 1 and iniconf.has_option('global','max_copies'):
             self.max_copies = iniconf.getint('global','max_copies')         
-            
+        if self.delete_snapshot == "yes" and iniconf.has_option('global','delete_snapshot'):
+            self.delete_snapshot = iniconf.get('global','delete_snapshot')
+
     
-    def copy_vm_to_sr(self, vm_name, storage_name, dry_run):        
+    def copy_vm_to_sr(self, vm_name, storage_name, dry_run, delete_snapshot="yes"):
             user_xen, password_xen, null = open(self.password_file).read().split('\n')
             session = XenAPI.Session('https://'+self.server_name)
             try:
@@ -209,6 +211,10 @@ class copy_vm_xcp(backup_generic):
                     if not 'NULL' in  vdi:
                         size_backup = size_backup + int(session.xenapi.VDI.get_record(vdi)['physical_utilisation'])
                 
+            result = (0,size_backup)
+            if self.delete_snapshot == 'no':
+                return result
+
             #delete the snapshot
             try:
                 for vbd in session.xenapi.VM.get_VBDs(snapshot):
@@ -223,14 +229,13 @@ class copy_vm_xcp(backup_generic):
                 result = (1,"error when destroy snapshot %s"%(error))
                 return result
             
-            result = (0,size_backup)
             return result
         
         
     def do_backup(self,stats):
         try:
             timestamp = int(time.time())
-            cmd = self.copy_vm_to_sr(self.vm_name, self.storage_name, self.dry_run)
+            cmd = self.copy_vm_to_sr(self.vm_name, self.storage_name, self.dry_run, delete_snapshot=self.delete_snapshot)
             
             if cmd[0] == 0:
                 timeExec = int(time.time()) - timestamp
@@ -249,4 +254,4 @@ class copy_vm_xcp(backup_generic):
             stats['log']=str(e)
             raise
 
-register_driver(copy_vm_xcp)            
+register_driver(copy_vm_xcp)

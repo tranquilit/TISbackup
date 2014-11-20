@@ -41,12 +41,12 @@ class backup_xva(backup_generic):
     type = 'xen-xva'
 
     required_params = backup_generic.required_params + ['xcphost','password_file','server_name']
-    optional_params = backup_generic.optional_params + ['enable_https', 'halt_vm', 'verify_export']
+    optional_params = backup_generic.optional_params + ['enable_https', 'halt_vm', 'verify_export', 'reuse_snapshot']
 
     enable_https = "no"
     halt_vm = "no"
     verify_export = "no"
-
+    reuse_snapshot = "no"
 
     def str2bool(self,v):
         if type(v) != bool:
@@ -64,7 +64,7 @@ class backup_xva(backup_generic):
                     raise Exception("File corrupt")
         tar.close()
 
-    def export_xva(self, vdi_name, filename, halt_vm,dry_run,enable_https=True):
+    def export_xva(self, vdi_name, filename, halt_vm,dry_run,enable_https=True, reuse_snapshot="no"):
 
         user_xen, password_xen, null = open(self.password_file).read().split('\n')
         session = XenAPI.Session('https://'+self.xcphost)
@@ -96,30 +96,38 @@ class backup_xva(backup_generic):
         if self.str2bool(halt_vm) == False:
             self.logger.debug("[%s] Check if previous tisbackups snapshots exist",vdi_name)
             old_snapshots =  session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))
-            for old_snapshot in old_snapshots:
+            self.logger.debug("[%s] Old snaps count %s", vdi_name, len(old_snapshots))
 
-                self.logger.debug("[%s] Destroy snapshot %s",vdi_name,session.xenapi.VM.get_name_description(old_snapshot))
+            if len(old_snapshots) == 1 and self.str2bool(reuse_snapshot) == True:
+                snapshot = old_snapshots[0]
+                self.logger.debug("[%s] Reusing snap \"%s\"", vdi_name, session.xenapi.VM.get_name_description(snapshot))
+                vm = snapshot # vm = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))[0]
+            else:
+                self.logger.debug("[%s] Deleting %s old snaps", vdi_name, len(old_snapshots))
+                for old_snapshot in old_snapshots:
+                    self.logger.debug("[%s] Destroy snapshot %s",vdi_name,session.xenapi.VM.get_name_description(old_snapshot))
+                    try:
+                        for vbd in session.xenapi.VM.get_VBDs(old_snapshot):
+                            if session.xenapi.VBD.get_type(vbd) == 'CD' and session.xenapi.VBD.get_record(vbd)['empty'] == False:
+                                session.xenapi.VBD.eject(vbd)
+                            else:
+                                vdi = session.xenapi.VBD.get_VDI(vbd)
+                                if not 'NULL' in  vdi:
+                                    session.xenapi.VDI.destroy(vdi)
+                        session.xenapi.VM.destroy(old_snapshot)
+                    except XenAPI.Failure, error:
+                        return("error when destroy snapshot %s"%(error))
+
+                now = datetime.datetime.now()
+                self.logger.debug("[%s] Snapshot in progress",vdi_name)
                 try:
-                    for vbd in session.xenapi.VM.get_VBDs(old_snapshot):
-                        if session.xenapi.VBD.get_type(vbd) == 'CD' and session.xenapi.VBD.get_record(vbd)['empty'] == False:
-                            session.xenapi.VBD.eject(vbd)
-                        else:
-                            vdi = session.xenapi.VBD.get_VDI(vbd)
-                            if not 'NULL' in  vdi:
-                                session.xenapi.VDI.destroy(vdi)                    
-                    session.xenapi.VM.destroy(old_snapshot)                
+                    snapshot = session.xenapi.VM.snapshot(vm,"tisbackup-%s"%(vdi_name))
+                    self.logger.debug("[%s] got snapshot %s", vdi_name, snapshot)
                 except XenAPI.Failure, error:
-                    return("error when destroy snapshot %s"%(error))                
-
-            now = datetime.datetime.now()
-            self.logger.debug("[%s] Snapshot in progress",vdi_name)
-            try:
-                snapshot = session.xenapi.VM.snapshot(vm,"tisbackup-%s"%(vdi_name))
-            except XenAPI.Failure, error:
-                return("error when snapshot %s"%(error))
-            #get snapshot opaqueRef    
-            vm = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))[0]
-            session.xenapi.VM.set_name_description(snapshot,"snapshot created by tisbackup on : %s"%(now.strftime("%Y-%m-%d %H:%M")))            
+                    return("error when snapshot %s"%(error))
+                #get snapshot opaqueRef
+                vm = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))[0]
+                session.xenapi.VM.set_name_description(snapshot,"snapshot created by tisbackup on: %s"%(now.strftime("%Y-%m-%d %H:%M")))
         else:    
             self.logger.debug("[%s] Status of VM: %s",self.backup_name,status_vm)
             if status_vm == "Running":
@@ -190,7 +198,7 @@ class backup_xva(backup_generic):
 
             options = []               
             options_params = " ".join(options)
-            cmd = self.export_xva( vdi_name= self.server_name,filename= dest_filename, halt_vm= self.halt_vm, enable_https=self.enable_https, dry_run= self.dry_run)
+            cmd = self.export_xva( vdi_name= self.server_name,filename= dest_filename, halt_vm= self.halt_vm, enable_https=self.enable_https, dry_run= self.dry_run, reuse_snapshot=self.reuse_snapshot)
             if os.path.exists(dest_filename):
                 stats['written_bytes'] = os.stat(dest_filename)[ST_SIZE]
                 stats['total_files_count'] = 1
