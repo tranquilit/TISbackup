@@ -48,10 +48,6 @@ class backup_xva(backup_generic):
     verify_export = "no"
     reuse_snapshot = "no"
 
-    def str2bool(self,v):
-        if type(v) != bool:
-            return v.lower() in ("yes", "true", "t", "1")
-
     def verify_export_xva(self,filename):
         self.logger.debug("[%s] Verify xva export integrity",self.server_name)
         tar  = tarfile.open(filename)
@@ -93,12 +89,12 @@ class backup_xva(backup_generic):
 
 
         #add snapshot option
-        if self.str2bool(halt_vm) == False:
+        if str2bool(halt_vm) == False:
             self.logger.debug("[%s] Check if previous tisbackups snapshots exist",vdi_name)
             old_snapshots =  session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))
             self.logger.debug("[%s] Old snaps count %s", vdi_name, len(old_snapshots))
 
-            if len(old_snapshots) == 1 and self.str2bool(reuse_snapshot) == True:
+            if len(old_snapshots) == 1 and str2bool(reuse_snapshot) == True:
                 snapshot = old_snapshots[0]
                 self.logger.debug("[%s] Reusing snap \"%s\"", vdi_name, session.xenapi.VM.get_name_description(snapshot))
                 vm = snapshot # vm = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))[0]
@@ -143,7 +139,7 @@ class backup_xva(backup_generic):
                 socket.setdefaulttimeout(120)
 
                 scheme = "http://"
-                if self.str2bool(enable_https) == True:
+                if str2bool(enable_https) == True:
                     scheme = "https://"
                 url = scheme+user_xen+":"+password_xen+"@"+self.xcphost+"/export?uuid="+session.xenapi.VM.get_uuid(vm)
 
@@ -157,7 +153,7 @@ class backup_xva(backup_generic):
                 raise
 
         finally:
-            if self.str2bool(halt_vm) == False:
+            if str2bool(halt_vm) == False:
                 self.logger.debug("[%s] Destroy snapshot",'tisbackup-%s'%(vdi_name))
                 try:
                     for vbd in session.xenapi.VM.get_VBDs(snapshot):
@@ -186,7 +182,7 @@ class backup_xva(backup_generic):
                 unlink(filename_temp)
                 return("Tar error")
             tar.close()
-            if self.str2bool(self.verify_export):
+            if str2bool(self.verify_export):
                 self.verify_export_xva(filename_temp)
             os.rename(filename_temp,filename)
 

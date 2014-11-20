@@ -280,6 +280,11 @@ def monitor_stdout(aprocess, onoutputdata,context):
     return "\n".join(stdout)
 
 
+def str2bool(val):
+    if type(val) != bool:
+        return val.lower() in ("yes", "true", "t", "1")
+
+
 class BackupStat:
     dbpath = ''
     db = None
