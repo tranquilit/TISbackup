@@ -141,10 +141,12 @@ class backup_xva(backup_generic):
                 filename_temp = filename+".tmp"
                 self.logger.debug("[%s] Copy in progress",self.backup_name)
                 socket.setdefaulttimeout(120)
+
+                scheme = "http://"
                 if self.str2bool(enable_https) == True:
-                    url = "https://"+user_xen+":"+password_xen+"@"+self.xcphost+"/export?uuid="+session.xenapi.VM.get_uuid(vm)
-                else:
-                    url = "http://"+user_xen+":"+password_xen+"@"+self.xcphost+"/export?uuid="+session.xenapi.VM.get_uuid(vm)                
+                    scheme = "https://"
+                url = scheme+user_xen+":"+password_xen+"@"+self.xcphost+"/export?uuid="+session.xenapi.VM.get_uuid(vm)
+
                 urllib.urlretrieve(url, filename_temp)
                 urllib.urlcleanup()
 
