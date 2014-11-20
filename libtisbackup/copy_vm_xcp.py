@@ -76,7 +76,7 @@ class copy_vm_xcp(backup_generic):
             try:
                 storage = session.xenapi.SR.get_by_name_label(storage_name)[0]
             except IndexError,error:
-                result = (1,"error get VM opaqueref %s"%(error))
+                result = (1,"error get SR opaqueref %s"%(error))
                 return result
             
             
