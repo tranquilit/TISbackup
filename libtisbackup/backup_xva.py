@@ -150,10 +150,11 @@ class backup_xva(backup_generic):
                 urllib.urlretrieve(url, filename_temp)
                 urllib.urlcleanup()
 
-            except:
+            except Exception as e:
+                self.logger.error("[%s] error when fetching snap: %s", "tisbackup-%s"%(vdi_name), e)
                 if os.path.exists(filename_temp):
                     os.unlink(filename_temp)
-                raise 
+                raise
 
         finally:
             if self.str2bool(halt_vm) == False:
