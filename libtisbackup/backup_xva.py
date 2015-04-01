@@ -219,6 +219,35 @@ class backup_xva(backup_generic):
             raise
 
 
+    def register_existingbackups(self):
+        """scan backup dir and insert stats in database"""
+
+        registered = [b['backup_location'] for b in self.dbstat.query('select distinct backup_location from stats where backup_name=?',(self.backup_name,))]
+
+        filelist = os.listdir(self.backup_dir)
+        filelist.sort()
+        for item in filelist:
+            if item.endswith('.xva'):
+                dir_name = os.path.join(self.backup_dir,item)
+                if not dir_name in registered:
+                    start = (datetime.datetime.strptime(item,self.backup_name+'-%Y%m%d-%Hh%Mm%S.xva') + datetime.timedelta(0,30*60)).isoformat()
+                    if fileisodate(dir_name)>start:
+                        stop = fileisodate(dir_name)
+                    else:
+                        stop = start
+                    self.logger.info('Registering %s started on %s',dir_name,start)
+                    self.logger.debug('  Disk usage %s','du -sb "%s"' % dir_name)
+                    if not self.dry_run:
+                        size_bytes = int(os.popen('du -sb "%s"' % dir_name).read().split('\t')[0])
+                    else:
+                        size_bytes = 0
+                    self.logger.debug('  Size in bytes : %i',size_bytes)
+                    if not self.dry_run:
+                        self.dbstat.add(self.backup_name,self.server_name,'',\
+                                        backup_start=start,backup_end = stop,status='OK',total_bytes=size_bytes,backup_location=dir_name,TYPE='BACKUP')
+                else:
+                    self.logger.info('Skipping %s, already registered',dir_name)
+
 
 register_driver(backup_xva)
 
