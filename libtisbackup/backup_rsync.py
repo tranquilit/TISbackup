@@ -139,7 +139,9 @@ class backup_rsync(backup_generic):
                     backup_source = '%s@%s::%s%s' % (self.remote_user, self.server_name, self.rsync_module, self.remote_dir)
                 else:
                     # case of rsync + ssh
-                    ssh_params = ['-o StrictHostKeyChecking=no','-c %s' % self.cipher_spec]
+                    ssh_params = ['-o StrictHostKeyChecking=no']
+                    if self.cipher_spec:
+                        ssh_params.append('-c %s' % self.cipher_spec)
                     if self.private_key:
                         ssh_params.append('-i %s' % self.private_key)
                     if self.ssh_port <> 22:
