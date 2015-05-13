@@ -102,7 +102,7 @@ class backup_rdiff:
     if self.verbose==True:
       verbose_arg = "-P "
     
-    cmd = "rdiff-backup " + verbose_arg + ' --compress-level=9 --numeric-ids -az --partial -e "ssh -o StrictHostKeyChecking=no -c Blowfish -p ' + self.ssh_port + ' -i ' + self.private_key + '" --stats --delete-after ' + self.exclude_list + ' ' + src_server + ' ' + self.dest_dir 
+    cmd = "rdiff-backup " + verbose_arg + ' --compress-level=9 --numeric-ids -az --partial -e "ssh -o StrictHostKeyChecking=no -p ' + self.ssh_port + ' -i ' + self.private_key + '" --stats --delete-after ' + self.exclude_list + ' ' + src_server + ' ' + self.dest_dir 
     print cmd
 
     ## deal with exit code 24 (file vanished)

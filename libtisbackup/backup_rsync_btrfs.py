@@ -149,7 +149,7 @@ class backup_rsync_btrfs(backup_generic):
                     backup_source = '%s@%s::%s%s' % (self.remote_user, self.server_name, self.rsync_module, self.remote_dir)
                 else:
                     # case of rsync + ssh
-                    ssh_params = ['-o StrictHostKeyChecking=no','-c blowfish']
+                    ssh_params = ['-o StrictHostKeyChecking=no']
                     if self.private_key:
                         ssh_params.append('-i %s' % self.private_key)
                     if self.ssh_port <> 22:

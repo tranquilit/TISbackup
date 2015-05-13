@@ -313,7 +313,6 @@ class backup_rsync_ssh(backup_rsync):
     type = 'rsync+ssh'       
     required_params = backup_generic.required_params + ['remote_user','remote_dir','private_key']
     optional_params = backup_generic.optional_params + ['compression','bwlimit','ssh_port','exclude_list','protect_args','overload_args', 'cipher_spec']
-    cipher_spec = 'blowfish'
 
 
 register_driver(backup_rsync)
