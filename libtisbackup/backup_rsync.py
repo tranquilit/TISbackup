@@ -140,8 +140,6 @@ class backup_rsync(backup_generic):
                 else:
                     # case of rsync + ssh
                     ssh_params = ['-o StrictHostKeyChecking=no']
-                    if self.cipher_spec:
-                        ssh_params.append('-c %s' % self.cipher_spec)
                     if self.private_key:
                         ssh_params.append('-i %s' % self.private_key)
                     if self.ssh_port <> 22:
@@ -312,7 +310,7 @@ class backup_rsync_ssh(backup_rsync):
     """Backup a directory on remote server with rsync and ssh protocol (requires rsync software on remote host)"""
     type = 'rsync+ssh'       
     required_params = backup_generic.required_params + ['remote_user','remote_dir','private_key']
-    optional_params = backup_generic.optional_params + ['compression','bwlimit','ssh_port','exclude_list','protect_args','overload_args', 'cipher_spec']
+    optional_params = backup_generic.optional_params + ['compression','bwlimit','ssh_port','exclude_list','protect_args','overload_args']
 
 
 register_driver(backup_rsync)
