@@ -186,7 +186,7 @@ class backup_rsync(backup_generic):
                         self.logger.warning("[" + self.backup_name + "] unable so set uid on some files")
                     elif (returncode != 0):
                         self.logger.error("[" + self.backup_name + "] shell program exited with error code " + str(returncode))
-                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd, log[-256:])
+                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd, log[-512:])
                 else:
                     print cmd
 
