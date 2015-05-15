@@ -215,14 +215,14 @@ class backup_rsync_btrfs(backup_generic):
                         log = monitor_stdout(process,'',self)
                         returncode = process.returncode
                         if (returncode != 0):
-                            self.logger.error("[" + self.backup_name + "] shell program exited with error code: %s"%log)
-                            raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)                      
+                            self.logger.error("[" + self.backup_name + "] shell program exited with error code " + str(returncode))
+                            raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd, log[-512:])
                         else:
-                            self.logger.info("[" + self.backup_name + "] snapshot directory created %s"%finaldest)                      
+                            self.logger.info("[" + self.backup_name + "] snapshot directory created %s"%finaldest)
                     else:
                         print "btrfs snapshot of %s to %s"%(dest_dir,finaldest)
                 else:
-                    raise Exception('snapshot directory already exists : %s' %finaldest)                    
+                    raise Exception('snapshot directory already exists : %s' %finaldest)
                 self.logger.debug("[%s] touching datetime of target directory %s" ,self.backup_name,finaldest)
                 print os.popen('touch "%s"' % finaldest).read()
                 stats['backup_location'] = finaldest
