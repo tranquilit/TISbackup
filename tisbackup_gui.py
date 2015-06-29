@@ -26,7 +26,7 @@ from shutil import *
 from iniparse import ConfigParser
 from libtisbackup.common import *
 import time 
-from flask import request, Flask,  session, g, redirect, url_for, abort, render_template, flash, jsonify
+from flask import request, Flask,  session, g, redirect, url_for, abort, render_template, flash, jsonify, Response
 from urlparse import urlparse
 import json
 import glob
@@ -227,7 +227,10 @@ def export_backup_status():
 @app.route('/backups.json')
 def last_backup_json():
     exports = dbstat.query('select * from stats where TYPE="BACKUP" ORDER BY backup_start DESC  ')
-    return jsonify(data=exports)
+    return Response(response=json.dumps(exports),
+                         status=200,
+                         mimetype="application/json")
+
 
 @app.route('/last_backups')
 def last_backup():
