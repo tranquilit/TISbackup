@@ -38,6 +38,7 @@ Released   : 20090910
 	</div>
 	<!-- end #header -->
 	<div id="menu">
+
 		<ul>
 			<li><a href="/">Backups</a></li>
 			<li><a href="/export_backup">Export Backup</a></li>
@@ -48,6 +49,10 @@ Released   : 20090910
         <div id="page">
         <div id="page-bgtop">
         <div id="page-bgbtm">
+	<div id="choix_conf" style="float:right;margin-top:5px;">
+	Choix du fichier de configuration :
+	 <select id="config">
+	</select> </div>
                 <div id="content">
                         <div class="post">
                                 {% block content %}
@@ -73,5 +78,26 @@ Released   : 20090910
         <div id="footer">
                 <p>Copyright (c) 2012 Tranquil IT Systems. All rights reserved. Design by <a href="http://www.tranquil-it-systems.fr/">TIS</a>.</p>
         </div>
+<script>
+function configs(){
+    $.getJSON("/config_number/", function(data) {
+	if ( data.configs.length == 1){
+	   $("#choix_conf").hide();
+	   return 0;
+	}
+        $.each(data.configs, function(key,val){
+            if (key == data.config_number)
+            $('#config').append('<option vaulue="'+key+'" selected>'+val+'</option>');
+	    else
+            $('#config').append('<option vaulue="'+key+'">'+val+'</option>');
+        });
+    });
+    $( "#config" ).change(function() {
+	$.get( "/config_number/"+this.selectedIndex, function( data ) {location.reload();});
+});
+};
+configs();
+</script>
+
 </body>
 </html>

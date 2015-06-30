@@ -36,11 +36,12 @@ import logging
 import re
 
 
-CONFIG = uwsgi.opt['config_tisbackup']
+CONFIG = uwsgi.opt['config_tisbackup'].split(",")
 SECTIONS = uwsgi.opt['sections']
 ADMIN_EMAIL = uwsgi.opt.get('ADMIN_EMAIL',uwsgi.opt.get('admin_email'))
 spooler =  uwsgi.opt['spooler']
-tisbackup_config_file= uwsgi.opt['config_tisbackup']
+tisbackup_config_file= CONFIG[0]
+config_number=0
 
 cp = ConfigParser()
 cp.read(tisbackup_config_file)
@@ -54,7 +55,7 @@ app.secret_key = 'fsiqefiuqsefARZ4Zfesfe34234dfzefzfe'
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
 def read_config():
-    config_file = CONFIG
+    config_file = CONFIG[config_number]
     cp = ConfigParser()
     cp.read(config_file)
 
@@ -131,6 +132,16 @@ def read_config():
 def backup_all():
     backup_dict = read_config()
     return render_template('backups.html', backup_list = backup_dict)
+
+
+@app.route('/config_number/')
+@app.route('/config_number/<int:id>')
+def set_config_number(id=None):
+    if id != None and  len(CONFIG) > id:
+        global config_number
+        config_number=id
+        read_config()
+    return  jsonify(configs=CONFIG,config_number=config_number)
 
 @app.route('/json')
 def backup_json():
