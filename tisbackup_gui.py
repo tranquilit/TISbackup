@@ -63,7 +63,7 @@ def read_config():
     backup.read_ini_file(config_file)
 
     backup_sections = SECTIONS or []
-        
+
     all_sections = [backup_item.backup_name for backup_item in backup.backup_list]
     if not backup_sections:
         backup_sections = all_sections
@@ -71,7 +71,7 @@ def read_config():
         for b in backup_sections:
             if not b in all_sections:
                 raise Exception('Section %s is not defined in config file' % b)
-    
+
     result = []
     if not backup_sections:
         sections = [backup_item.backup_name for backup_item in backup.backup_list]
@@ -170,7 +170,7 @@ def check_usb_disk():
         if "tisbackup" in os.popen("/sbin/dumpe2fs -h %s 2>&1 |/bin/grep 'volume name'" % usb_partition).read().lower():
             flash("tisbackup backup partition found: %s" % usb_partition)
             tisbackup_partition_list.append(usb_partition)
-    
+
     print tisbackup_partition_list    
 
     if len(tisbackup_partition_list) ==0:
@@ -222,14 +222,14 @@ def check_mount_disk(partition_name, refresh):
 @app.route('/status.json')
 def export_backup_status():
     exports = dbstat.query('select * from stats where TYPE="EXPORT" and backup_start>="%s"' % mindate)
-    return jsonify(data=exports)
+    return jsonify(data=exports,finish= ( len(os.listdir(spooler)) == 0 ))
 
 @app.route('/backups.json')
 def last_backup_json():
     exports = dbstat.query('select * from stats where TYPE="BACKUP" ORDER BY backup_start DESC  ')
     return Response(response=json.dumps(exports),
-                         status=200,
-                         mimetype="application/json")
+                    status=200,
+                    mimetype="application/json")
 
 
 @app.route('/last_backups')
@@ -244,16 +244,18 @@ def export_backup():
     backup_dict = read_config()
     sections = []
     for  backup_types in backup_dict:
+        if backup_types == "null_list":
+            continue
         for section in backup_dict[backup_types]:
             if section.count > 0:
                 sections.append(section[1])
-    
+
     noJobs = ( len(os.listdir(spooler)) == 0 ) 
     if "start" in request.args.keys() or not noJobs:
         start=True
         if "sections" in request.args.keys():
             backup_sections = request.args.getlist('sections')
-            
+
     else:
         start=False
     cp.read(tisbackup_config_file)
@@ -277,13 +279,13 @@ def raise_error(strError, strInfo):
     global error, info
     error = strError
     info = strInfo
-    
+
 def cleanup():
     if os.path.isdir(spooler):
         print "cleanup ", spooler
         rmtree(spooler)
     os.mkdir(spooler)
-        
+
 @spool
 def run_export_backup(args):
     #Log
@@ -296,12 +298,12 @@ def run_export_backup(args):
 
     # Main
     logger.info("Running export....")
-    
+
     if args['backup_sections']:
         backup_sections = args['backup_sections'].split(",")
     else:
         backup_sections = []
-    
+
     backup = tis_backup(dry_run=False,verbose=True,backup_base_dir=args['base'])
     backup.read_ini_file(args['config_file'])
     mount_point = args['mount_point']
