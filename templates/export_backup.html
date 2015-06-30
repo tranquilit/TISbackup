@@ -19,18 +19,30 @@
         <script>
         $(document).ready( function() {
             $("#confirm_button").click( function() {
-                jConfirm('Do you want to proced backup now ?', 'Confirmation Dialog', function(r) {
+                bootbox.confirm('Do you want to proced backup now ?',  function(r) {
                     if(r == true ){
                         $("#backup").submit();
                     };
                 });
             }); 
+	    $('#selectall').click(function(event) {  //on click
+		if(this.checked) { // check select status
+		    $('.checkbox1').each(function() { //loop through each checkbox
+			this.checked = true;  //select all checkboxes with class "checkbox1"              
+		    });
+		}else{
+		    $('.checkbox1').each(function() { //loop through each checkbox
+			this.checked = false; //deselect all checkboxes with class "checkbox1"                      
+		    });        
+		}
+    	     });
         });
         </script>
         <form id="backup" action='/export_backup'>
-			<p> Select backups to save : <br />
-			{% for entry in sections %}
-	        <input type="checkbox" name="sections" value="{{entry}}" checked="true">{{entry}} <br />
+			<p> Select backups to save : <br/> <br/>
+			Select all <input type="checkbox" id="selectall" checked="true"><br /><br/>
+			{% for entry in sections|sort %}
+	        <input type="checkbox" name="sections" class="checkbox1" value="{{entry}}" checked="true">{{entry}} <br />
 	        {% endfor %}
 			<p>
             <input type="hidden" name="start" value="true" />
@@ -50,8 +62,10 @@
     </table>
 
 <script>
+   
+
 //Refresh periode in seconds
-var refresh = 10;
+var refresh = 15;
 var done = false;
 function status(){
     $.getJSON("/status.json",  function(data) {
@@ -60,7 +74,7 @@ function status(){
             $('#table-design').append('<tr>');
             $('tbody').append('<td>'+val.server_name+'</td>');
             $('tbody').append('<td>'+val.backup_name+'</td>');
-            if(val.status == 'Running'){
+            if(val.status != 'OK'){
                 $('tbody').append('<td class=loading><img src="/static/images/loader.gif" width="15" height="15"/></td>');
                 done = false;
             }else{
@@ -71,7 +85,7 @@ function status(){
         });
     });
     if (done){
-        jAlert('Backup finished', 'TIS Backup');
+        bootbox.alert('Backup finished');
         window.clearInterval(timer);
     };
 };
