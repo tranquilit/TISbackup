@@ -43,12 +43,17 @@ class backup_xva(backup_generic):
     type = 'xen-xva'
 
     required_params = backup_generic.required_params + ['xcphost','password_file','server_name']
-    optional_params = backup_generic.optional_params + ['enable_https', 'halt_vm', 'verify_export', 'reuse_snapshot']
+    optional_params = backup_generic.optional_params + ['enable_https', 'halt_vm', 'verify_export', 'reuse_snapshot', 'ignore_proxies']
 
     enable_https = "no"
     halt_vm = "no"
     verify_export = "no"
     reuse_snapshot = "no"
+    ignore_proxies = "yes"
+    
+    if  str2bool(ignore_proxies) == True:
+        os.environ['http_proxy']=""
+        os.environ['https_proxy']=""
 
     def verify_export_xva(self,filename):
         self.logger.debug("[%s] Verify xva export integrity",self.server_name)
