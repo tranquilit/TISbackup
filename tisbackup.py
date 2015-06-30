@@ -246,13 +246,10 @@ class tis_backup:
         # before mindate, backup is too old
         mindate = datetime2isodate((datetime.datetime.now() - datetime.timedelta(hours=maxage_hours)))
         failed_backups = self.dbstat.query("""\
-      select distinct s.backup_name as bname,
-          (select max(backup_start) from stats where status="OK" and backup_name=s.backup_name) as lastok 
-      from stats s 
-      where 
-       (s.status<>"OK" and (s.backup_start>lastok or lastok is null)) 
-       or (s.backup_start=lastok and s.backup_start<=?)
-      order by s.backup_start desc""",(mindate,))
+        select   backup_name as bname,  max(backup_start)  
+        from stats    
+        where      not  status="OK"  and  backup_start>=?   
+        group by backup_name  """,(mindate,))
 
         defined_backups = map(lambda f:f.backup_name,self.backup_list)
         failed_backups_names = [b['bname'] for b in failed_backups if b['bname'] in defined_backups]

@@ -4,6 +4,7 @@
             $(document).ready(function() {
                 var oTable = $('#table-design').dataTable( {
                     "bProcessing": true,
+                     "pagingType": "full",
                     "sAjaxDataProp": "",
                     "sAjaxSource": "/backups.json",
                     "iDisplayLength": 25,
