@@ -34,7 +34,8 @@ import base64
 import socket
 from stat import *
 import ssl  
-ssl._create_default_https_context = ssl._create_unverified_context
+if hasattr(ssl, '_create_unverified_context'): 
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class copy_vm_xcp(backup_generic):
