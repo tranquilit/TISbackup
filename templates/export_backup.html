@@ -42,6 +42,12 @@
 			<p> Select backups to save : <br/> <br/>
 			Select all <input type="checkbox" id="selectall" checked="true"><br /><br/>
 			{% for entry in sections|sort %}
+			<div class="col-xs-6 col-md-4">
+	 <div class="form-group">
+		<div class="checkbox"><label><input type="checkbox"  class="checkbox1" value="{{entry}}"  checked>{{entry}}</label></div>
+		
+	   </div>
+	 </div>
 	        <input type="checkbox" name="sections" class="checkbox1" value="{{entry}}" checked="true">{{entry}} <br />
 	        {% endfor %}
 			<p>

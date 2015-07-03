@@ -30,18 +30,27 @@ from flask import request, Flask,  session, g, redirect, url_for, abort, render_
 from urlparse import urlparse
 import json
 import glob
-from uwsgidecorators import *
+import time
+from huey.api import Huey, create_task
+from huey.backends.sqlite_backend import SqliteQueue,SqliteDataStore
+
 from tisbackup import tis_backup
 import logging
 import re
 
 
-CONFIG = uwsgi.opt['config_tisbackup'].split(",")
+
+"""CONFIG = uwsgi.opt['config_tisbackup'].split(",")
 SECTIONS = uwsgi.opt['sections']
 ADMIN_EMAIL = uwsgi.opt.get('ADMIN_EMAIL',uwsgi.opt.get('admin_email'))
 spooler =  uwsgi.opt['spooler']
+"""
+CONFIG="/home/homes/ssamson/projects/tisbackup/configtest.ini".split(",")
+ADMIN_EMAIL="toot@test.fr"
+SECTIONS=''
 tisbackup_config_file= CONFIG[0]
 config_number=0
+
 
 cp = ConfigParser()
 cp.read(tisbackup_config_file)
@@ -53,6 +62,10 @@ info = None
 app = Flask(__name__)
 app.secret_key = 'fsiqefiuqsefARZ4Zfesfe34234dfzefzfe'
 app.config['PROPAGATE_EXCEPTIONS'] = True
+
+queue = SqliteQueue('tisbackups',os.path.join(tisbackup_root_dir,"tasks.sqlite"))
+result_store = SqliteDataStore('tisbackups',os.path.join(tisbackup_root_dir,"tasks.sqlite"))
+huey = Huey(queue,result_store)
 
 def read_config():
     config_file = CONFIG[config_number]
@@ -233,7 +246,7 @@ def check_mount_disk(partition_name, refresh):
 @app.route('/status.json')
 def export_backup_status():
     exports = dbstat.query('select * from stats where TYPE="EXPORT" and backup_start>="%s"' % mindate)
-    return jsonify(data=exports,finish= ( len(os.listdir(spooler)) == 0 ))
+    return jsonify(data=exports,finish=True)
 
 @app.route('/backups.json')
 def last_backup_json():
@@ -261,7 +274,7 @@ def export_backup():
             if section.count > 0:
                 sections.append(section[1])
 
-    noJobs = ( len(os.listdir(spooler)) == 0 ) 
+    noJobs = True
     if "start" in request.args.keys() or not noJobs:
         start=True
         if "sections" in request.args.keys():
@@ -291,13 +304,8 @@ def raise_error(strError, strInfo):
     error = strError
     info = strInfo
 
-def cleanup():
-    if os.path.isdir(spooler):
-        print "cleanup ", spooler
-        rmtree(spooler)
-    os.mkdir(spooler)
 
-@spool
+@huey.task()
 def run_export_backup(args):
     #Log
     logger = logging.getLogger('tisbackup')
@@ -323,9 +331,10 @@ def run_export_backup(args):
     os.system("/bin/umount %s" % mount_point)
     os.rmdir(mount_point)
 
-cleanup()
 
 if __name__ == "__main__":
     read_config()
-    app.debug=True
-    app.run(host='0.0.0.0',port=8000, debug=True)
+    from os import environ
+    if 'WINGDB_ACTIVE' in environ:
+        app.debug = False
+    app.run(use_reloader=True)

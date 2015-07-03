@@ -1,71 +1,106 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<div class="accordion" id="accordion2">
 
 {% if backup_list['rsync_ssh_list']|count != 0 %}
-    <h2 class="title">Rsync+ssh</h2>
-    <table id="table-design">
-	    <thead>
-	        <th>Server</th>
-	        <th>Backup</th>
-	        <th>Directory</th>
-        </thead>
-        </tbody>
-	        {% for entry in backup_list['rsync_ssh_list'] %}
-	        <tr>
-	            <td>{{ entry[0] }}</td>
-	            <td>{{ entry[1] }}</td>
-	            <td>{{ entry[3] }}</td>
-	        </tr>
-	        {% endfor %}
-        </tbody>
-    </table>
+
+  <div class="accordion-group">
+    <div class="accordion-heading">
+    	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse1"><h2 >Type: rsync+ssh</h2></a>
+    </div>
+    <div id="collapse1" class="accordion-body collapse in">
+      <div class="accordion-inner">
+	<table class="table table-bordered">
+	      <thead>
+		      <th>Server</th>
+		      <th>Backup</th>
+		      <th>Directory</th>
+	      </thead>
+	      </tbody>
+		      {% for entry in backup_list['rsync_ssh_list'] %}
+		      <tr>
+			  <td>{{ entry[0] }}</td>
+			  <td>{{ entry[1] }}</td>
+			  <td>{{ entry[3] }}</td>
+		      </tr>
+		      {% endfor %}
+	      </tbody>
+	  </table>
+
+      </div>
+    </div>
+  </div>
+
+
 {% endif %}
 
 {% if backup_list['rsync_btrfs_list']|count != 0 %}
-    <h2 class="title">rsync+btrfs+ssh</h2>
-    <table id="table-design">
-	    <thead>
-	        <th>Server</th>
-	        <th>Backup</th>
-	        <th>Directory</th>
-        </thead>
-        </tbody>
-	        {% for entry in backup_list['rsync_btrfs_list'] %}
-	        <tr>
-	            <td>{{ entry[0] }}</td>
-	            <td>{{ entry[1] }}</td>
-	            <td>{{ entry[3] }}</td>
-	        </tr>
-	        {% endfor %}
-        </tbody>
-    </table>
+ <div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse2"><h2 >Type: rsync+btrfs+ssh</h2></a>
+    </div>
+    <div id="collapse2" class="accordion-body collapse ">
+      <div class="accordion-inner">
+	<table class="table table-bordered">
+		<thead>
+		    <th>Server</th>
+		    <th>Backup</th>
+		    <th>Directory</th>
+	    </thead>
+	    </tbody>
+		    {% for entry in backup_list['rsync_btrfs_list'] %}
+		    <tr>
+			<td>{{ entry[0] }}</td>
+			<td>{{ entry[1] }}</td>
+			<td>{{ entry[3] }}</td>
+		    </tr>
+		    {% endfor %}
+	    </tbody>
+	</table>
+	</div>
+    </div>
+  </div>
+	
 {% endif %}
 
 {% if backup_list['rsync_list']|count != 0 %}
-    <h2 class="title">Rsync</h2>
-    <table id="table-design">
-	    <thead>
-	        <th>Server</th>
-	        <th>Backup</th>
-	        <th>Directory</th>
-        </thead>
-        </tbody>
-	        {% for entry in backup_list['rsync_list'] %}
-	        <tr>
-	            <td>{{ entry[0] }}</td>
-	            <td>{{ entry[1] }}</td>
-	            <td>{{ entry[3] }}</td>
-	        </tr>
-	        {% endfor %}
-        </tbody>
-    </table>
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse3"><h2>Type: rsync</h2></a>
+    </div>
+    <div id="collapse3" class="accordion-body collapse ">
+      <div class="accordion-inner">
+	<table class="table table-bordered">
+		<thead>
+		    <th>Server</th>
+		    <th>Backup</th>
+		    <th>Directory</th>
+	    </thead>
+	    </tbody>
+		    {% for entry in backup_list['rsync_list'] %}
+		    <tr>
+			<td>{{ entry[0] }}</td>
+			<td>{{ entry[1] }}</td>
+			<td>{{ entry[3] }}</td>
+		    </tr>
+		    {% endfor %}
+	    </tbody>
+	</table>
+     </div>
+  </div>
+</div>
 {% endif %}
 
 
 {% if backup_list['pgsql_list']|count != 0 %}
-    <h2 class="title">pgSQL</h2>
-    <table id="table-design">
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse4"><h2>Type: pgsql</h2></a>
+    </div>
+    <div id="collapse4" class="accordion-body collapse ">
+      <div class="accordion-inner">
+    <table class="table table-bordered">
 	    <thead>
 	        <th>Server</th>
 	        <th>Backup</th>
@@ -81,12 +116,20 @@
 	        {% endfor %}
         </tbody>
     </table>
+       </div>
+  </div>
+</div>
 {% endif %}
 
 
 {% if backup_list['mysql_list']|count != 0 %}
-    <h2 class="title">SQL Server</h2>
-    <table id="table-design">
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse5"><h2>Type: mysql</h2></a>
+    </div>
+    <div id="collapse5" class="accordion-body collapse ">
+      <div class="accordion-inner">
+    <table class="table table-bordered">
 	    <thead>
 	        <th>Server</th>
 	        <th>Backup</th>
@@ -102,11 +145,19 @@
 	        {% endfor %}
         </tbody>
     </table>
+        </div>
+  </div>
+</div>
 {% endif %}
 
 {% if backup_list['sqlserver_list']|count != 0 %}
-    <h2 class="title">SQL Server</h2>
-    <table id="table-design">
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse6"><h2>Type: SQLserver</h2></a>
+    </div>
+    <div id="collapse6" class="accordion-body collapse ">
+      <div class="accordion-inner">
+    <table class="table table-bordered">
 	    <thead>
 	        <th>Server</th>
 	        <th>Backup</th>
@@ -122,11 +173,19 @@
 	        {% endfor %}
         </tbody>
     </table>
+       </div>
+  </div>
+</div>
 {% endif %}
 
 {% if backup_list['xva_list']|count != 0 %}
-    <h2 class="title">XVA</h2>
-    <table id="table-design">
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse7"><h2>Type: Exports XVA</h2></a>
+    </div>
+    <div id="collapse7" class="accordion-body collapse ">
+      <div class="accordion-inner">
+    <table class="table table-bordered">
 	    <thead>
 	        <th>Server</th>
 	        <th>Backup</th>
@@ -140,11 +199,19 @@
 	        {% endfor %}
         </tbody>
     </table>
+       </div>
+  </div>
+</div>
 {% endif %}
 
 {% if backup_list['metadata_list']|count != 0 %}
-    <h2 class="title">XCP Metadata</h2>
-    <table id="table-design">
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse8"><h2>Type: XCP Metadata</h2></a>
+    </div>
+    <div id="collapse8" class="accordion-body collapse ">
+      <div class="accordion-inner">
+    <table class="table table-bordered">
         <thead>
             <th>Server</th>
             <th>Backup</th>
@@ -158,11 +225,19 @@
             {% endfor %}
         </tbody>
     </table>
+         </div>
+  </div>
+</div>
 {% endif %}
 
 {% if backup_list['switch_list']|count != 0 %}
-    <h2 class="title">Switchs</h2>
-    <table id="table-design">
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse9"><h2>Type: Switchs</h2></a>
+    </div>
+    <div id="collapse9" class="accordion-body collapse ">
+      <div class="accordion-inner">
+    <table class="table table-bordered">
         <thead>
             <th>Server</th>
             <th>Backup</th>
@@ -176,24 +251,12 @@
             {% endfor %}
         </tbody>
     </table>
+         </div>
+  </div>
+</div>
 {% endif %}
 
-{% if backup_list['null_list']|count != 0 %}
-    <h2 class="title">Null</h2>
-    <table id="table-design">
-	    <thead>
-	        <th>Server</th>
-	        <th>Backup</th>
-        </thead>
-        <tbody>
-	        {% for entry in backup_list['null_list'] %}
-	        <tr>
-	            <td>{{ entry[0] }}</td>
-	            <td>{{ entry[1] }}</td>
-	        </tr>
-	        {% endfor %}
-        </tbody>
-    </table>
-{% endif %}
+</div>
+
 
 {% endblock %}
