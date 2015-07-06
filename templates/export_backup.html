@@ -1,18 +1,25 @@
 
 {% extends "layout.html" %}
 {% block content %}
+    <script src="/static/js/bootbox.js"></script>
+
     <h2 class="title">Hard drive verifications:</h2>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         {% for message in messages %}
-          <h4>{{ message }} <img src="/static/images/check.png" width="15" height="15"/></h4>
+	<div class="alert alert-success fade in">
+	    <a href="#" class="close" data-dismiss="alert">&times;</a>
+		<strong>Success!</strong> {{ message }} 
+	</div>
+          
         {% endfor %}
       {% endif %}
     {% endwith %}
       {% if error %}
         <p>
-        <div class=error><img class="center-img" src='/static/images/important.gif' title="Notice" width="24" height="24"/> <strong>Error:</strong> {{ error }}</div>
-        <div class=info><img class="center-img" src='/static/images/info.gif' title="Notice" width="24" height="24"/> <strong>Notice:</strong> {{ info }}</div>
+        <div class="alert alert-danger fade in"><strong>Error</strong>:  {{ error }}</div>
+	<div class="alert alert-warning"><strong>Notice</strong>:  {{ info }}</div>
+	    
         <h4>Also, you can contact your <a href="mailto:{{ email }}?Subject=TISBACKUP%20Export"> System Administrator</a> for more details </h4>
         </p>
       {% elif not start %}
@@ -39,16 +46,14 @@
         });
         </script>
         <form id="backup" action='/export_backup'>
-			<p> Select backups to save : <br/> <br/>
-			Select all <input type="checkbox" id="selectall" checked="true"><br /><br/>
+			<p> Select backups to save : <br/> 
+				<div class="checkbox"><label><input type="checkbox"  class="checkbox1" id="selectall"  checked>Select all</label></div>		
 			{% for entry in sections|sort %}
 			<div class="col-xs-6 col-md-4">
-	 <div class="form-group">
-		<div class="checkbox"><label><input type="checkbox"  class="checkbox1" value="{{entry}}"  checked>{{entry}}</label></div>
-		
-	   </div>
-	 </div>
-	        <input type="checkbox" name="sections" class="checkbox1" value="{{entry}}" checked="true">{{entry}} <br />
+			    <div class="form-group">
+				<div class="checkbox"><label><input type="checkbox" name="sections" class="checkbox1" value="{{entry}}"  checked>{{entry}}</label></div>		
+			    </div>
+			</div>
 	        {% endfor %}
 			<p>
             <input type="hidden" name="start" value="true" />
@@ -57,7 +62,7 @@
         
     {% else %}
     <h2 class="title">Backups is running: </h2>
-    <table id="table-design">
+    <table id="table" class='table'>
         <thead>
             <th>Server</th>
             <th>Backup</th>
@@ -75,9 +80,9 @@ var refresh = 10;
 var done = false;
 function status(){
     $.getJSON("/status.json",  function(data) {
-        $("#table-design tbody").remove();
+        $("#table tbody").remove();
         $.each(data.data, function(key,val){
-            $('#table-design').append('<tr>');
+            $('#table').append('<tr>');
             $('tbody').append('<td>'+val.server_name+'</td>');
             $('tbody').append('<td>'+val.backup_name+'</td>');
             if(val.status != 'OK'){

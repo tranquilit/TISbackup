@@ -26,7 +26,7 @@ from shutil import *
 from iniparse import ConfigParser
 from libtisbackup.common import *
 import time 
-from flask import request, Flask,  session, g, redirect, url_for, abort, render_template, flash, jsonify, Response
+from flask import request, Flask,  session, g, appcontext_pushed, redirect, url_for, abort, render_template, flash, jsonify, Response
 from urlparse import urlparse
 import json
 import glob
@@ -39,15 +39,13 @@ import logging
 import re
 
 
+cp = ConfigParser()
+cp.read("/etc/tis/tisbackup_gui.ini")
 
-"""CONFIG = uwsgi.opt['config_tisbackup'].split(",")
-SECTIONS = uwsgi.opt['sections']
-ADMIN_EMAIL = uwsgi.opt.get('ADMIN_EMAIL',uwsgi.opt.get('admin_email'))
-spooler =  uwsgi.opt['spooler']
-"""
-CONFIG="/home/homes/ssamson/projects/tisbackup/configtest.ini".split(",")
-ADMIN_EMAIL="toot@test.fr"
-SECTIONS=''
+CONFIG = cp.get('uwsgi','config_tisbackup').split(",")
+SECTIONS = cp.get('uwsgi','sections')
+ADMIN_EMAIL = cp.get('uwsgi','ADMIN_EMAIL')
+
 tisbackup_config_file= CONFIG[0]
 config_number=0
 
@@ -63,9 +61,11 @@ app = Flask(__name__)
 app.secret_key = 'fsiqefiuqsefARZ4Zfesfe34234dfzefzfe'
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
-queue = SqliteQueue('tisbackups',os.path.join(tisbackup_root_dir,"tasks.sqlite"))
-result_store = SqliteDataStore('tisbackups',os.path.join(tisbackup_root_dir,"tasks.sqlite"))
-huey = Huey(queue,result_store)
+tasks_db = os.path.join(tisbackup_root_dir,"tasks.sqlite")
+queue = SqliteQueue('tisbackups',tasks_db)
+result_store = SqliteDataStore('tisbackups',tasks_db)
+huey = Huey(queue,result_store,always_eager=False)
+
 
 def read_config():
     config_file = CONFIG[config_number]
@@ -172,9 +172,8 @@ def check_usb_disk():
                 usb_disk_list += [ name ]
 
     if len(usb_disk_list) == 0:
-        raise_error("cannot find external usb disk", "You should plug the usb hard drive into the server")
+        raise_error("Cannot find any external usb disk", "You should plug the usb hard drive into the server")
         return ""
-
     print usb_disk_list
 
     usb_partition_list = []
@@ -187,7 +186,12 @@ def check_usb_disk():
         if '/devices/pci'  in  output:
             #flash("partition found: %s1" % usb_disk)
             usb_partition_list.append(usb_disk + "1")
+
     print usb_partition_list
+
+    if len(usb_partition_list) ==0:
+        raise_error("The dribe %s has no partition" % (usb_disk_list[0] ), "You should initialize the usb drive and format an ext4 partition with TISBACKUP label")
+        return ""    
 
     tisbackup_partition_list = []
     for usb_partition in usb_partition_list:
@@ -198,7 +202,7 @@ def check_usb_disk():
     print tisbackup_partition_list    
 
     if len(tisbackup_partition_list) ==0:
-        raise_error("No tisbackup partition exist on external disk", "You should initialize the usb drive and set TISBACKUP label on ext4 partition")
+        raise_error("No tisbackup partition exist on disk %s" % (usb_disk_list[0] ), "You should initialize the usb drive and format an ext4 partition with TISBACKUP label")
         return ""
 
     if  len(tisbackup_partition_list) > 1:
@@ -209,44 +213,53 @@ def check_usb_disk():
     return tisbackup_partition_list[0]
 
 
+def check_already_mount(partition_name):
+    with  open('/proc/mounts') as f:
+        mount_point = ""
+        for line in f.readlines():
+            if line.startswith(partition_name):
+                mount_point = line.split(' ')[1]     
+                run_command("/bin/umount %s" % mount_point)
+                os.rmdir(mount_point)                   
 
-def check_mount_disk(partition_name, refresh):
+def run_command(cmd, info=""):
+    flash("Executing: %s"% cmd)
+    from subprocess import CalledProcessError, check_output  
+    result =""
+    try:
+        result = check_output(cmd, stderr=subprocess.STDOUT,shell=True)
+    except CalledProcessError as e:
+        raise_error(result,info)
+    return result
 
-    flash("check if disk is mounted")
-
-
-    already_mounted=False
-    f = open('/proc/mounts')
-    lines = f.readlines()
-    mount_point = ""
-    for line in lines:
-        if line.startswith(partition_name):
-            already_mounted = True
-            mount_point = line.split(' ')[1]
-            break
-    f.close()
-
+def check_mount_disk(partition_name, refresh):       
     if not refresh:
-        if already_mounted == True:
-            os.system("/bin/umount %s" % mount_point)
-            os.rmdir(mount_point)
+        check_already_mount(partition_name)
+                                    
 
-        mount_point = "/mnt/" + str(time.time())
+        mount_point = "/mnt/TISBACKUP-" +str(time.time())
         os.mkdir(mount_point)
         flash("must mount " + partition_name )
         cmd = "mount %s %s" % (partition_name, mount_point)
-        flash("executing : " + cmd)
-        result  = os.popen(cmd+" 2>&1").read()
-        if len(result) > 1:
-            raise_error(result, "You should manualy mount the usb drive")
-            return ""
+        if run_command(cmd,"You should manualy mount the usb drive") != "":            
+            flash("Remove directory: %s" % mount_point)
+            os.rmdir(mount_point)   
+            return ""        
 
     return mount_point
 
 @app.route('/status.json')
 def export_backup_status():
     exports = dbstat.query('select * from stats where TYPE="EXPORT" and backup_start>="%s"' % mindate)
-    return jsonify(data=exports,finish=True)
+    return jsonify(data=exports,finish=(not runnings_backups()))
+
+def runnings_backups():
+    conn = sqlite3.connect(tasks_db)
+    c = conn.cursor()    
+    c.execute('SELECT count(*) FROM huey_queue_tisbackups')
+    count = c.fetchall()[0][0]
+    conn.close()     
+    return ( int(count) > 0  ) 
 
 @app.route('/backups.json')
 def last_backup_json():
@@ -264,9 +277,11 @@ def last_backup():
 
 @app.route('/export_backup')
 def export_backup():
+    
     raise_error("", "")
     backup_dict = read_config()
     sections = []
+    backup_sections = []
     for  backup_types in backup_dict:
         if backup_types == "null_list":
             continue
@@ -274,11 +289,12 @@ def export_backup():
             if section.count > 0:
                 sections.append(section[1])
 
-    noJobs = True
+    noJobs = (not runnings_backups())
     if "start" in request.args.keys() or not noJobs:
         start=True
         if "sections" in request.args.keys():
             backup_sections = request.args.getlist('sections')
+        
 
     else:
         start=False
@@ -294,8 +310,11 @@ def export_backup():
         global mindate 
         mindate =  datetime2isodate(datetime.datetime.now())
         if not error and start:
-            run_export_backup.spool(base=backup_base_dir, config_file=tisbackup_config_file, mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections]))
+            run_export_backup(base=backup_base_dir, config_file=tisbackup_config_file, mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections]))
+   
+            
 
+            
     return render_template("export_backup.html", error=error, start=start, info=info, email=ADMIN_EMAIL, sections=sections)
 
 
@@ -306,7 +325,7 @@ def raise_error(strError, strInfo):
 
 
 @huey.task()
-def run_export_backup(args):
+def run_export_backup(base, config_file, mount_point, backup_sections):
     #Log
     logger = logging.getLogger('tisbackup')
     logger.setLevel(logging.INFO)
@@ -318,18 +337,18 @@ def run_export_backup(args):
     # Main
     logger.info("Running export....")
 
-    if args['backup_sections']:
-        backup_sections = args['backup_sections'].split(",")
+    if backup_sections:
+        backup_sections = backup_sections.split(",")
     else:
         backup_sections = []
-
-    backup = tis_backup(dry_run=False,verbose=True,backup_base_dir=args['base'])
-    backup.read_ini_file(args['config_file'])
-    mount_point = args['mount_point']
+    backup = tis_backup(dry_run=False,verbose=True,backup_base_dir=base)
+    backup.read_ini_file(config_file)
+    mount_point = mount_point
     backup.export_backups(backup_sections,mount_point)
 
     os.system("/bin/umount %s" % mount_point)
     os.rmdir(mount_point)
+    
 
 
 if __name__ == "__main__":
