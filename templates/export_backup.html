@@ -76,8 +76,9 @@
    
 
 //Refresh periode in seconds
-var refresh = 10;
+var refresh = 5;
 var done = false;
+var error = "";
 function status(){
     $.getJSON("/status.json",  function(data) {
         $("#table tbody").remove();
@@ -95,10 +96,15 @@ function status(){
             }
             $('#table-design').append('</tr>');
         });
+	error = data.error;
     });
     if (done){
         bootbox.alert('Backup finished');
         window.clearInterval(timer);
+    };
+    if( error  != ""){
+	window.clearInterval(timer);
+	bootbox.alert("Error: " + error);
     };
 };
 var timer = window.setInterval(function(){

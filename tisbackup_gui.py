@@ -31,8 +31,9 @@ from urlparse import urlparse
 import json
 import glob
 import time
-from huey.api import Huey, create_task
-from huey.backends.sqlite_backend import SqliteQueue,SqliteDataStore
+
+from config import huey 
+from tasks import run_export_backup, get_task, set_task
 
 from tisbackup import tis_backup
 import logging
@@ -62,9 +63,7 @@ app.secret_key = 'fsiqefiuqsefARZ4Zfesfe34234dfzefzfe'
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
 tasks_db = os.path.join(tisbackup_root_dir,"tasks.sqlite")
-queue = SqliteQueue('tisbackups',tasks_db)
-result_store = SqliteDataStore('tisbackups',tasks_db)
-huey = Huey(queue,result_store,always_eager=False)
+
 
 
 def read_config():
@@ -213,14 +212,16 @@ def check_usb_disk():
     return tisbackup_partition_list[0]
 
 
-def check_already_mount(partition_name):
+def check_already_mount(partition_name,refresh):
     with  open('/proc/mounts') as f:
         mount_point = ""
         for line in f.readlines():
             if line.startswith(partition_name):
                 mount_point = line.split(' ')[1]     
-                run_command("/bin/umount %s" % mount_point)
-                os.rmdir(mount_point)                   
+		if not refresh:
+	            run_command("/bin/umount %s" % mount_point)
+        	    os.rmdir(mount_point)                   
+    return mount_point
 
 def run_command(cmd, info=""):
     flash("Executing: %s"% cmd)
@@ -233,8 +234,9 @@ def run_command(cmd, info=""):
     return result
 
 def check_mount_disk(partition_name, refresh):       
+    
+    mount_point =  check_already_mount(partition_name, refresh)
     if not refresh:
-        check_already_mount(partition_name)
                                     
 
         mount_point = "/mnt/TISBACKUP-" +str(time.time())
@@ -251,15 +253,22 @@ def check_mount_disk(partition_name, refresh):
 @app.route('/status.json')
 def export_backup_status():
     exports = dbstat.query('select * from stats where TYPE="EXPORT" and backup_start>="%s"' % mindate)
-    return jsonify(data=exports,finish=(not runnings_backups()))
+    error = ""
+    finish=not runnings_backups()
+    if  get_task() != None and finish:
+        status = get_task().get()
+        if status != "ok":
+            error = "Export failing with error: "+status
+
+    
+    return jsonify(data=exports,finish=finish,error=error)
 
 def runnings_backups():
-    conn = sqlite3.connect(tasks_db)
-    c = conn.cursor()    
-    c.execute('SELECT count(*) FROM huey_queue_tisbackups')
-    count = c.fetchall()[0][0]
-    conn.close()     
-    return ( int(count) > 0  ) 
+    task  = get_task()
+    is_runnig = (task != None)
+    finish = ( is_runnig and task.get() != None)
+    return is_runnig and not finish
+
 
 @app.route('/backups.json')
 def last_backup_json():
@@ -310,10 +319,9 @@ def export_backup():
         global mindate 
         mindate =  datetime2isodate(datetime.datetime.now())
         if not error and start:
-            run_export_backup(base=backup_base_dir, config_file=tisbackup_config_file, mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections]))
-   
-            
-
+            task = run_export_backup(base=backup_base_dir, config_file=tisbackup_config_file, mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections])) 
+	    set_task(task)
+		
             
     return render_template("export_backup.html", error=error, start=start, info=info, email=ADMIN_EMAIL, sections=sections)
 
@@ -324,36 +332,9 @@ def raise_error(strError, strInfo):
     info = strInfo
 
 
-@huey.task()
-def run_export_backup(base, config_file, mount_point, backup_sections):
-    #Log
-    logger = logging.getLogger('tisbackup')
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-    # Main
-    logger.info("Running export....")
-
-    if backup_sections:
-        backup_sections = backup_sections.split(",")
-    else:
-        backup_sections = []
-    backup = tis_backup(dry_run=False,verbose=True,backup_base_dir=base)
-    backup.read_ini_file(config_file)
-    mount_point = mount_point
-    backup.export_backups(backup_sections,mount_point)
-
-    os.system("/bin/umount %s" % mount_point)
-    os.rmdir(mount_point)
-    
-
-
-if __name__ == "__main__":
+if __name__ == "__main__":    
     read_config()
     from os import environ
     if 'WINGDB_ACTIVE' in environ:
         app.debug = False
-    app.run(use_reloader=True)
+    app.run(host= '0.0.0.0',port=8080)
