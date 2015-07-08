@@ -43,9 +43,9 @@ import re
 cp = ConfigParser()
 cp.read("/etc/tis/tisbackup_gui.ini")
 
-CONFIG = cp.get('uwsgi','config_tisbackup').split(",")
-SECTIONS = cp.get('uwsgi','sections')
-ADMIN_EMAIL = cp.get('uwsgi','ADMIN_EMAIL')
+CONFIG = cp.get('general','config_tisbackup').split(",")
+SECTIONS = cp.get('general','sections')
+ADMIN_EMAIL = cp.get('general','ADMIN_EMAIL')
 
 tisbackup_config_file= CONFIG[0]
 config_number=0
