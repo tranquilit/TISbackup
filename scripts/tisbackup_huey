@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 dir="/opt/tisbackup/"
-cmd="python tisbackup_gui.py"
+cmd="huey_consumer.py -n tisbackup_gui.huey"
 user="root"
 
 name=`basename $0`
