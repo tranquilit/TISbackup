@@ -15,8 +15,7 @@ user="root"
 
 name=`basename $0`
 pid_file="/var/run/$name.pid"
-stdout_log="/var/log/$name.log"
-stderr_log="/var/log/$name.err"
+logfile="/var/log/$name.log"
 
 get_pid() {
     cat "$pid_file"
@@ -34,13 +33,13 @@ case "$1" in
         echo "Starting $name"
         cd "$dir"
         if [ -z "$user" ]; then
-            sudo $cmd >> "$stdout_log" 2>> "$stderr_log" &
+            sudo $cmd >> "$logfile" 2>&1 &
         else
-            sudo -u "$user" $cmd >> "$stdout_log" 2>> "$stderr_log" &
+            sudo -u "$user" $cmd >> "$logfile" 2>&1 &
         fi
         echo $! > "$pid_file"
         if ! is_running; then
-            echo "Unable to start, see $stdout_log and $stderr_log"
+            echo "Unable to start, see $logfile"
             exit 1
         fi
     fi
