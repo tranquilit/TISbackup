@@ -319,7 +319,8 @@ def export_backup():
         global mindate 
         mindate =  datetime2isodate(datetime.datetime.now())
         if not error and start:
-            task = run_export_backup(base=backup_base_dir, config_file=tisbackup_config_file, mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections])) 
+	    print tisbackup_config_file
+            task = run_export_backup(base=backup_base_dir, config_file=CONFIG[config_number], mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections])) 
 	    set_task(task)
 		
             

@@ -47,6 +47,7 @@
         </script>
         <form id="backup" action='/export_backup'>
 			<p> Select backups to save : <br/> 
+	    <div class="row">
 				<div class="checkbox"><label><input type="checkbox"  class="checkbox1" id="selectall"  checked>Select all</label></div>		
 			{% for entry in sections|sort %}
 			<div class="col-xs-6 col-md-4">
@@ -55,9 +56,14 @@
 			    </div>
 			</div>
 	        {% endfor %}
-			<p>
-            <input type="hidden" name="start" value="true" />
-            <input type="button" id="confirm_button" value="Launch Backup" style="margin-left: 400px;"  />
+	    </div>
+	    <div class="row">
+		    <div class="col-sm-offset-5 col-sm-2 text-center ">
+	              <input type="hidden" name="start" value="true" />
+ 		      <input type="button" id="confirm_button" value="Launch Backup" class="btn btn-primary btn-lg"  />
+		 </div>
+	    </div>
+
         </form>
         
     {% else %}
