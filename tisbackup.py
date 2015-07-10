@@ -37,7 +37,7 @@ from libtisbackup.backup_rsync_btrfs import backup_rsync__btrfs_ssh
 from libtisbackup.backup_pgsql import backup_pgsql
 from libtisbackup.backup_xva import backup_xva
 from libtisbackup.backup_vmdk import backup_vmdk
-#from libtisbackup.backup_switch import backup_switch
+from libtisbackup.backup_switch import backup_switch
 from libtisbackup.backup_null import backup_null
 from libtisbackup.backup_xcp_metadata import backup_xcp_metadata
 from libtisbackup.copy_vm_xcp import copy_vm_xcp
