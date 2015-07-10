@@ -129,7 +129,7 @@ def read_config():
             db_name = row['db_name']
             backup_dict['pgsql_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "mysql+ssh":
-            db_name = row['db_name']
+            db_name = row.get('db_name', '*')
             backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "sqlserver+ssh":
             db_name = row['db_name']
