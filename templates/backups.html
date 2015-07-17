@@ -256,6 +256,35 @@
 </div>
 {% endif %}
 
+
+{% if backup_list['oracle_list']|count != 0 %}
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse10"><h2>Type: Oracle serveurs</h2></a>
+    </div>
+    <div id="collapse10" class="accordion-body collapse ">
+      <div class="accordion-inner">
+    <table class="table table-bordered">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+	        <th>Database</th>
+        </thead>
+        <tbody>
+	        {% for entry in backup_list['oracle_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	            <td>{{ entry[3] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+         </div>
+  </div>
+</div>
+{% endif %}
+
 </div>
 
 

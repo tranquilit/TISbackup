@@ -108,6 +108,7 @@ def read_config():
     backup_dict['xva_list'] = []
     backup_dict['metadata_list'] = []
     backup_dict['switch_list'] = []
+    backup_dict['oracle_list'] = []
     for row in result:
         backup_name = row['backup_name']
         server_name = row['server_name']
@@ -134,6 +135,9 @@ def read_config():
         if backup_type == "sqlserver+ssh":
             db_name = row['db_name']
             backup_dict['sqlserver_list'].append([server_name, backup_name, backup_type, db_name])
+        if backup_type == "oracle+ssh":
+	    db_name = row['db_name']
+	    backup_dict['oracle_list'].append([server_name, backup_name, backup_type, db_name])	    
         if backup_type == "xen-xva":
             backup_dict['xva_list'].append([server_name, backup_name, backup_type, ""])
         if backup_type == "switch":

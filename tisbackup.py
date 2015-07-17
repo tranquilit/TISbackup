@@ -32,6 +32,7 @@ from libtisbackup.common import *
 from libtisbackup.backup_mysql import backup_mysql 
 from libtisbackup.backup_rsync import backup_rsync
 from libtisbackup.backup_rsync import backup_rsync_ssh
+from libtisbackup.backup_oracle import backup_oracle
 from libtisbackup.backup_rsync_btrfs import backup_rsync_btrfs
 from libtisbackup.backup_rsync_btrfs import backup_rsync__btrfs_ssh
 from libtisbackup.backup_pgsql import backup_pgsql
