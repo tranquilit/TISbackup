@@ -61,7 +61,13 @@ class backup_oracle(backup_generic):
         dumplog = self.remote_backup_dir + '/' + self.db_name + '_' + self.backup_start_date+'.log'
 
         self.dest_dir = os.path.join(self.backup_dir,self.backup_start_date)
-        
+        if not os.path.isdir(self.dest_dir):
+            if not self.dry_run:
+                os.makedirs(self.dest_dir)
+            else:
+                print 'mkdir "%s"' % self.dest_dir
+        else:
+            raise Exception('backup destination directory already exists : %s' % self.dest_dir)        
         # dump db
         stats['status']='Dumping'
         cmd = "exp '%s'  file='%s' grants=y log='%s'"% (self.userid,dumpfile, dumplog) 
