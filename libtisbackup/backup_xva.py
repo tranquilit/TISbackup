@@ -45,13 +45,14 @@ class backup_xva(backup_generic):
     type = 'xen-xva'
 
     required_params = backup_generic.required_params + ['xcphost','password_file','server_name']
-    optional_params = backup_generic.optional_params + ['enable_https', 'halt_vm', 'verify_export', 'reuse_snapshot', 'ignore_proxies']
+    optional_params = backup_generic.optional_params + ['enable_https', 'halt_vm', 'verify_export', 'reuse_snapshot', 'ignore_proxies', 'use_compression' ]
 
     enable_https = "no"
     halt_vm = "no"
     verify_export = "no"
     reuse_snapshot = "no"
     ignore_proxies = "yes"
+    use_compression = "true"
     
     if  str2bool(ignore_proxies) == True:
         os.environ['http_proxy']=""
@@ -150,8 +151,8 @@ class backup_xva(backup_generic):
                 scheme = "http://"
                 if str2bool(enable_https) == True:
                     scheme = "https://"
-                url = scheme+user_xen+":"+password_xen+"@"+self.xcphost+"/export?uuid="+session.xenapi.VM.get_uuid(vm)
-
+                url = scheme+user_xen+":"+password_xen+"@"+self.xcphost+"/export?use_compression="+self.use_compression+"&uuid="+session.xenapi.VM.get_uuid(vm)
+               
                 urllib.urlretrieve(url, filename_temp)
                 urllib.urlcleanup()
 
