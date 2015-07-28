@@ -162,7 +162,7 @@ def set_config_number(id=None):
 @app.route('/json')
 def backup_json():
     backup_dict = read_config()
-    return json.dumps(backup_dict['rsync_list']+backup_dict['sqlserver+ssh']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+  backup_dict['switch_list'])
+    return json.dumps(backup_dict['rsync_list']+backup_dict['sqlserver_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+  backup_dict['switch_list'])
 
 
 def check_usb_disk():
