@@ -38,9 +38,12 @@ from stat import *
 class backup_switch(backup_generic):
     """Backup a startup-config on a switch"""
     type = 'switch'
-    
-    required_params = backup_generic.required_params + ['switch_ip','switch_user' , 'switch_type']
-    optional_params = backup_generic.optional_params + ['switch_password']
+
+    required_params = backup_generic.required_params + ['switch_ip','switch_type']
+    optional_params = backup_generic.optional_params + [ 'switch_user', 'switch_password']
+
+    switch_user = ''
+    switch_password = ''
 
     def switch_hp(self, filename):
 
@@ -77,6 +80,46 @@ class backup_switch(backup_generic):
         for line in lines.split("\n")[1:-1]:
             open(filename,"a").write(line.strip()+"\n")
 
+    def switch_cisco(self, filename):
+        s = socket.socket()
+        try:
+            s.connect((self.switch_ip, 23))
+            s.close()
+        except:
+            raise
+
+        child=pexpect.spawn('telnet '+self.switch_ip)
+        time.sleep(1)
+        if self.switch_user:
+            child.sendline(self.switch_user)
+        child.expect('Password: ')
+        child.sendline(self.switch_password+'\r')
+        try:
+            child.expect(">")
+        except:
+            raise Exception("Bad Credentials")
+        child.sendline('enable\r')
+        child.expect('Password: ')
+        child.sendline(self.switch_password+'\r')
+        try:
+            child.expect("#")
+        except:
+            raise Exception("Bad Credentials")
+        child.sendline( "terminal length 0\r")
+        child.expect("#")
+        child.sendline("show run\r")
+        child.expect('Building configuration...')
+        child.expect("#")
+        running_config = child.before
+        child.sendline("show vlan\r")
+        child.expect('VLAN')
+        child.expect("#")
+        vlan = 'VLAN'+child.before
+        open(filename,"a").write(running_config+'\n'+vlan)
+        child.send('exit\r')
+        child.close()
+
+
     def switch_linksys_SRW2024(self, filename):
         s = socket.socket()
         try:
@@ -84,7 +127,7 @@ class backup_switch(backup_generic):
             s.close()
         except:
             raise
-            
+
         child=pexpect.spawn('telnet '+self.switch_ip)
         time.sleep(1)
         if hasattr(self,'switch_password'):
@@ -101,9 +144,9 @@ class backup_switch(backup_generic):
         child.sendline('lcli')
         child.expect("Name:")
         if hasattr(self,'switch_password'):
-            child.send(self.switch_user+'\r'+self.switch_password+'\r')  
+            child.send(self.switch_user+'\r'+self.switch_password+'\r')
         else:
-            child.sendline(self.switch_user)  
+            child.sendline(self.switch_user)
         child.expect(".*#")
 	child.sendline( "terminal datadump")
 	child.expect("#")
@@ -114,10 +157,10 @@ class backup_switch(backup_generic):
             raise Exception("Bad Credentials")
         child.sendline("exit")
         child.expect( ">")
-        child.sendline("logout")        
+        child.sendline("logout")
         for line in lines.split("\n")[1:-1]:
             open(filename,"a").write(line.strip()+"\n")
-        
+
 
     def switch_dlink_DGS1210(self, filename):
         login_data = urllib.urlencode({'Login' : self.switch_user, 'Password' : self.switch_password, 'currlang' : 0, 'BrowsingPage' : 'index_dlink.htm', 'changlang' : 0})
@@ -133,12 +176,15 @@ class backup_switch(backup_generic):
     def do_backup(self,stats):
         try:
             dest_filename = os.path.join(self.backup_dir,"%s-%s" % (self.backup_name,self.backup_start_date))
-            
-            options = []               
+
+            options = []
             options_params = " ".join(options)
             if "LINKSYS-SRW2024" == self.switch_type:
                 dest_filename += '.txt'
-                self.switch_linksys_SRW2024(dest_filename) 
+                self.switch_linksys_SRW2024(dest_filename)
+            elif self.switch_type in [ "CISCO", ]:
+                dest_filename += '.txt'
+                self.switch_cisco(dest_filename)
             elif self.switch_type in [ "HP-PROCURVE-4104GL", "HP-PROCURVE-2524" ]:
                 dest_filename += '.txt'
                 self.switch_hp(dest_filename)
@@ -147,7 +193,7 @@ class backup_switch(backup_generic):
                 self.switch_dlink_DGS1210(dest_filename)
             else:
                 raise Exception("Unknown Switch type")
-            
+
             stats['total_files_count']=1
             stats['written_files_count']=1
             stats['total_bytes']= os.stat(dest_filename).st_size
@@ -155,7 +201,7 @@ class backup_switch(backup_generic):
             stats['backup_location'] = dest_filename
             stats['status']='OK'
             stats['log']='Switch backup from %s OK, %d bytes written' % (self.server_name,stats['written_bytes'])
-                
+
 
         except BaseException , e:
             stats['status']='ERROR'
