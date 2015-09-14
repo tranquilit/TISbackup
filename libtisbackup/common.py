@@ -296,7 +296,7 @@ class BackupStat:
             self.db=sqlite3.connect(self.dbpath)
             self.initdb()
         else:
-            self.db=sqlite3.connect(self.dbpath) 
+            self.db=sqlite3.connect(self.dbpath,check_same_thread=False) 
             if not "'TYPE'" in str(self.db.execute("select * from stats").description):
                 self.updatedb()
                  

@@ -37,6 +37,8 @@ class backup_null(backup_generic):
         pass
     def cleanup_backup(self):
         pass
+    def register_existingbackups(self):
+        pass
     def export_latestbackup(self,destdir):
         return {}
     def checknagios(self,maxage_hours=30):

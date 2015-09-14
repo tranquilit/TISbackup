@@ -33,6 +33,9 @@ import urllib2
 import base64
 import socket
 from stat import *
+import ssl  
+if hasattr(ssl, '_create_unverified_context'): 
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class copy_vm_xcp(backup_generic):
@@ -40,10 +43,11 @@ class copy_vm_xcp(backup_generic):
     type = 'copy-vm-xcp'
 
     required_params = backup_generic.required_params + ['server_name','storage_name','password_file','vm_name','network_name']
-    optional_params = backup_generic.optional_params + ['start_vm','max_copies', 'delete_snapshot']
+    optional_params = backup_generic.optional_params + ['start_vm','max_copies', 'delete_snapshot', 'halt_vm']
     
     start_vm = "no"
     max_copies = 1
+    halt_vm = "no"    
     delete_snapshot = "yes"
     
     def read_config(self,iniconf):
@@ -89,18 +93,29 @@ class copy_vm_xcp(backup_generic):
                 result = (1,"error get VM opaqueref %s"%(error))
                 return result
             
-            #do the snapshot    
-            self.logger.debug("[%s] Snapshot in progress",self.backup_name)
-            try:
-                snapshot = session.xenapi.VM.snapshot(vm,"tisbackup-%s"%(vm_name))
-            except XenAPI.Failure, error:
-                result = (1,"error when snapshot %s"%(error))
-                return result
+            if str2bool(self.halt_vm):
+                status_vm = session.xenapi.VM.get_power_state(vm)                
+                self.logger.debug("[%s] Status of VM: %s",self.backup_name,status_vm)
+                if status_vm == "Running":
+                    self.logger.debug("[%s] Shudown in progress",self.backup_name)
+                    if dry_run:
+                        print "session.xenapi.VM.clean_shutdown(vm)" 
+                    else:
+                        session.xenapi.VM.clean_shutdown(vm)     
+                snapshot = vm
+            else:
+                #do the snapshot    
+                self.logger.debug("[%s] Snapshot in progress",self.backup_name)
+                try:
+                    snapshot = session.xenapi.VM.snapshot(vm,"tisbackup-%s"%(vm_name))
+                except XenAPI.Failure, error:
+                    result = (1,"error when snapshot %s"%(error))
+                    return result
             
             
-            #get snapshot opaqueRef    
-            snapshot = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vm_name))[0]
-            session.xenapi.VM.set_name_description(snapshot,"snapshot created by tisbackup on : %s"%(now.strftime("%Y-%m-%d %H:%M")))
+                #get snapshot opaqueRef    
+                snapshot = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vm_name))[0]
+                session.xenapi.VM.set_name_description(snapshot,"snapshot created by tisbackup on : %s"%(now.strftime("%Y-%m-%d %H:%M")))
             
             
             
@@ -215,20 +230,28 @@ class copy_vm_xcp(backup_generic):
             if self.delete_snapshot == 'no':
                 return result
 
-            #delete the snapshot
-            try:
-                for vbd in session.xenapi.VM.get_VBDs(snapshot):
-                    if session.xenapi.VBD.get_type(vbd) == 'CD' and session.xenapi.VBD.get_record(vbd)['empty'] == False:
-                        session.xenapi.VBD.eject(vbd)
+            if not str2bool(self.halt_vm):
+                #delete the snapshot
+                try:
+                    for vbd in session.xenapi.VM.get_VBDs(snapshot):
+                        if session.xenapi.VBD.get_type(vbd) == 'CD' and session.xenapi.VBD.get_record(vbd)['empty'] == False:
+                            session.xenapi.VBD.eject(vbd)
+                        else:
+                            vdi = session.xenapi.VBD.get_VDI(vbd)
+                            if not 'NULL' in  vdi:
+                                session.xenapi.VDI.destroy(vdi)
+                    session.xenapi.VM.destroy(snapshot)
+                except XenAPI.Failure, error:
+                    result = (1,"error when destroy snapshot %s"%(error))
+                    return result
+            else:
+                if status_vm == "Running":
+                    self.logger.debug("[%s] Starting in progress",self.backup_name)
+                    if dry_run:
+                        print "session.xenapi.VM.start(vm,False,True)" 
                     else:
-                        vdi = session.xenapi.VBD.get_VDI(vbd)
-                        if not 'NULL' in  vdi:
-                            session.xenapi.VDI.destroy(vdi)
-                session.xenapi.VM.destroy(snapshot)
-            except XenAPI.Failure, error:
-                result = (1,"error when destroy snapshot %s"%(error))
-                return result
-            
+                        session.xenapi.VM.start(vm,False,True)
+                
             return result
         
         

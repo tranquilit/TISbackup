@@ -1,6 +1,6 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:tisbackup_gui
+# Provides:tisbackup_huey
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 dir="/opt/tisbackup/"
-cmd="python tisbackup_gui.py"
+cmd="huey_consumer.py -n tisbackup_gui.huey"
 user="root"
 
 name=`basename $0`

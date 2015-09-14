@@ -1,45 +1,74 @@
 
 {% extends "layout.html" %}
 {% block content %}
+    <script src="/static/js/bootbox.js"></script>
+
     <h2 class="title">Hard drive verifications:</h2>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         {% for message in messages %}
-          <h4>{{ message }} <img src="/static/images/check.png" width="15" height="15"/></h4>
+	<div class="alert alert-success fade in">
+	    <a href="#" class="close" data-dismiss="alert">&times;</a>
+		<strong>Success!</strong> {{ message }} 
+	</div>
+          
         {% endfor %}
       {% endif %}
     {% endwith %}
       {% if error %}
         <p>
-        <div class=error><img class="center-img" src='/static/images/important.gif' title="Notice" width="24" height="24"/> <strong>Error:</strong> {{ error }}</div>
-        <div class=info><img class="center-img" src='/static/images/info.gif' title="Notice" width="24" height="24"/> <strong>Notice:</strong> {{ info }}</div>
+        <div class="alert alert-danger fade in"><strong>Error</strong>:  {{ error }}</div>
+	<div class="alert alert-warning"><strong>Notice</strong>:  {{ info }}</div>
+	    
         <h4>Also, you can contact your <a href="mailto:{{ email }}?Subject=TISBACKUP%20Export"> System Administrator</a> for more details </h4>
         </p>
       {% elif not start %}
         <script>
         $(document).ready( function() {
             $("#confirm_button").click( function() {
-                jConfirm('Do you want to proced backup now ?', 'Confirmation Dialog', function(r) {
+                bootbox.confirm('Do you want to proced backup now ?',  function(r) {
                     if(r == true ){
                         $("#backup").submit();
                     };
                 });
             }); 
+	    $('#selectall').click(function(event) {  //on click
+		if(this.checked) { // check select status
+		    $('.checkbox1').each(function() { //loop through each checkbox
+			this.checked = true;  //select all checkboxes with class "checkbox1"              
+		    });
+		}else{
+		    $('.checkbox1').each(function() { //loop through each checkbox
+			this.checked = false; //deselect all checkboxes with class "checkbox1"                      
+		    });        
+		}
+    	     });
         });
         </script>
         <form id="backup" action='/export_backup'>
-			<p> Select backups to save : <br />
-			{% for entry in sections %}
-	        <input type="checkbox" name="sections" value="{{entry}}" checked="true">{{entry}} <br />
+			<p> Select backups to save : <br/> 
+	    <div class="row">
+				<div class="checkbox"><label><input type="checkbox"  class="checkbox1" id="selectall"  checked>Select all</label></div>		
+			{% for entry in sections|sort %}
+			<div class="col-xs-6 col-md-4">
+			    <div class="form-group">
+				<div class="checkbox"><label><input type="checkbox" name="sections" class="checkbox1" value="{{entry}}"  checked>{{entry}}</label></div>		
+			    </div>
+			</div>
 	        {% endfor %}
-			<p>
-            <input type="hidden" name="start" value="true" />
-            <input type="button" id="confirm_button" value="Launch Backup" style="margin-left: 400px;"  />
+	    </div>
+	    <div class="row">
+		    <div class="col-sm-offset-5 col-sm-2 text-center ">
+	              <input type="hidden" name="start" value="true" />
+ 		      <input type="button" id="confirm_button" value="Launch Backup" class="btn btn-primary btn-lg"  />
+		 </div>
+	    </div>
+
         </form>
         
     {% else %}
     <h2 class="title">Backups is running: </h2>
-    <table id="table-design">
+    <table id="table" class='table'>
         <thead>
             <th>Server</th>
             <th>Backup</th>
@@ -50,29 +79,38 @@
     </table>
 
 <script>
+   
+
 //Refresh periode in seconds
-var refresh = 10;
+var refresh = 5;
 var done = false;
+var error = "";
 function status(){
     $.getJSON("/status.json",  function(data) {
-        $("#table-design tbody").remove();
+        $("#table tbody").remove();
         $.each(data.data, function(key,val){
-            $('#table-design').append('<tr>');
+            $('#table').append('<tr>');
             $('tbody').append('<td>'+val.server_name+'</td>');
             $('tbody').append('<td>'+val.backup_name+'</td>');
-            if(val.status == 'Running'){
+            if(val.status != 'OK'){
                 $('tbody').append('<td class=loading><img src="/static/images/loader.gif" width="15" height="15"/></td>');
                 done = false;
             }else{
                 $('tbody').append('<td>'+val.status+'</td>');
-                done = true;
+		
+                done = data.finish;
             }
             $('#table-design').append('</tr>');
         });
+	error = data.error;
     });
     if (done){
-        jAlert('Backup finished', 'TIS Backup');
+        bootbox.alert('Backup finished');
         window.clearInterval(timer);
+    };
+    if( error  != ""){
+	window.clearInterval(timer);
+	bootbox.alert("Error: " + error);
     };
 };
 var timer = window.setInterval(function(){

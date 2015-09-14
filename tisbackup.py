@@ -32,11 +32,13 @@ from libtisbackup.common import *
 from libtisbackup.backup_mysql import backup_mysql 
 from libtisbackup.backup_rsync import backup_rsync
 from libtisbackup.backup_rsync import backup_rsync_ssh
+from libtisbackup.backup_oracle import backup_oracle
 from libtisbackup.backup_rsync_btrfs import backup_rsync_btrfs
 from libtisbackup.backup_rsync_btrfs import backup_rsync__btrfs_ssh
 from libtisbackup.backup_pgsql import backup_pgsql
 from libtisbackup.backup_xva import backup_xva
-#from libtisbackup.backup_switch import backup_switch
+from libtisbackup.backup_vmdk import backup_vmdk
+from libtisbackup.backup_switch import backup_switch
 from libtisbackup.backup_null import backup_null
 from libtisbackup.backup_xcp_metadata import backup_xcp_metadata
 from libtisbackup.copy_vm_xcp import copy_vm_xcp
@@ -245,16 +247,13 @@ class tis_backup:
         # before mindate, backup is too old
         mindate = datetime2isodate((datetime.datetime.now() - datetime.timedelta(hours=maxage_hours)))
         failed_backups = self.dbstat.query("""\
-      select distinct s.backup_name as bname,
-          (select max(backup_start) from stats where status="OK" and backup_name=s.backup_name) as lastok 
-      from stats s 
-      where 
-       (s.status<>"OK" and (s.backup_start>lastok or lastok is null)) 
-       or (s.backup_start=lastok and s.backup_start<=?)
-      order by s.backup_start desc""",(mindate,))
+        select  distinct backup_name as bname
+        from stats    
+        where  status="OK"  and  backup_start>=?""",(mindate,))
 
-        defined_backups = map(lambda f:f.backup_name,self.backup_list)
-        failed_backups_names = [b['bname'] for b in failed_backups if b['bname'] in defined_backups]
+        defined_backups =  map(lambda f:f.backup_name, [ x for x in self.backup_list if not isinstance(x, backup_null) ])
+        failed_backups_names = set(defined_backups) - set([b['bname'] for b in failed_backups if b['bname'] in defined_backups])
+
 
         if failed_backups_names:
             self.logger.info('Processing backup for %s',','.join(failed_backups_names))

@@ -1,10 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
+<link rel="stylesheet" type="text/css" href="/static/styles/jquery.dataTables.css">
+<script type=text/javascript   src="/static/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf-8">
             $(document).ready(function() {
                 var oTable = $('#table-design').dataTable( {
                     "bProcessing": true,
-                    "sAjaxDataProp": "data",
+                     "pagingType": "full",
+                    "sAjaxDataProp": "",
                     "sAjaxSource": "/backups.json",
                     "iDisplayLength": 25,
 //                 "aLengthMenu": [[25, 50, 100, 200, 500, -1], [25, 50, 100, 200, 500, "All"]],
@@ -58,7 +61,6 @@
                         { "mData":"TYPE" , "bVisible": false }
                     ],
 		    "fnFooterCallback": function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-//humanFileSize(aaData[1]['written_bytes'], true)
 			var total_bytes = 0;
 			var total_time = 0;
                         for (var i = iStart; i < iEnd; i++) {
@@ -157,7 +159,7 @@
 		    }
 		};
         </script>
-            <table style='text-align: center;' cellpadding="0" cellspacing="0" border="0" class="display" id="table-design">
+    <table style='text-align: center;' cellpadding="0" cellspacing="0" border="0" class="display" id="table-design">
     <thead style='text-align: center;'>
         <tr>
             <th>Backup start</th>
@@ -190,33 +192,40 @@
 	</tr>
     </tfoot>
 </table>
-<br / >
 <p>Nomber of rows per page : <input id="inputDatabaseName" value=25 size=4 style="text-align:center" ></p>
  <p>
-    Backup start<input type="checkbox" onclick="fnShowHide( 0 );"/>
-    Backup end<input type="checkbox" onclick="fnShowHide( 1 );"/>
-    Server name<input type="checkbox" onclick="fnShowHide( 2 );"/>
-    Backup name<input type="checkbox" onclick="fnShowHide( 3 );"/>
-    Backup duration<input type="checkbox" onclick="fnShowHide( 4 );"/>
-    Status<input type="checkbox" onclick="fnShowHide( 5 );"/>
-    <br />
-    Written bytes<input type="checkbox" onclick="fnShowHide( 6 );"/>
-    Written files count<input type="checkbox" onclick="fnShowHide( 7 );"/>
-    Total files count<input type="checkbox" onclick="fnShowHide( 8 );"/>
-    Total bytes <input type="checkbox" onclick="fnShowHide( 9 );"/>
-    <br />
-    Backup location<input type="checkbox" onclick="fnShowHide( 10 );"/>
-    Description<input type="checkbox" onclick="fnShowHide( 11 );"/>
-    Log<input type="checkbox" onclick="fnShowHide( 12 );"/>
-    Type<input type="checkbox" onclick="fnShowHide( 13 );"/>
+ <form class="form-horizontal">
+	<div class="col-xs-6 col-md-4">
+	 <div class="form-group">
+		<div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 0 );" checked> Backup start</label></div>
+		<div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 1 );"/> Backup end</label></div>
+		<div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 2 );" checked> Server name</label></div>
+		<div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 3 );" checked> Backup name</label></div>
+		<div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 4 );" checked> Backup duration</label></div>
+	   </div>
+	 </div>
+     
+	<div class="col-xs-6 col-md-4">
+	 <div class="form-group">
+	    <div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 6 );"checked> Written bytes</label></div>
+	    <div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 7 );"/> Written files count</label></div>
+	    <div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 8 );"/> Total files count</label></div>
+	    <div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 9 );"/> Total bytes</label></div>
+	  </div>
+	 </div>
+     
+       <div class="col-xs-6 col-md-4">
+	 <div class="form-group"> 
+		<div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 10 );">  Backup location</label></div>
+	       <div class="checkbox"><label><input type="checkbox" onclick="fnShowHide(  11);">Description </label></div>
+	       <div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 12);"> Log</label></div>
+	       <div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 13 );">Type </label></div>
+	       <div class="checkbox"><label><input type="checkbox" onclick="fnShowHide( 5 );"checked> Status</label></div>
+	</div>
+      </div>
+
+  </form>
+  
 </p>
-<script>
-$('input:checkbox').attr('checked', false);
-$('input:checkbox:eq(0)').attr('checked', true);
-$('input:checkbox:eq(2)').attr('checked', true);
-$('input:checkbox:eq(3)').attr('checked', true);
-$('input:checkbox:eq(4)').attr('checked', true);
-$('input:checkbox:eq(5)').attr('checked', true);
-$('input:checkbox:eq(6)').attr('checked', true);
-</script>
+
 {% endblock %}

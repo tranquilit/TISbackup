@@ -139,9 +139,11 @@ class backup_rsync(backup_generic):
                     backup_source = '%s@%s::%s%s' % (self.remote_user, self.server_name, self.rsync_module, self.remote_dir)
                 else:
                     # case of rsync + ssh
-                    ssh_params = ['-o StrictHostKeyChecking=no','-c blowfish']
+                    ssh_params = ['-o StrictHostKeyChecking=no']
                     if self.private_key:
                         ssh_params.append('-i %s' % self.private_key)
+                    if self.cipher_spec:
+                        ssh_params.append('-c %s' % self.cipher_spec)
                     if self.ssh_port <> 22:
                         ssh_params.append('-p %i' % self.ssh_port)
                     options.append('-e "/usr/bin/ssh %s"' % (" ".join(ssh_params)))
@@ -168,13 +170,13 @@ class backup_rsync(backup_generic):
 
                     for l in log.splitlines():
                         if l.startswith('Number of files:'):
-                            stats['total_files_count'] += int(l.split(':')[1])
+                            stats['total_files_count'] += int(re.sub("[^0-9]", "", l.split(':')[1]))
                         if l.startswith('Number of files transferred:'):
-                            stats['written_files_count'] += int(l.split(':')[1])
+                            stats['written_files_count'] += int(re.sub("[^0-9]", "", l.split(':')[1]))
                         if l.startswith('Total file size:'):
-                            stats['total_bytes'] += int(l.split(':')[1].split()[0])
+                            stats['total_bytes'] += int(re.sub("[^0-9]", "", l.split(':')[1].split()[0]))
                         if l.startswith('Total transferred file size:'):
-                            stats['written_bytes'] += int(l.split(':')[1].split()[0])
+                            stats['written_bytes'] += int(re.sub("[^0-9]", "", l.split(':')[1].split()[0]))
 
                     returncode = process.returncode
                     ## deal with exit code 24 (file vanished)
@@ -183,8 +185,8 @@ class backup_rsync(backup_generic):
                     elif (returncode == 23):
                         self.logger.warning("[" + self.backup_name + "] unable so set uid on some files")
                     elif (returncode != 0):
-                        self.logger.error("[" + self.backup_name + "] shell program exited with error code ")
-                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)
+                        self.logger.error("[" + self.backup_name + "] shell program exited with error code " + str(returncode))
+                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd, log[-512:])
                 else:
                     print cmd
 
@@ -310,7 +312,8 @@ class backup_rsync_ssh(backup_rsync):
     """Backup a directory on remote server with rsync and ssh protocol (requires rsync software on remote host)"""
     type = 'rsync+ssh'       
     required_params = backup_generic.required_params + ['remote_user','remote_dir','private_key']
-    optional_params = backup_generic.optional_params + ['compression','bwlimit','ssh_port','exclude_list','protect_args','overload_args']
+    optional_params = backup_generic.optional_params + ['compression','bwlimit','ssh_port','exclude_list','protect_args','overload_args', 'cipher_spec']
+    cipher_spec = ''
 
 
 register_driver(backup_rsync)

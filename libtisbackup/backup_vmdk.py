@@ -44,11 +44,12 @@ class backup_vmdk(backup_generic):
     type = 'esx-vmdk'
 
     required_params = backup_generic.required_params + ['esxhost','password_file','server_name']
-    optional_params = backup_generic.optional_params + ['esx_port', 'prefix_clone', 'create_ovafile']
+    optional_params = backup_generic.optional_params + ['esx_port', 'prefix_clone', 'create_ovafile', 'halt_vm']
 
     esx_port = 443
     prefix_clone = "clone-"
     create_ovafile = "no"
+    halt_vm = "no"
 
     def make_compatible_cookie(self,client_cookie):
         cookie_name = client_cookie.split("=", 1)[0]
@@ -234,19 +235,26 @@ class backup_vmdk(backup_generic):
                     vmList = vmFolder.childEntity
                     for vm in vmList:
                         if vm.name == self.server_name:
-                            if not vm.summary.runtime.powerState == "poweredOff":
+                            vm_is_off = vm.summary.runtime.powerState == "poweredOff"
+                            if str2bool(self.halt_vm):
+                                vm.ShutdownGuest()  
+                                vm_is_off = True
+                                
+                            if  vm_is_off:
+                                vmdks = self.export_vmdks(vm)
+                                ovf_filename = self.create_ovf(vm, vmdks)                                                                                               
+                            else:
                                 new_vm = self.clone_vm(vm)
                                 vmdks = self.export_vmdks(new_vm)
                                 ovf_filename = self.create_ovf(vm, vmdks)
-                                if str2bool(self.create_ovafile):
-                                    ova_filename = self.create_ova(vm, vmdks, ovf_filename)    
-                                self.wait_task(new_vm.Destroy_Task())
-                            else:
-                                vmdks = self.export_vmdks(vm)
-                                ovf_filename = self.create_ovf(vm, vmdks)
-                                if str2bool(self.create_ovafile):
-                                    ova_filename = self.create_ova(vm, vmdks, ovf_filename)                                   
-
+                                self.wait_task(new_vm.Destroy_Task())                                
+                                                                
+                            if str2bool(self.create_ovafile):
+                                ova_filename = self.create_ova(vm, vmdks, ovf_filename)       
+                                
+                            if str2bool(self.halt_vm):
+                                vm.PowerOnVM()                               
+                                
 
             if os.path.exists(dest_dir):
                 for file in os.listdir(dest_dir):                    

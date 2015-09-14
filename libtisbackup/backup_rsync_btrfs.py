@@ -149,9 +149,11 @@ class backup_rsync_btrfs(backup_generic):
                     backup_source = '%s@%s::%s%s' % (self.remote_user, self.server_name, self.rsync_module, self.remote_dir)
                 else:
                     # case of rsync + ssh
-                    ssh_params = ['-o StrictHostKeyChecking=no','-c blowfish']
+                    ssh_params = ['-o StrictHostKeyChecking=no']
                     if self.private_key:
                         ssh_params.append('-i %s' % self.private_key)
+                    if self.cipher_spec:
+                        ssh_params.append('-c %s' % self.cipher_spec)
                     if self.ssh_port <> 22:
                         ssh_params.append('-p %i' % self.ssh_port)
                     options.append('-e "/usr/bin/ssh %s"' % (" ".join(ssh_params)))
@@ -198,8 +200,8 @@ class backup_rsync_btrfs(backup_generic):
                     elif (returncode == 23):
                         self.logger.warning("[" + self.backup_name + "] unable so set uid on some files")
                     elif (returncode != 0):
-                        self.logger.error("[" + self.backup_name + "] shell program exited with error code ")
-                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)
+                        self.logger.error("[" + self.backup_name + "] shell program exited with error code ", str(returncode))
+                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd, log[-512:])
                 else:
                     print cmd
 
@@ -213,14 +215,14 @@ class backup_rsync_btrfs(backup_generic):
                         log = monitor_stdout(process,'',self)
                         returncode = process.returncode
                         if (returncode != 0):
-                            self.logger.error("[" + self.backup_name + "] shell program exited with error code: %s"%log)
-                            raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)                      
+                            self.logger.error("[" + self.backup_name + "] shell program exited with error code " + str(returncode))
+                            raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd, log[-512:])
                         else:
-                            self.logger.info("[" + self.backup_name + "] snapshot directory created %s"%finaldest)                      
+                            self.logger.info("[" + self.backup_name + "] snapshot directory created %s"%finaldest)
                     else:
                         print "btrfs snapshot of %s to %s"%(dest_dir,finaldest)
                 else:
-                    raise Exception('snapshot directory already exists : %s' %finaldest)                    
+                    raise Exception('snapshot directory already exists : %s' %finaldest)
                 self.logger.debug("[%s] touching datetime of target directory %s" ,self.backup_name,finaldest)
                 print os.popen('touch "%s"' % finaldest).read()
                 stats['backup_location'] = finaldest
@@ -335,7 +337,8 @@ class backup_rsync__btrfs_ssh(backup_rsync_btrfs):
     """Backup a directory on remote server with rsync,ssh and btrfs protocol (requires rsync software on remote host)"""
     type = 'rsync+btrfs+ssh'       
     required_params = backup_generic.required_params + ['remote_user','remote_dir','private_key']
-    optional_params = backup_generic.optional_params + ['compression','bwlimit','ssh_port','exclude_list','protect_args','overload_args']
+    optional_params = backup_generic.optional_params + ['compression','bwlimit','ssh_port','exclude_list','protect_args','overload_args','cipher_spec']
+    cipher_spec = ''
 
 
 register_driver(backup_rsync_btrfs)

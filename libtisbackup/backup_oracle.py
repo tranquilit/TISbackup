@@ -17,9 +17,6 @@
 #    along with TISBackup.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -----------------------------------------------------------------------
-
-
-
 import sys
 try:
     sys.stderr = open('/dev/null')       # Silence silly warnings from paramiko
@@ -34,58 +31,83 @@ import datetime
 import base64
 import os
 from common import *
+import re
 
 class backup_oracle(backup_generic):
     """Backup a oracle database as zipped file through ssh"""
     type = 'oracle+ssh'    
-    required_params = backup_generic.required_params + ['db_name','private_key']
-    optional_params = ['username', 'remote_backup_dir']
+    required_params = backup_generic.required_params + ['db_name','private_key', 'userid']
+    optional_params = ['username', 'remote_backup_dir', 'ignore_error_oracle_code']
     db_name=''
     username='oracle'
     remote_backup_dir =  r'/home/oracle/backup'
+    ignore_error_oracle_code = [ ]
 
     def do_backup(self,stats):
-
-        self.logger.debug('[%s] Connecting to %s with user root and key %s',self.backup_name,self.server_name,self.private_key)
+        
+        self.logger.debug('[%s] Connecting to %s with user %s and key %s',self.backup_name,self.server_name,self.username,self.private_key)
         try:
             mykey = paramiko.RSAKey.from_private_key_file(self.private_key)
         except paramiko.SSHException:
             mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
 
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(self.server_name,username=self.username,pkey = mykey,port=self.ssh_port)
-
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh.connect(self.server_name,username=self.username,pkey = mykey,port=self.ssh_port)      
+        
         t = datetime.datetime.now()
-        backup_start_date =  t.strftime('%Y%m%d-%Hh%Mm%S')
+        self.backup_start_date =  t.strftime('%Y%m%d-%Hh%Mm%S')
+        dumpfile= self.remote_backup_dir + '/' + self.db_name + '_' + self.backup_start_date+'.dmp'
+        dumplog = self.remote_backup_dir + '/' + self.db_name + '_' + self.backup_start_date+'.log'
 
+        self.dest_dir = os.path.join(self.backup_dir,self.backup_start_date)
+        if not os.path.isdir(self.dest_dir):
+            if not self.dry_run:
+                os.makedirs(self.dest_dir)
+            else:
+                print 'mkdir "%s"' % self.dest_dir
+        else:
+            raise Exception('backup destination directory already exists : %s' % self.dest_dir)        
         # dump db
         stats['status']='Dumping'
-        cmd = 'expdp / full=Y compression=all directory=' + self.remote_backup_dir +' dumpfile='  + self.db_name + '_' + backup_start_date+'.dmp logfile=expd_' + self.db_name + '_' + backup_start_date +'.log'
+        cmd = "exp '%s'  file='%s' grants=y log='%s'"% (self.userid,dumpfile, dumplog) 
         self.logger.debug('[%s] Dump DB : %s',self.backup_name,cmd)
         if not self.dry_run:
-            (error_code,output) = ssh_exec(cmd,ssh=ssh)
+            (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
             self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
             if error_code:
-                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
+                localpath = os.path.join(self.dest_dir , self.db_name + '.log')
+                self.logger.debug('[%s] Get log file with sftp on %s from %s to %s',self.backup_name,self.server_name,dumplog,localpath)
+                transport =  self.ssh.get_transport()
+                sftp = paramiko.SFTPClient.from_transport(transport)
+                sftp.get(dumplog, localpath)
+                sftp.close()
+
+                file = open(localpath)
+                for line in file:
+                    if re.search('EXP-[0-9]+:', line) and not re.match('EXP-[0-9]+:', line).group(0).replace(':','') in self.ignore_error_oracle_code:
+                        stats['status']='RMTemp'
+                        self.clean_dumpfiles(dumpfile,dumplog)
+                        raise Exception('Aborting, Not null exit code (%s) for "%s"' % (re.match('EXP-[0-9]+:', line).group(0).replace(':',''),cmd))
+                file.close()
 
         # zip the file
         stats['status']='Zipping'
-        cmd = '/usr/bin/pigz  --best --verbose --rsyncable ' + self.remote_backup_dir  + '/'+ self.db_name + '_' + backup_start_date+'.dmp'
+        cmd = 'gzip  %s' % dumpfile 
         self.logger.debug('[%s] Compress backup : %s',self.backup_name,cmd)
         if not self.dry_run:
-            (error_code,output) = ssh_exec(cmd,ssh=ssh)
+            (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
             self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
-            if error_code:
-                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
+        if error_code:
+            raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
 
         # get the file
         stats['status']='SFTP'
-        filepath = self.remote_backup_dir  + '/'+ self.db_name + '_' + backup_start_date+'.dmp.gz'
-        localpath = os.path.join(self.backup_dir , self.db_name + '-' + backup_start_date + '.dmp.gz')
+        filepath = dumpfile + '.gz'
+        localpath = os.path.join(self.dest_dir , self.db_name + '.dmp.gz')
         self.logger.debug('[%s] Get gz backup with sftp on %s from %s to %s',self.backup_name,self.server_name,filepath,localpath)
         if not self.dry_run:
-            transport =  ssh.get_transport()
+            transport =  self.ssh.get_transport()
             sftp = paramiko.SFTPClient.from_transport(transport)
             sftp.get(filepath, localpath)
             sftp.close()
@@ -96,23 +118,9 @@ class backup_oracle(backup_generic):
             stats['total_bytes']=os.stat(localpath).st_size
             stats['written_bytes']=os.stat(localpath).st_size    
         stats['log']='gzip dump of DB %s:%s (%d bytes) to %s' % (self.server_name,self.db_name, stats['written_bytes'], localpath)
-        stats['backup_location'] = localpath
-
+        stats['backup_location'] = self.dest_dir
         stats['status']='RMTemp'
-        cmd = 'rm -f '+self.remote_backup_dir  + '/' +self.db_name + '_' + backup_start_date+'.dmp.gz'
-        self.logger.debug('[%s] Remove temp gzip : %s',self.backup_name,cmd)
-        if not self.dry_run:
-            (error_code,output) = ssh_exec(cmd,ssh=ssh)
-            self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
-            if error_code:
-                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
-	cmd = 'rm -f '+self.remote_backup_dir  + '/' + self.db_name + '_' + backup_start_date+'.dmp'
-        self.logger.debug('[%s] Remove temp dump : %s',self.backup_name,cmd)
-        if not self.dry_run:
-            (error_code,output) = ssh_exec(cmd,ssh=ssh)
-            self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
-            if error_code:
-                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
+        self.clean_dumpfiles(dumpfile,dumplog)
         stats['status']='OK'
 
     def register_existingbackups(self):
@@ -122,20 +130,44 @@ class backup_oracle(backup_generic):
 
         filelist = os.listdir(self.backup_dir)
         filelist.sort()
-        p = re.compile('^%s-(?P<date>\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}).sql.gz$' % self.db_name) 
+        p = re.compile('^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$') 
         for item in filelist:
-            sr = p.match(item)
-            if sr:
-                file_name = os.path.join(self.backup_dir,item)
-                start = datetime.datetime.strptime(sr.groups()[0],'%Y%m%d-%Hh%Mm%S').isoformat()
-                if not file_name in registered:
-                    self.logger.info('Registering %s from %s',file_name,fileisodate(file_name))
-                    size_bytes = int(os.popen('du -sb "%s"' % file_name).read().split('\t')[0])
+            if p.match(item):
+                dir_name = os.path.join(self.backup_dir,item)
+                if not dir_name in registered:
+                    start = datetime.datetime.strptime(item,'%Y%m%d-%Hh%Mm%S').isoformat()
+                    if fileisodate(dir_name)>start:
+                        stop = fileisodate(dir_name)
+                    else:
+                        stop = start
+                    self.logger.info('Registering %s started on %s',dir_name,start)
+                    self.logger.debug('  Disk usage %s','du -sb "%s"' % dir_name)
+                    if not self.dry_run:
+                        size_bytes = int(os.popen('du -sb "%s"' % dir_name).read().split('\t')[0])
+                    else:
+                        size_bytes = 0
                     self.logger.debug('  Size in bytes : %i',size_bytes)
-                    if not self.dry_run:        
+                    if not self.dry_run:
                         self.dbstat.add(self.backup_name,self.server_name,'',\
-                                        backup_start=start,backup_end=fileisodate(file_name),status='OK',total_bytes=size_bytes,backup_location=file_name)
+                                        backup_start=start,backup_end = stop,status='OK',total_bytes=size_bytes,backup_location=dir_name)
                 else:
-                    self.logger.info('Skipping %s from %s, already registered',file_name,fileisodate(file_name))
+                    self.logger.info('Skipping %s, already registered',dir_name)
+
+
+    def clean_dumpfiles(self,dumpfile,dumplog):
+        cmd = 'rm -f "%s.gz" "%s"' %( dumpfile , dumplog)
+        self.logger.debug('[%s] Remove temp gzip : %s',self.backup_name,cmd)
+        if not self.dry_run:
+            (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
+            self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
+            if error_code:
+                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
+        cmd = 'rm -f '+self.remote_backup_dir  + '/' + self.db_name + '_' + self.backup_start_date+'.dmp'
+        self.logger.debug('[%s] Remove temp dump : %s',self.backup_name,cmd)
+        if not self.dry_run:
+            (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
+            self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
+            if error_code:
+                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
 
 register_driver(backup_oracle)
