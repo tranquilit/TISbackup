@@ -78,8 +78,8 @@ class backup_pgsql(backup_generic):
                 raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))            
             databases = output.split('\n')
             for database in databases:
-                if database.rstrip() not in ("", "template0", "template1"): 
-                    self.db_name = database.rstrip()
+                if database.strip() not in ("", "template0", "template1"): 
+                    self.db_name = database.strip()
                     self.do_pgsqldump(stats)            
             
 
