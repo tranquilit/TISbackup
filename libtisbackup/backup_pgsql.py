@@ -70,7 +70,7 @@ class backup_pgsql(backup_generic):
         else:
             stats['log']= "Successfully backuping processed to the following databases :"            
             stats['status']='List'
-            cmd = "su -  postgres -c 'psql -l -t' | cut -d'|' -f1 | sed -e 's/ //g' -e '/^$/d'"
+            cmd = """su -  postgres -c 'psql -t  -c "SELECT datname FROM pg_database WHERE datistemplate = false;"'"""
             self.logger.debug('[%s] List databases: %s',self.backup_name,cmd)
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
             self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
