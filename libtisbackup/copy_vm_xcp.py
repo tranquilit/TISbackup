@@ -229,6 +229,10 @@ class copy_vm_xcp(backup_generic):
             result = (0,size_backup)
             if self.delete_snapshot == 'no':
                 return result
+            
+            #Disable automatic boot
+            if session.xenapi.VM.get_other_config(vm).has_key('auto_poweron'):
+                session.xenapi.VM.remove_from_other_config(vm, "auto_poweron")
 
             if not str2bool(self.halt_vm):
                 #delete the snapshot
