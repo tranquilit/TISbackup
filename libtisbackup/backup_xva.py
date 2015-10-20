@@ -146,7 +146,8 @@ class backup_xva(backup_generic):
             try:
                 filename_temp = filename+".tmp"
                 self.logger.debug("[%s] Copy in progress",self.backup_name)
-                socket.setdefaulttimeout(120)
+                if not str2bool(use_compression):
+                    socket.setdefaulttimeout(120)
 
                 scheme = "http://"
                 if str2bool(enable_https) == True:
