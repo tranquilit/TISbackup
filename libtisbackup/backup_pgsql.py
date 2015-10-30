@@ -27,11 +27,6 @@ except ImportError,e:
 
 sys.stderr = sys.__stderr__
 
-import datetime
-import base64
-import os
-import logging
-import re
 from common import *
 
 class backup_pgsql(backup_generic):
@@ -70,7 +65,7 @@ class backup_pgsql(backup_generic):
         else:
             stats['log']= "Successfully backuping processed to the following databases :"            
             stats['status']='List'
-            cmd = """su -  postgres -c 'psql -t  -c "SELECT datname FROM pg_database WHERE datistemplate = false;"'"""
+            cmd = """su -  postgres -c 'psql -t  -c "SELECT datname FROM pg_database WHERE datistemplate = false;"' 2> /dev/null"""
             self.logger.debug('[%s] List databases: %s',self.backup_name,cmd)
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
             self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)

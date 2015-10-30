@@ -30,9 +30,6 @@ except ImportError,e:
 
 sys.stderr = sys.__stderr__
 
-import datetime
-import base64
-import os
 from common import *
 
 class backup_mysql(backup_generic):
@@ -69,10 +66,11 @@ class backup_mysql(backup_generic):
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh.connect(self.server_name,username='root',pkey = mykey, port=self.ssh_port)
 
+        self.db_passwd=self.db_passwd.replace('$','\$')
         if not self.db_name:
             stats['log']= "Successfully backuping processed to the following databases :"
             stats['status']='List'
-            cmd = 'mysql -N  -B -p  -e "SHOW DATABASES;" -u ' + self.db_user +'  -p'  + self.db_passwd 
+            cmd = 'mysql -N  -B -p  -e "SHOW DATABASES;" -u ' + self.db_user +'  -p'  + self.db_passwd + ' 2> /dev/null'
             self.logger.debug('[%s] List databases: %s',self.backup_name,cmd)
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
             self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
