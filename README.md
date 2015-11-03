@@ -1,6 +1,23 @@
 tisbackup
 =========
 
+<<<<<<< HEAD
+=======
+Dépendances python:
+* Flask
+* requests
+* pyvmomi
+* huey
+* six
+* pexpect
+* MarkupSafe
+* Werkzeug
+* itsdangerous
+* Jinja2
+* Paramiko
+
+
+>>>>>>> 1df89b3b6c765545beb43a2673db35f62d3ba89b
 Le script tisbackup se base sur un fichier de configuration .ini. Cf le fichier d'exemple pour le format
 
 Pour lancer le backup, lancer la commande
