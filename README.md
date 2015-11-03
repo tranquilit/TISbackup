@@ -13,6 +13,8 @@ Dépendances python:
 * Jinja2
 * Paramiko
 
+![alt tag](https://raw.githubusercontent.com/tranquilit/TISbackup/master/static/images/tisbackup-gui-home.png)
+
 Le script tisbackup se base sur un fichier de configuration .ini. Cf le fichier d'exemple pour le format
 
 Pour lancer le backup, lancer la commande
