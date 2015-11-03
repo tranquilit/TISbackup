@@ -1,5 +1,9 @@
 tisbackup
 =========
+
+Installation
+-----------
+
 Dépendances python:
 * Flask
 * requests
@@ -15,7 +19,11 @@ Dépendances python:
 
 ![alt tag](https://raw.githubusercontent.com/tranquilit/TISbackup/master/static/images/tisbackup-gui-home.png)
 
-Le script tisbackup se base sur un fichier de configuration .ini. Cf le fichier d'exemple pour le format
+
+Utilisation
+-----
+Le script tisbackup se base sur un fichier de configuration .ini. [Cf le fichier d'exemple pour le format](https://github.com/tranquilit/TISbackup/blob/master/samples/config.ini.sample)
+
 
 Pour lancer le backup, lancer la commande
 
@@ -29,5 +37,6 @@ Pour mettre le mode debug
 
 > ./tisbackup.py -c fichierconf.ini -l debug 
 
-
+Aide
+-----
 Pour plus d'informations aller voir le site : http://dev.tranquil.it/
