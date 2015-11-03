@@ -17,8 +17,6 @@ Dépendances python:
 * Jinja2
 * Paramiko
 
-![alt tag](https://raw.githubusercontent.com/tranquilit/TISbackup/master/static/images/tisbackup-gui-home.png)
-
 
 Utilisation
 -----
@@ -36,6 +34,11 @@ Pour lancer une section particulière du fichier .ini
 Pour mettre le mode debug
 
 > ./tisbackup.py -c fichierconf.ini -l debug 
+
+Interface web
+-----
+
+![alt tag](https://raw.githubusercontent.com/tranquilit/TISbackup/master/static/images/tisbackup-gui-home.png)
 
 Aide
 -----
