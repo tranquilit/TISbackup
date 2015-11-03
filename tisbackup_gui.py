@@ -92,7 +92,7 @@ def read_config():
     for backup_item in backup.backup_list:
         if backup_item.backup_name in backup_sections:
             b = {}
-            for attrib_name in backup_item.required_params+backup_item.required_params:
+            for attrib_name in backup_item.required_params+backup_item.optional_params:
                 if hasattr(backup_item,attrib_name):
                     b[attrib_name] = getattr(backup_item,attrib_name)
             result.append(b)
@@ -126,12 +126,12 @@ def read_config():
             backup_dict['rsync_list'].append([server_name, backup_name, backup_type,remote_dir])
         if backup_type == "null":
             backup_dict['null_list'].append([server_name, backup_name, backup_type, ""])
-        if backup_type == "pgsql+ssh":
-            db_name = row['db_name']
-            backup_dict['pgsql_list'].append([server_name, backup_name, backup_type, db_name])
-        if backup_type == "mysql+ssh":
-            db_name = row.get('db_name', '*')
-            backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
+	if backup_type == "pgsql+ssh":
+	    db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
+	    backup_dict['pgsql_list'].append([server_name, backup_name, backup_type, db_name])
+	if backup_type == "mysql+ssh":
+	    db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
+	    backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "sqlserver+ssh":
             db_name = row['db_name']
             backup_dict['sqlserver_list'].append([server_name, backup_name, backup_type, db_name])

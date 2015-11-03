@@ -59,7 +59,7 @@ action is either :
  exportbackup :  copy lastest OK backups from local to location defned by --exportdir parameter 
  register_existing : scan backup directories and add missing backups to database"""
 
-version = "0.7.3"
+version="VERSION"
 
 parser=OptionParser(usage=usage,version="%prog " + version)
 parser.add_option("-c","--config", dest="config", default='/etc/tis/tisbackup-config.ini', help="Config file full path (default: %default)")
