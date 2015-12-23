@@ -2,3 +2,8 @@
 *.swp
 *~
 *.pyc
+/tasks.sqlite
+/tasks.sqlite-wal
+/srvinstallation
+/tasks.sqlite-shm
+.idea

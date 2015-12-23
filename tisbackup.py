@@ -17,32 +17,10 @@
 #    along with TISBackup.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -----------------------------------------------------------------------
-import os
-import datetime
-import subprocess
-from iniparse import ConfigParser
 from optparse import OptionParser
 
-import re
-import sys
-import getopt
-import os.path
-import logging
-from libtisbackup.common import *
-from libtisbackup.backup_mysql import backup_mysql 
-from libtisbackup.backup_rsync import backup_rsync
-from libtisbackup.backup_rsync import backup_rsync_ssh
-from libtisbackup.backup_oracle import backup_oracle
-from libtisbackup.backup_rsync_btrfs import backup_rsync_btrfs
-from libtisbackup.backup_rsync_btrfs import backup_rsync__btrfs_ssh
-from libtisbackup.backup_pgsql import backup_pgsql
-from libtisbackup.backup_xva import backup_xva
-from libtisbackup.backup_vmdk import backup_vmdk
-from libtisbackup.backup_switch import backup_switch
 from libtisbackup.backup_null import backup_null
-from libtisbackup.backup_xcp_metadata import backup_xcp_metadata
-from libtisbackup.copy_vm_xcp import copy_vm_xcp
-from libtisbackup.backup_sqlserver import backup_sqlserver
+from libtisbackup.common import *
 
 usage="""\
 %prog -c configfile action
@@ -64,7 +42,7 @@ version="VERSION"
 parser=OptionParser(usage=usage,version="%prog " + version)
 parser.add_option("-c","--config", dest="config", default='/etc/tis/tisbackup-config.ini', help="Config file full path (default: %default)")
 parser.add_option("-d","--dry-run",    dest="dry_run",    default=False, action='store_true', help="Dry run (default: %default)")
-parser.add_option("-v","--verbose",    dest="verbose",  default=False, action='store_true', help="More information (default: %default)")
+parser.add_option("-v","--verbose",    dest="verbose", default=False, action='store_true', help="More information (default: %default)")
 parser.add_option("-s","--sections", dest="sections", default='', help="Comma separated list of sections (backups) to process (default: All)")
 parser.add_option("-l","--loglevel", dest="loglevel", default='info', type='choice',  choices=['debug','warning','info','error','critical'], metavar='LOGLEVEL',help="Loglevel (default: %default)")
 parser.add_option("-n","--len", dest="statscount", default=30, type='int', help="Number of lines to list for dumpstat (default: %default)")
