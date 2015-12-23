@@ -66,8 +66,7 @@ maximum_backup_age=30
 ;type=samba4
 ;server_name=srvads
 ;private_key=/root/.ssh/id_dsa
-;root_dir_samba=/var/lib/samba/
-
+;root_dir_samba=/usr/local/samba/
 
 ;[backup_mysql_srvintranet]
 ;type=mysql+ssh
