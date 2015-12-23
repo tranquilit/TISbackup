@@ -38,7 +38,7 @@ class backup_samba4(backup_generic):
     required_params = backup_generic.required_params + ['private_key']
     optional_params = backup_generic.optional_params + ['root_dir_samba']
 
-    root_dir_samba = "/usr/local/samba/"
+    root_dir_samba = "/var/lib/samba/"
     def do_backup(self,stats):
         self.dest_dir = os.path.join(self.backup_dir,self.backup_start_date)
 
