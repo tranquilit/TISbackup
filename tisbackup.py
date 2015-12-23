@@ -17,10 +17,33 @@
 #    along with TISBackup.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -----------------------------------------------------------------------
+import os
+import datetime
+import subprocess
+from iniparse import ConfigParser
 from optparse import OptionParser
 
-from libtisbackup.backup_null import backup_null
+import re
+import sys
+import getopt
+import os.path
+import logging
 from libtisbackup.common import *
+from libtisbackup.backup_mysql import backup_mysql
+from libtisbackup.backup_rsync import backup_rsync
+from libtisbackup.backup_rsync import backup_rsync_ssh
+from libtisbackup.backup_oracle import backup_oracle
+from libtisbackup.backup_rsync_btrfs import backup_rsync_btrfs
+from libtisbackup.backup_rsync_btrfs import backup_rsync__btrfs_ssh
+from libtisbackup.backup_pgsql import backup_pgsql
+from libtisbackup.backup_xva import backup_xva
+from libtisbackup.backup_vmdk import backup_vmdk
+from libtisbackup.backup_switch import backup_switch
+from libtisbackup.backup_null import backup_null
+from libtisbackup.backup_xcp_metadata import backup_xcp_metadata
+from libtisbackup.copy_vm_xcp import copy_vm_xcp
+from libtisbackup.backup_sqlserver import backup_sqlserver
+from libtisbackup.backup_samba4 import backup_samba4
 
 usage="""\
 %prog -c configfile action
