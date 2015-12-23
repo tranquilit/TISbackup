@@ -62,6 +62,12 @@ maximum_backup_age=30
 ;db_user=root
 ;db_passwd=
 
+;[srvads-samba4]
+;type=samba4
+;server_name=srvads
+;private_key=/root/.ssh/id_dsa
+;root_dir_samba=/var/lib/samba/
+
 
 ;[backup_mysql_srvintranet]
 ;type=mysql+ssh
