@@ -33,8 +33,6 @@ class backup_xcp_metadata(backup_generic):
     type = 'xcp-dump-metadata'    
     required_params = ['type','server_name','password_file','backup_name']
 
-    user_xen, password_xen, null = open(self.password_file).read().split('\n')
-
     def do_backup(self,stats):
 
         self.logger.debug('[%s] Connecting to %s with user root and key %s',self.backup_name,self.server_name,self.private_key)
@@ -55,7 +53,7 @@ class backup_xcp_metadata(backup_generic):
 
 
         if not self.dry_run:
-            cmd = "/opt/xensource/bin/xe -s %s -u %s -pw %s pool-dump-database file-name=%s" %(self.server_name,self.user_xen,self.password_xen,temppath)
+            cmd = "/opt/xensource/bin/xe -s %s -pwf %s pool-dump-database file-name=%s" %(self.server_name,self.password_file,temppath)
             self.logger.debug('[%s] Dump XCP Metadata : %s',self.backup_name,cmd)
             call_external_process(cmd)
         
