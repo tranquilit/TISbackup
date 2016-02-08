@@ -31,9 +31,9 @@ from common import *
 class backup_xcp_metadata(backup_generic):
     """Backup metatdata of a xcp pool using xe pool-dump-database"""
     type = 'xcp-dump-metadata'    
-    required_params = ['type','server_name','xcp_user','xcp_passwd','backup_name']
-    xcp_user=''
-    xcp_passwd='' 
+    required_params = ['type','server_name','password_file','backup_name']
+
+    user_xen, password_xen, null = open(self.password_file).read().split('\n')
 
     def do_backup(self,stats):
 
@@ -52,8 +52,10 @@ class backup_xcp_metadata(backup_generic):
 
         stats['status']='Dumping'
 
+
+
         if not self.dry_run:
-            cmd = "/opt/xensource/bin/xe -s %s -u %s -pw %s pool-dump-database file-name=%s" %(self.server_name,self.xcp_user,self.xcp_passwd,temppath)
+            cmd = "/opt/xensource/bin/xe -s %s -u %s -pw %s pool-dump-database file-name=%s" %(self.server_name,self.user_xen,self.password_xen,temppath)
             self.logger.debug('[%s] Dump XCP Metadata : %s',self.backup_name,cmd)
             call_external_process(cmd)
         
