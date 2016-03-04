@@ -156,8 +156,8 @@ class backup_switch(backup_generic):
         if "Unrecognized command" in lines:
             raise Exception("Bad Credentials")
         child.sendline("exit")
-        child.expect( ">")
-        child.sendline("logout")
+        #child.expect( ">")
+        #child.sendline("logout")
         for line in lines.split("\n")[1:-1]:
             open(filename,"a").write(line.strip()+"\n")
 
