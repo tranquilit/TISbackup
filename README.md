@@ -8,7 +8,7 @@ Dépendances python:
 * Flask
 * requests
 * pyvmomi
-* huey
+* huey (<= 0.4.9)
 * six
 * pexpect
 * MarkupSafe
