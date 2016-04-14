@@ -27,9 +27,7 @@ class backup_xcp_metadata(backup_generic):
     """Backup metatdata of a xcp pool using xe pool-dump-database"""
     type = 'xcp-dump-metadata'    
     required_params = ['type','server_name','private_key','backup_name']
-    optional_params = backup_generic.optional_params + ['ssh_port']
 
-    ssh_port = 22
     def do_backup(self,stats):
 
         self.logger.debug('[%s] Connecting to %s with user root and key %s',self.backup_name,self.server_name,self.private_key)
@@ -40,22 +38,11 @@ class backup_xcp_metadata(backup_generic):
 
         # dump pool medatadata
         localpath = os.path.join(self.backup_dir ,  'xcp_metadata-' + backup_start_date + '.dump')
-        try:
-            mykey = paramiko.RSAKey.from_private_key_file(self.private_key)
-        except paramiko.SSHException:
-            mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
-
-        self.ssh = paramiko.SSHClient()
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh.connect(self.server_name,username='root',pkey = mykey, port=self.ssh_port)
-
         stats['status']='Dumping'
-
-
         if not self.dry_run:
             cmd = "/opt/xensource/bin/xe pool-dump-database file-name="
             self.logger.debug('[%s] Dump XCP Metadata : %s', self.backup_name, cmd)
-            (error_code, output) = ssh_exec(cmd, ssh=self.ssh)
+            (error_code, output) = ssh_exec(cmd, server_name=self.server_name,private_key=self.private_key, remote_user='root')
 
             with open(localpath,"w") as f:
                 f.write(output)
