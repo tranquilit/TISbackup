@@ -20,57 +20,53 @@
 
 
 
-import sys
-import shutil
-
-import datetime
-import base64
-import os
 from common import *
+import paramiko
 
 class backup_xcp_metadata(backup_generic):
     """Backup metatdata of a xcp pool using xe pool-dump-database"""
     type = 'xcp-dump-metadata'    
-    required_params = ['type','server_name','password_file','backup_name']
+    required_params = ['type','server_name','private_key','backup_name']
+    optional_params = backup_generic.optional_params + ['ssh_port']
 
+    ssh_port = 22
     def do_backup(self,stats):
 
         self.logger.debug('[%s] Connecting to %s with user root and key %s',self.backup_name,self.server_name,self.private_key)
 
-    	if os.path.isfile('/opt/xensource/bin/xe') == False:
-    	    raise Exception('Aborting, /opt/xensource/bin/xe binary not present"')
-	
 
         t = datetime.datetime.now()
-        backup_start_date =  t.strftime('%Y%m%d-%Hh%Mm%S')
+        backup_start_date = t.strftime('%Y%m%d-%Hh%Mm%S')
 
         # dump pool medatadata
-        localpath = os.path.join(self.backup_dir ,  'xcp_metadata-' + backup_start_date + '.dump.gz')
-        temppath = '/tmp/xcp_metadata-' + backup_start_date + '.dump'
+        localpath = os.path.join(self.backup_dir ,  'xcp_metadata-' + backup_start_date + '.dump')
+        try:
+            mykey = paramiko.RSAKey.from_private_key_file(self.private_key)
+        except paramiko.SSHException:
+            mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh.connect(self.server_name,username='root',pkey = mykey, port=self.ssh_port)
 
         stats['status']='Dumping'
 
 
-
         if not self.dry_run:
-            cmd = "/opt/xensource/bin/xe -s %s -pwf %s pool-dump-database file-name=%s" %(self.server_name,self.password_file,temppath)
-            self.logger.debug('[%s] Dump XCP Metadata : %s',self.backup_name,cmd)
-            call_external_process(cmd)
-        
+            cmd = "/opt/xensource/bin/xe pool-dump-database file-name="
+            self.logger.debug('[%s] Dump XCP Metadata : %s', self.backup_name, cmd)
+            (error_code, output) = ssh_exec(cmd, ssh=self.ssh)
+
+            with open(localpath,"w") as f:
+                f.write(output)
 
         # zip the file
         stats['status']='Zipping'
-        cmd = 'gzip %s '  %temppath
+        cmd = 'gzip %s '  % localpath
         self.logger.debug('[%s] Compress backup : %s',self.backup_name,cmd)
         if not self.dry_run:
             call_external_process(cmd)
-
-        # get the file
-        stats['status']='move to backup directory'
-        self.logger.debug('[%s] Moving temp backup file %s to backup new path %s',self.backup_name,self.server_name,localpath)
-        if not self.dry_run:
-            shutil.move (temppath + '.gz' ,localpath)
-
+        localpath += ".gz"
         if not self.dry_run:
             stats['total_files_count']=1
             stats['written_files_count']=1
