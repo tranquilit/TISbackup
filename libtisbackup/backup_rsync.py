@@ -140,6 +140,8 @@ class backup_rsync(backup_generic):
                 else:
                     # case of rsync + ssh
                     ssh_params = ['-o StrictHostKeyChecking=no']
+                    ssh_params.append('-o BatchMode=yes')
+
                     if self.private_key:
                         ssh_params.append('-i %s' % self.private_key)
                     if self.cipher_spec:

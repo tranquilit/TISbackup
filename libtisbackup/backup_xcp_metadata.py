@@ -20,57 +20,40 @@
 
 
 
-import sys
-import shutil
-
-import datetime
-import base64
-import os
 from common import *
+import paramiko
 
 class backup_xcp_metadata(backup_generic):
     """Backup metatdata of a xcp pool using xe pool-dump-database"""
     type = 'xcp-dump-metadata'    
-    required_params = ['type','server_name','xcp_user','xcp_passwd','backup_name']
-    xcp_user=''
-    xcp_passwd='' 
+    required_params = ['type','server_name','private_key','backup_name']
 
     def do_backup(self,stats):
 
         self.logger.debug('[%s] Connecting to %s with user root and key %s',self.backup_name,self.server_name,self.private_key)
 
-    	if os.path.isfile('/opt/xensource/bin/xe') == False:
-    	    raise Exception('Aborting, /opt/xensource/bin/xe binary not present"')
-	
 
         t = datetime.datetime.now()
-        backup_start_date =  t.strftime('%Y%m%d-%Hh%Mm%S')
+        backup_start_date = t.strftime('%Y%m%d-%Hh%Mm%S')
 
         # dump pool medatadata
-        localpath = os.path.join(self.backup_dir ,  'xcp_metadata-' + backup_start_date + '.dump.gz')
-        temppath = '/tmp/xcp_metadata-' + backup_start_date + '.dump'
-
+        localpath = os.path.join(self.backup_dir ,  'xcp_metadata-' + backup_start_date + '.dump')
         stats['status']='Dumping'
-
         if not self.dry_run:
-            cmd = "/opt/xensource/bin/xe -s %s -u %s -pw %s pool-dump-database file-name=%s" %(self.server_name,self.xcp_user,self.xcp_passwd,temppath)
-            self.logger.debug('[%s] Dump XCP Metadata : %s',self.backup_name,cmd)
-            call_external_process(cmd)
-        
+            cmd = "/opt/xensource/bin/xe pool-dump-database file-name="
+            self.logger.debug('[%s] Dump XCP Metadata : %s', self.backup_name, cmd)
+            (error_code, output) = ssh_exec(cmd, server_name=self.server_name,private_key=self.private_key, remote_user='root')
+
+            with open(localpath,"w") as f:
+                f.write(output)
 
         # zip the file
         stats['status']='Zipping'
-        cmd = 'gzip %s '  %temppath
+        cmd = 'gzip %s '  % localpath
         self.logger.debug('[%s] Compress backup : %s',self.backup_name,cmd)
         if not self.dry_run:
             call_external_process(cmd)
-
-        # get the file
-        stats['status']='move to backup directory'
-        self.logger.debug('[%s] Moving temp backup file %s to backup new path %s',self.backup_name,self.server_name,localpath)
-        if not self.dry_run:
-            shutil.move (temppath + '.gz' ,localpath)
-
+        localpath += ".gz"
         if not self.dry_run:
             stats['total_files_count']=1
             stats['written_files_count']=1

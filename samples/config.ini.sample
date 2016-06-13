@@ -62,6 +62,11 @@ maximum_backup_age=30
 ;db_user=root
 ;db_passwd=
 
+;[srvads-samba4]
+;type=samba4
+;server_name=srvads
+;private_key=/root/.ssh/id_dsa
+;root_dir_samba=/usr/local/samba/
 
 ;[backup_mysql_srvintranet]
 ;type=mysql+ssh
@@ -71,18 +76,24 @@ maximum_backup_age=30
 ;db_user=root
 ;db_passwd=
 
-;[[backup_sql_srvintranet]]
-;[type=sqlserver+ssh]
-;[server_name=srvintranet  ]
-;[private_key=/root/.ssh/id_dsa]
-;[db_name=testbackup]
-;[db_user=sa]
-;[db_password=xxx]
+;[backup_sql_srvintranet]
+;type=sqlserver+ssh
+;server_name=srvintranet
+;private_key=/root/.ssh/id_dsa
+;db_name=testbackup
+;db_user=sa
+;db_password=xxx
 
 
-;[debian-ovf]]
-;[type=esx-vmdk]
-;[server_name=debian]
-;[esxhost=192.168.149.213]
-;[password_file=/etc/.esx_passwd]
-;[create_ovafile=yes]
+;[debian-ovf]
+;type=esx-vmdk
+;server_name=debian
+;esxhost=192.168.149.213
+;password_file=/etc/.esx_passwd
+;create_ovafile=yes
+
+;[srvxen1-metadata]
+;type=xcp-dump-metadata
+;server_name=srvxen1
+;private_key=/root/.ssh/id_dsa
+

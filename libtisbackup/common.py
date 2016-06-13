@@ -480,7 +480,7 @@ def ssh_exec(command,ssh=None,server_name='',remote_user='',private_key='',ssh_p
 
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(server_name,username=remote_user,pkey = private_key,port=ssh_port)
+        ssh.connect(server_name,username=remote_user,pkey = mykey,port=ssh_port)
 
     tran = ssh.get_transport()
     chan = tran.open_session()

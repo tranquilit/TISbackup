@@ -29,7 +29,7 @@ import getopt
 import os.path
 import logging
 from libtisbackup.common import *
-from libtisbackup.backup_mysql import backup_mysql 
+from libtisbackup.backup_mysql import backup_mysql
 from libtisbackup.backup_rsync import backup_rsync
 from libtisbackup.backup_rsync import backup_rsync_ssh
 from libtisbackup.backup_oracle import backup_oracle
@@ -43,6 +43,7 @@ from libtisbackup.backup_null import backup_null
 from libtisbackup.backup_xcp_metadata import backup_xcp_metadata
 from libtisbackup.copy_vm_xcp import copy_vm_xcp
 from libtisbackup.backup_sqlserver import backup_sqlserver
+from libtisbackup.backup_samba4 import backup_samba4
 
 usage="""\
 %prog -c configfile action
@@ -64,7 +65,7 @@ version="VERSION"
 parser=OptionParser(usage=usage,version="%prog " + version)
 parser.add_option("-c","--config", dest="config", default='/etc/tis/tisbackup-config.ini', help="Config file full path (default: %default)")
 parser.add_option("-d","--dry-run",    dest="dry_run",    default=False, action='store_true', help="Dry run (default: %default)")
-parser.add_option("-v","--verbose",    dest="verbose",  default=False, action='store_true', help="More information (default: %default)")
+parser.add_option("-v","--verbose",    dest="verbose", default=False, action='store_true', help="More information (default: %default)")
 parser.add_option("-s","--sections", dest="sections", default='', help="Comma separated list of sections (backups) to process (default: All)")
 parser.add_option("-l","--loglevel", dest="loglevel", default='info', type='choice',  choices=['debug','warning','info','error','critical'], metavar='LOGLEVEL',help="Loglevel (default: %default)")
 parser.add_option("-n","--len", dest="statscount", default=30, type='int', help="Number of lines to list for dumpstat (default: %default)")
