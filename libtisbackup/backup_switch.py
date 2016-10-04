@@ -31,6 +31,7 @@ import select
 import urllib2, urllib
 import base64
 import socket
+import requests
 import pexpect
 from stat import *
 
@@ -163,14 +164,13 @@ class backup_switch(backup_generic):
 
 
     def switch_dlink_DGS1210(self, filename):
-        login_data = urllib.urlencode({'Login' : self.switch_user, 'Password' : self.switch_password, 'currlang' : 0, 'BrowsingPage' : 'index_dlink.htm', 'changlang' : 0})
-        req = urllib2.Request('http://%s/' % self.switch_ip, login_data)
-        resp = urllib2.urlopen(req)
-        if "Wrong password" in resp.read():
+        login_data = {'Login' : self.switch_user, 'Password' : self.switch_password, 'sellanId' : 0, 'sellan' : 0, 'lang_seqid' : 1}
+        resp = requests.post('http://%s/form/formLoginApply' % self.switch_ip, data=login_data, headers={"Referer":'http://%s/www/login.html' % self.switch_ip})
+        if "Wrong password" in resp.text:
             raise Exception("Wrong password")
-        resp = urllib2.urlopen("http://%s/config.bin?Gambit=gdkdcdgdidbdkdadkdbgegngjgogkdbgegngjgog&dumy=1348649950256" % self.switch_ip)
-        f = open(filename, 'w')
-        f.write(resp.read())
+        resp = requests.post("http://%s/BinFile/config.bin" % self.switch_ip, headers={"Referer":'http://%s/www/iss/013_download_cfg.html' % self.switch_ip})
+        with  open(filename, 'w') as f:
+            f.write(resp.content)
 
     def switch_dlink_DGS1510(self, filename):
         s = socket.socket()
