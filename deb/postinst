@@ -1,0 +1,4 @@
+#!/bin/bash
+systemctl enable tisbackup_huey
+systemctl enable tisbackup_gui
+
