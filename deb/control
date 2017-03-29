@@ -1,0 +1,10 @@
+Package: tis-tisbackup
+Version: VERSION
+Section: base
+Priority: optional
+Architecture: all
+Depends:  unzip ssh rsync python-paramiko python-pyvmomi python-pexpect
+Maintainer: Tranquil-IT-Systems <admin@tranquil-it-systems.fr>
+Description: TISBackup backup management 
+Homepage: http://www.tranquil-it-systems.fr
+

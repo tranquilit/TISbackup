@@ -1,0 +1,9 @@
+[Unit]
+Description=tisbackup
+ 
+[Service]
+Type=simple
+ExecStart=/usr/bin/python2 /opt/tisbackup/tisbackup_gui.py
+ 
+[Install]
+WantedBy=multi-user.target
