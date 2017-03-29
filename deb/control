@@ -3,7 +3,7 @@ Version: VERSION
 Section: base
 Priority: optional
 Architecture: all
-Depends:  unzip ssh rsync python-paramiko python-pyvmomi python-pexpect
+Depends:  unzip, ssh, rsync, python-paramiko, python-pyvmomi, python-pexpect, python-flask,python-simplejson 
 Maintainer: Tranquil-IT-Systems <admin@tranquil-it-systems.fr>
 Description: TISBackup backup management 
 Homepage: http://www.tranquil-it-systems.fr
