@@ -1,5 +1,7 @@
 #!/bin/bash
 systemctl enable tisbackup_huey
 systemctl enable tisbackup_gui
-ln -s /opt/tisbackup/tisbackup.py  /usr/bin/tisbackup
 
+if [ ! -f /usr/bin/tisbackup ]; then
+    ln -s /opt/tisbackup/tisbackup.py  /usr/bin/tisbackup
+fi

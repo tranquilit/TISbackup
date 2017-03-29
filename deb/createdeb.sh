@@ -6,7 +6,7 @@ rm -Rf builddir
 mkdir builddir
 mkdir builddir/DEBIAN
 cp ./control ./builddir/DEBIAN
-cp ./files/postinst ./builddir/DEBIAN
+cp ./postinst ./builddir/DEBIAN
 
 sed "s/VERSION/$VERSION/" -i ./builddir/DEBIAN/control
 
