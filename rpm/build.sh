@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -ex
-rm -rf ./tis-tisbackup/ ./BUILD  *.rpm ./RPMS
+rm -rf ./builddir/ ./BUILD  *.rpm ./RPMS
 mkdir -p BUILD RPMS
 
 VERSION=`git rev-list HEAD --count` 
