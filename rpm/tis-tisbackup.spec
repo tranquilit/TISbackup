@@ -41,10 +41,11 @@ ln -s /opt/tisbackup/tisbackup.py  %{buildroot}/usr/bin/tisbackup
 %files
 %defattr(-,root,root)
 %attr(-,root,root)/opt/tisbackup/
-%attr(-,root,root)/usr/lib/systemd/system/
+%attr(-,root,root)/usr/lib/systemd/system/tisbackup_gui.service
+%attr(-,root,root)/usr/lib/systemd/system/tisbackup_huey.service
 %attr(-,root,root)/etc/tis
-%attr(-,root,root)/etc/cron.d/
-%attr(-,root,root)/usr/bin/
+%attr(-,root,root)/etc/cron.d/tisbackup
+%attr(-,root,root)/usr/bin/tisbackup
 
 %pre
 
