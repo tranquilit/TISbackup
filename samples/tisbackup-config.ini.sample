@@ -13,7 +13,7 @@ maximum_backup_age=30
 ;remote_dir=/
 ;compression=True
 ;exclude_list="/proc/**","/sys/**","/dev/**"
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 ;ssh_port = 22
 
 ;[srvzimbra-slash]
@@ -21,13 +21,13 @@ maximum_backup_age=30
 ;server_name=srvzimbra
 ;remote_dir=/
 ;exclude_list="/proc/**","/sys/**","/dev/**" 
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 ;ssh_port = 22
 
 ;[backup_mysql_srvintranet]
 ;type=mysql+ssh
 ;server_name=srvintranet
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 ;db_name=wiki
 ;db_user=root
 ;db_passwd=mypassword
@@ -36,7 +36,7 @@ maximum_backup_age=30
 ;type=pgsql+ssh
 ;server_name=srvopenerp
 ;db_name=tranquil-production
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 ;ssh_port = 22
 
 ;[test-backup-xva2]
@@ -48,16 +48,15 @@ maximum_backup_age=30
 ;[sw-serveur]
 ;type=switch
 ;server_name=sw-serveur
-;switch_ip=192.168.149.253
+;switch_ip=192.168.0.253
 ;switch_user=admin
 ;switch_password=toto
 ;switch_type=LINKSYS-SRW2024
 
-
 ;[backup_mysql_srvintranet]
 ;type=mysql+ssh
 ;server_name=srvintranet
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 ;db_name=
 ;db_user=root
 ;db_passwd=
@@ -65,13 +64,13 @@ maximum_backup_age=30
 ;[srvads-samba4]
 ;type=samba4
 ;server_name=srvads
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 ;root_dir_samba=/usr/local/samba/
 
 ;[backup_mysql_srvintranet]
 ;type=mysql+ssh
 ;server_name=srvintranet
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 ;db_name=
 ;db_user=root
 ;db_passwd=
@@ -79,7 +78,7 @@ maximum_backup_age=30
 ;[backup_sql_srvintranet]
 ;type=sqlserver+ssh
 ;server_name=srvintranet
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 ;db_name=testbackup
 ;db_user=sa
 ;db_password=xxx
@@ -88,12 +87,12 @@ maximum_backup_age=30
 ;[debian-ovf]
 ;type=esx-vmdk
 ;server_name=debian
-;esxhost=192.168.149.213
+;esxhost=192.168.0.213
 ;password_file=/etc/.esx_passwd
 ;create_ovafile=yes
 
 ;[srvxen1-metadata]
 ;type=xcp-dump-metadata
 ;server_name=srvxen1
-;private_key=/root/.ssh/id_dsa
+;private_key=/root/.ssh/id_rsa
 

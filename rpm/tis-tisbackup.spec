@@ -34,7 +34,7 @@ rsync -aP ../../../tisbackup/scripts/tisbackup_gui.service  %{buildroot}/usr/lib
 rsync -aP ../../../tisbackup/scripts/tisbackup_huey.service  %{buildroot}/usr/lib/systemd/system/
 rsync -aP ../../../tisbackup/samples/tisbackup.cron  %{buildroot}/etc/cron.d/tisbackup
 rsync -aP ../../../tisbackup/samples/tisbackup_gui.ini  %{buildroot}/etc/tis
-rsync -aP ../../../tisbackup/samples/config.ini.sample  %{buildroot}/etc/tis/tisbackup-config.ini.sample
+rsync -aP ../../../tisbackup/samples/tisbackup-config.ini.sample  %{buildroot}/etc/tis/tisbackup-config.ini.sample
 ln -s /opt/tisbackup/tisbackup.py /usr/bin/tisbackup
 
 %files
