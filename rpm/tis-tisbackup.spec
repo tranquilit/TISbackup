@@ -14,7 +14,7 @@ URL:		http://dev.tranquil.it
 Source0:	../
 Prefix:		/
 
-Requires:       unzip rsync python-paramiko python-pyvmomi python-pip nfs-utils  python-flask python-setuptools python-simplejson autofs pexpect
+Requires:       unzip rsync python-paramiko python-pyvmomi nfs-utils  python-flask python-simplejson autofs pexpect
 
 # Turn off the brp-python-bytecompile script
 #%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
@@ -51,8 +51,4 @@ ln -s /opt/tisbackup/tisbackup.py  %{buildroot}/usr/bin/tisbackup
 
 
 %post
-#[ -f /etc/dhcp/reservations.conf ] || touch /etc/dhcp/reservations.conf
-#[ -f /etc/dhcp/reservations.conf.disabled ] || touch /etc/dhcp/reservations.conf.disabled
-#[ -f /opt/tis-dhcpmanager/config.ini ] || cp /opt/tis-dhcpmanager/config.ini.sample /opt/tis-dhcpmanager/config.ini
-#[ -f /etc/dhcp/reservations.conf ] && sed -i 's/{/{\n/;s/;/;\n/g;'  /etc/dhcp/reservations.conf &&  sed -i '/^$/d'  /etc/dhcp/reservations.conf
 
