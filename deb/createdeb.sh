@@ -21,7 +21,6 @@ rsync -aP ../scripts/tisbackup_huey.service  ./builddir/usr/lib/systemd/system/
 rsync -aP ../samples/tisbackup.cron  ./builddir/etc/cron.d/tisbackup
 rsync -aP ../samples/tisbackup_gui.ini  ./builddir/etc/tis
 rsync -aP ../samples/tisbackup-config.ini.sample  ./builddir/etc/tis/tisbackup-config.ini.sample
-ln -s /opt/tisbackup/tisbackup.py  ./builddir/usr/bin/tisbackup
 
 chmod 755 /opt/tisbackup/tisbackup.py
 
