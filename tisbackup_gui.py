@@ -109,6 +109,7 @@ def read_config():
     backup_dict['metadata_list'] = []
     backup_dict['switch_list'] = []
     backup_dict['oracle_list'] = []
+    backup_dict['samba_list'] = []
     for row in result:
         backup_name = row['backup_name']
         server_name = row['server_name']
@@ -126,22 +127,24 @@ def read_config():
             backup_dict['rsync_list'].append([server_name, backup_name, backup_type,remote_dir])
         if backup_type == "null":
             backup_dict['null_list'].append([server_name, backup_name, backup_type, ""])
-	if backup_type == "pgsql+ssh":
-	    db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
-	    backup_dict['pgsql_list'].append([server_name, backup_name, backup_type, db_name])
-	if backup_type == "mysql+ssh":
-	    db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
-	    backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
+	    if backup_type == "pgsql+ssh":
+	        db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
+	        backup_dict['pgsql_list'].append([server_name, backup_name, backup_type, db_name])
+	    if backup_type == "mysql+ssh":
+	        db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
+	        backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "sqlserver+ssh":
             db_name = row['db_name']
             backup_dict['sqlserver_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "oracle+ssh":
-	    db_name = row['db_name']
-	    backup_dict['oracle_list'].append([server_name, backup_name, backup_type, db_name])	    
+	        db_name = row['db_name']
+	        backup_dict['oracle_list'].append([server_name, backup_name, backup_type, db_name])	    
         if backup_type == "xen-xva":
             backup_dict['xva_list'].append([server_name, backup_name, backup_type, ""])
         if backup_type == "switch":
             backup_dict['switch_list'].append([server_name, backup_name, backup_type, ""])
+        if backup_type == "samba4":
+            backup_dict['samba_list'].append([server_name, backup_name, backup_type, ""])
     return backup_dict
 
 @app.route('/')
@@ -162,7 +165,7 @@ def set_config_number(id=None):
 @app.route('/json')
 def backup_json():
     backup_dict = read_config()
-    return json.dumps(backup_dict['rsync_list']+backup_dict['sqlserver_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+  backup_dict['switch_list'])
+    return json.dumps(backup_dict['rsync_list']+backup_dict['sqlserver_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+backup_dict['switch_list']+backup_dict['samba_list'])
 
 
 def check_usb_disk():

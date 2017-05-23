@@ -285,6 +285,33 @@
 </div>
 {% endif %}
 
+{% if backup_list['samba_list']|count != 0 %}
+<div class="accordion-group">
+    <div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse11"><h2>Type: Samba4</h2></a>
+    </div>
+    <div id="collapse11" class="accordion-body collapse ">
+      <div class="accordion-inner">
+    <table class="table table-bordered">
+	    <thead>
+	        <th>Server</th>
+	        <th>Backup</th>
+        </thead>
+        <tbody>
+	        {% for entry in backup_list['samba_list'] %}
+	        <tr>
+	            <td>{{ entry[0] }}</td>
+	            <td>{{ entry[1] }}</td>
+	        </tr>
+	        {% endfor %}
+        </tbody>
+    </table>
+       </div>
+  </div>
+</div>
+{% endif %}
+
+
 </div>
 
 
