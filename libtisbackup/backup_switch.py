@@ -31,6 +31,7 @@ import select
 import urllib2, urllib
 import base64
 import socket
+import requests
 import pexpect
 from stat import *
 
@@ -163,14 +164,44 @@ class backup_switch(backup_generic):
 
 
     def switch_dlink_DGS1210(self, filename):
-        login_data = urllib.urlencode({'Login' : self.switch_user, 'Password' : self.switch_password, 'currlang' : 0, 'BrowsingPage' : 'index_dlink.htm', 'changlang' : 0})
-        req = urllib2.Request('http://%s/' % self.switch_ip, login_data)
-        resp = urllib2.urlopen(req)
-        if "Wrong password" in resp.read():
+        login_data = {'Login' : self.switch_user, 'Password' : self.switch_password, 'sellanId' : 0, 'sellan' : 0, 'lang_seqid' : 1}
+        resp = requests.post('http://%s/form/formLoginApply' % self.switch_ip, data=login_data, headers={"Referer":'http://%s/www/login.html' % self.switch_ip})
+        if "Wrong password" in resp.text:
             raise Exception("Wrong password")
-        resp = urllib2.urlopen("http://%s/config.bin?Gambit=gdkdcdgdidbdkdadkdbgegngjgogkdbgegngjgog&dumy=1348649950256" % self.switch_ip)
-        f = open(filename, 'w')
-        f.write(resp.read())
+        resp = requests.post("http://%s/BinFile/config.bin" % self.switch_ip, headers={"Referer":'http://%s/www/iss/013_download_cfg.html' % self.switch_ip})
+        with  open(filename, 'w') as f:
+            f.write(resp.content)
+
+    def switch_dlink_DGS1510(self, filename):
+        s = socket.socket()
+        try:
+            s.connect((self.switch_ip, 23))
+            s.close()
+        except:
+            raise
+
+        child = pexpect.spawn('telnet ' + self.switch_ip)
+        time.sleep(1)
+        if self.switch_user:
+            child.sendline(self.switch_user)
+        child.expect('Password:')
+        child.sendline(self.switch_password + '\r')
+        try:
+            child.expect("#")
+        except:
+            raise Exception("Bad Credentials")
+        child.sendline("terminal length 0\r")
+        child.expect("#")
+        child.sendline("show run\r")
+        child.logfile_read = open(filename, "a")
+        child.expect('End of configuration file')
+        child.expect('#--')
+        child.expect("#")
+        child.close()
+        myre = re.compile("#--+")
+        config = myre.split(open(filename).read())[2]
+        with open(filename,'w') as f:
+            f.write(config)
 
 
     def do_backup(self,stats):
@@ -191,6 +222,9 @@ class backup_switch(backup_generic):
             elif "DLINK-DGS1210" == self.switch_type:
                 dest_filename += '.bin'
                 self.switch_dlink_DGS1210(dest_filename)
+            elif "DLINK-DGS1510" == self.switch_type:
+                dest_filename += '.cfg'
+                self.switch_dlink_DGS1510(dest_filename)
             else:
                 raise Exception("Unknown Switch type")
 

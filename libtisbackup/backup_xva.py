@@ -184,11 +184,10 @@ class backup_xva(backup_generic):
             session.logout()
 
         if os.path.exists(filename_temp):
-            tar = tarfile.open(filename_temp)
-            if not tar.getnames():
+            tar = os.system('tar tf "%s" > /dev/null' % filename_temp)
+            if not tar == 0:
                 os.unlink(filename_temp)
                 return("Tar error")
-            tar.close()
             if str2bool(self.verify_export):
                 self.verify_export_xva(filename_temp)
             os.rename(filename_temp,filename)
