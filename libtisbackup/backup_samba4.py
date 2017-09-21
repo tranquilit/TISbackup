@@ -94,7 +94,7 @@ class backup_samba4(backup_generic):
 
         # zip the file
         stats['status']='Zipping'
-        cmd = 'gzip "%s.tisbackup"' % self.db_name
+        cmd = 'gzip -f "%s.tisbackup"' % self.db_name
         self.logger.debug('[%s] Compress backup : %s',self.backup_name,cmd)
         if not self.dry_run:
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
