@@ -50,14 +50,14 @@ usage="""\
 
 TIS Files Backup system.
 
-action is either : 
+action is either :
  backup : launch all backups or a specific one if -s option is used
  cleanup : removed backups older than retension period
  checknagios : check all or a specific backup against max_backup_age parameter
  dumpstat : dump the content of database for the last 20 backups
  retryfailed :  try to relaunch the last failed backups
  listdrivers :  list available backup types and parameters for config inifile
- exportbackup :  copy lastest OK backups from local to location defned by --exportdir parameter 
+ exportbackup :  copy lastest OK backups from local to location defned by --exportdir parameter
  register_existing : scan backup directories and add missing backups to database"""
 
 version="VERSION"
@@ -115,7 +115,7 @@ class tis_backup:
         # TODO limit backup to one backup on the command line
 
 
-    def checknagios(self,sections=[],maxage_hours=None):
+    def checknagios(self,sections=[]):
         try:
             if not sections:
                 sections = [backup_item.backup_name for backup_item in self.backup_list]
@@ -133,7 +133,7 @@ class tis_backup:
                         assert(isinstance(backup_item,backup_generic))
                         if not maxage_hours:
                             maxage_hours = backup_item.maximum_backup_age
-                        (nagiosstatus,log) = backup_item.checknagios(maxage_hours=maxage_hours)
+                        (nagiosstatus,log) = backup_item.checknagios()
                         if nagiosstatus == nagiosStateCritical:
                             critical.append((backup_item.backup_name,log))
                         elif nagiosstatus == nagiosStateWarning :
@@ -195,7 +195,7 @@ class tis_backup:
         errors = []
         if not sections:
             sections = [backup_item.backup_name for backup_item in self.backup_list]
-           
+
         self.logger.info('Processing backup for %s' % (','.join(sections)) )
         for backup_item in self.backup_list:
             if not sections or backup_item.backup_name in sections:
@@ -220,9 +220,9 @@ class tis_backup:
         errors = []
         if not sections:
             sections = [backup_item.backup_name for backup_item in self.backup_list]
-           
+
         self.logger.info('Exporting OK backups for %s to %s' % (','.join(sections),exportdir) )
-        
+
         for backup_item in self.backup_list:
             if backup_item.backup_name in sections:
                 try:
@@ -249,7 +249,7 @@ class tis_backup:
         mindate = datetime2isodate((datetime.datetime.now() - datetime.timedelta(hours=maxage_hours)))
         failed_backups = self.dbstat.query("""\
         select  distinct backup_name as bname
-        from stats    
+        from stats
         where  status="OK"  and  backup_start>=?""",(mindate,))
 
         defined_backups =  map(lambda f:f.backup_name, [ x for x in self.backup_list if not isinstance(x, backup_null) ])
@@ -284,7 +284,7 @@ class tis_backup:
         processed = False
         if not sections:
             sections = [backup_item.backup_name for backup_item in self.backup_list]
-        
+
         self.logger.info('Processing cleanup for %s' % (','.join(sections)) )
         for backup_item in self.backup_list:
             if backup_item.backup_name in sections:
@@ -301,13 +301,13 @@ class tis_backup:
     def register_existingbackups(self,sections = []):
         if not sections:
             sections = [backup_item.backup_name for backup_item in self.backup_list]
-            
+
         self.logger.info('Append existing backups to database...')
         for backup_item in self.backup_list:
             if backup_item.backup_name in sections:
                 backup_item.register_existingbackups()
 
-    def html_report(self):    
+    def html_report(self):
         for backup_item in self.backup_list:
             if not section or section == backup_item.backup_name:
                 assert(isinstance(backup_item,backup_generic))
@@ -321,9 +321,9 @@ class tis_backup:
                     worst_nagiosstatus = nagiosstatus
 
 
-def main():                         
+def main():
     (options,args)=parser.parse_args()
-    
+
     if len(args) != 1:
         print "ERROR : You must provide one action to perform"
         parser.print_usage()
@@ -341,14 +341,14 @@ def main():
     config_file =options.config
     dry_run = options.dry_run
     verbose = options.verbose
-            
+
     loglevel = options.loglevel
 
     # setup Logger
     logger = logging.getLogger('tisbackup')
-    hdlr = logging.StreamHandler() 
+    hdlr = logging.StreamHandler()
     hdlr.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-    logger.addHandler(hdlr)    
+    logger.addHandler(hdlr)
 
     # set loglevel
     if loglevel in ('debug','warning','info','error','critical'):
@@ -374,14 +374,14 @@ def main():
     if action!='checknagios':
         hdlr = logging.FileHandler(os.path.join(log_dir,'tisbackup_%s.log' % (backup_start_date)))
         hdlr.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-        logger.addHandler(hdlr) 
+        logger.addHandler(hdlr)
 
     # Main
     backup = tis_backup(dry_run=dry_run,verbose=verbose,backup_base_dir=backup_base_dir)
     backup.read_ini_file(config_file)
 
     backup_sections = options.sections.split(',') if options.sections else []
-        
+
     all_sections = [backup_item.backup_name for backup_item in backup.backup_list]
     if not backup_sections:
         backup_sections = all_sections
@@ -410,8 +410,8 @@ def main():
         backup.retry_failed_backups()
     elif action == "register_existing":
         backup.register_existingbackups(backup_sections)
-        
-        
+
+
     else:
         logger.error('Unhandled action "%s", quitting...',action)
         sys.exit(1)

@@ -1,4 +1,4 @@
-#!/usr/bin/python 
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -78,7 +78,7 @@ def dateof(adatetime):
 # http://code.activestate.com/recipes/498181-add-thousands-separator-commas-to-formatted-number/
 # Code from Michael Robellard's comment made 28 Feb 2010
 # Modified for leading +, -, space on 1 Mar 2010 by Glenn Linderman
-# 
+#
 # Tail recursion removed and  leading garbage handled on March 12 2010, Alessandro Forghieri
 def splitThousands( s, tSep=',', dSep='.'):
     '''Splits a general float on thousands. GIGO on general input'''
@@ -126,7 +126,7 @@ def check_string(test_string):
 def convert_bytes(bytes):
     if bytes is None:
         return None
-    else:        
+    else:
         bytes = float(bytes)
         if bytes >= 1099511627776:
             terabytes = bytes / 1099511627776
@@ -142,7 +142,7 @@ def convert_bytes(bytes):
             size = '%.2fK' % kilobytes
         else:
             size = '%.2fb' % bytes
-        return size    
+        return size
 
 ## {{{ http://code.activestate.com/recipes/81189/ (r2)
 def pp(cursor, data=None, rowlens=0, callback=None):
@@ -219,7 +219,7 @@ def html_table(cur,callback=None):
     return "<table border=1  cellpadding=2 cellspacing=0>%s%s</table>" % (head,lines)
 
 
-    
+
 def monitor_stdout(aprocess, onoutputdata,context):
     """Reads data from stdout and stderr from aprocess and return as a string
        on each chunk, call a call back onoutputdata(dataread)
@@ -296,17 +296,17 @@ class BackupStat:
             self.db=sqlite3.connect(self.dbpath)
             self.initdb()
         else:
-            self.db=sqlite3.connect(self.dbpath,check_same_thread=False) 
+            self.db=sqlite3.connect(self.dbpath,check_same_thread=False)
             if not "'TYPE'" in str(self.db.execute("select * from stats").description):
                 self.updatedb()
-                 
+
 
     def updatedb(self):
         self.logger.debug('Update stat database')
         self.db.execute("alter table stats add column TYPE TEXT;")
         self.db.execute("update stats set TYPE='BACKUP';")
         self.db.commit()
-        
+
     def initdb(self):
         assert(isinstance(self.db,sqlite3.Connection))
         self.logger.debug('Initialize stat database')
@@ -332,7 +332,7 @@ create index idx_stats_backup_name on stats(backup_name);""")
 create index idx_stats_backup_location on stats(backup_location);""")
         self.db.execute("""
 CREATE INDEX idx_stats_backup_name_start on stats(backup_name,backup_start);""")
-        self.db.commit()        
+        self.db.commit()
 
     def start(self,backup_name,server_name,TYPE,description='',backup_location=None):
         """ Add in stat DB a record for the newly running backup"""
@@ -351,7 +351,7 @@ CREATE INDEX idx_stats_backup_name_start on stats(backup_name,backup_start);""")
 
         # update stat record
         self.db.execute("""\
-      update stats set 
+      update stats set
         total_files_count=?,written_files_count=?,total_bytes=?,written_bytes=?,log=?,status=?,backup_end=?,backup_duration=?,backup_location=?
       where
         rowid = ?
@@ -377,7 +377,7 @@ CREATE INDEX idx_stats_backup_name_start on stats(backup_name,backup_start);""")
             backup_start=datetime2isodate()
         if not backup_end:
             backup_end=datetime2isodate()
-        
+
         cur = self.db.execute("""\
       insert into stats (
           backup_name,
@@ -408,7 +408,7 @@ CREATE INDEX idx_stats_backup_name_start on stats(backup_name,backup_start);""")
            status,
            log,
            backup_location,
-           TYPE)       
+           TYPE)
        )
 
         self.db.commit()
@@ -465,7 +465,7 @@ CREATE INDEX idx_stats_backup_name_start on stats(backup_name,backup_start);""")
 
 
 def ssh_exec(command,ssh=None,server_name='',remote_user='',private_key='',ssh_port=22):
-    """execute command on server_name using the provided ssh connection 
+    """execute command on server_name using the provided ssh connection
       or creates a new connection if ssh is not provided.
       returns (exit_code,output)
 
@@ -520,7 +520,7 @@ class backup_generic:
 
     def __init__(self,backup_name, backup_dir,dbstat=None,dry_run=False):
         if not re.match('^[A-Za-z0-9_\-\.]*$',backup_name):
-            raise Exception('The backup name %s should contain only alphanumerical characters' % backup_name) 
+            raise Exception('The backup name %s should contain only alphanumerical characters' % backup_name)
         self.backup_name = backup_name
         self.backup_dir = backup_dir
 
@@ -563,7 +563,7 @@ class backup_generic:
 
         # if retention (in days) is not defined at section level, get default global one.
         if not self.backup_retention_time:
-            self.backup_retention_time = iniconf.getint('global','backup_retention_time')    
+            self.backup_retention_time = iniconf.getint('global','backup_retention_time')
 
         # for nagios, if maximum last backup age (in hours) is not defined at section level, get default global one.
         if not self.maximum_backup_age:
@@ -639,7 +639,7 @@ class backup_generic:
 
     def process_backup(self):
         """Process the backup.
-          launch 
+          launch
            - do_preexec
            - do_backup
            - do_postexec
@@ -713,10 +713,10 @@ class backup_generic:
                                    backup_location=stats['backup_location'])
 
             self.logger.error('[%s] ######### Backup finished with ERROR: %s',self.backup_name,stats['log'])
-            raise     
+            raise
 
 
-    def checknagios(self,maxage_hours=30):
+    def checknagios(self):
         """
         Returns a tuple (nagiosstatus,message) for the current backup_name
         Read status from dbstat database
@@ -731,7 +731,7 @@ class backup_generic:
                 self.logger.debug('[%s] checknagios : no result from query',self.backup_name)
                 return (nagiosStateCritical,'CRITICAL : No backup found for %s in database' % self.backup_name)
             else:
-                mindate = datetime2isodate((datetime.datetime.now() - datetime.timedelta(hours=maxage_hours)))
+                mindate = datetime2isodate((datetime.datetime.now() - datetime.timedelta(hours=self.maximum_backup_age)))
                 self.logger.debug('[%s] checknagios : looking for most recent OK not older than %s',self.backup_name,mindate)
                 for b in q:
                     if b['backup_end'] >= mindate and b['status'] == 'OK':
@@ -784,15 +784,15 @@ class backup_generic:
                                     returncode = process.returncode
                                     if (returncode != 0):
                                         self.logger.error("[" + self.backup_name + "] shell program exited with error code: %s"%log)
-                                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)                      
+                                        raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)
                                     else:
-                                        self.logger.info("[" + self.backup_name + "] deleting snapshot volume: %s"%oldbackup_location.encode('ascii'))                                    
+                                        self.logger.info("[" + self.backup_name + "] deleting snapshot volume: %s"%oldbackup_location.encode('ascii'))
                                 else:
                                     shutil.rmtree(oldbackup_location.encode('ascii'))
                         if os.path.isfile(oldbackup_location) and self.backup_dir in oldbackup_location :
                             self.logger.debug('[%s] removing file "%s"',self.backup_name,oldbackup_location)
                             if not self.dry_run:
-                                os.remove(oldbackup_location)             
+                                os.remove(oldbackup_location)
                         self.logger.debug('Cleanup_backup : Removing records from DB : [%s]-"%s"',self.backup_name,oldbackup_location)
                         if not self.dry_run:
                             self.dbstat.db.execute('update stats set TYPE="CLEAN" where backup_name=? and backup_location=?',(self.backup_name,oldbackup_location))
@@ -812,7 +812,7 @@ class backup_generic:
         """scan existing backups and insert stats in database"""
         registered = [b['backup_location'] for b in self.dbstat.query('select distinct backup_location from stats where backup_name=?',self.backup_name)]
         raise Exception('Abstract method')
-    
+
     def export_latestbackup(self,destdir):
         """Copy (rsync) latest OK backup to external storage located at locally mounted "destdir"
         """
@@ -828,11 +828,11 @@ class backup_generic:
             raise Exception('No database')
         else:
             latest_sql = """\
-              select status, backup_start, backup_end, log, backup_location, total_bytes 
-              from stats 
+              select status, backup_start, backup_end, log, backup_location, total_bytes
+              from stats
               where backup_name=? and status='OK' and TYPE='BACKUP'
               order by backup_start desc limit 30"""
-            self.logger.debug('[%s] export_latestbackup : sql query "%s" %s',self.backup_name,latest_sql,self.backup_name) 
+            self.logger.debug('[%s] export_latestbackup : sql query "%s" %s',self.backup_name,latest_sql,self.backup_name)
             q = self.dbstat.query(latest_sql,(self.backup_name,))
             if not q:
                 self.logger.debug('[%s] export_latestbackup : no result from query',self.backup_name)
@@ -849,10 +849,10 @@ class backup_generic:
                     backup_source += '/'
                     if backup_dest[-1] <> '/':
                         backup_dest += '/'
-                
+
                 if not os.path.isdir(backup_dest):
                     os.makedirs(backup_dest)
-                    
+
                 options = ['-aP','--stats','--delete-excluded','--numeric-ids','--delete-after']
                 if self.logger.level:
                     options.append('-P')
@@ -901,7 +901,7 @@ class backup_generic:
 
                 stats['status']='OK'
                 self.logger.info('export backup from %s to %s OK, %d bytes written for %d changed files' % (backup_source,backup_dest,stats['written_bytes'],stats['written_files_count']))
-                
+
                 endtime = time.time()
                 duration = (endtime-starttime)/3600.0
                 if not self.dry_run and self.dbstat:
@@ -914,7 +914,7 @@ class backup_generic:
                                        written_bytes=stats['written_bytes'],
                                        status=stats['status'],
                                        log=stats['log'],
-                                       backup_location=backup_dest)             
+                                       backup_location=backup_dest)
                 return stats
 
 
@@ -925,4 +925,4 @@ if __name__ == '__main__':
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    dbstat = BackupStat('/backup/data/log/tisbackup.sqlite') 
+    dbstat = BackupStat('/backup/data/log/tisbackup.sqlite')
