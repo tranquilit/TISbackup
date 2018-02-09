@@ -810,7 +810,7 @@ class backup_generic:
 
     def register_existingbackups(self):
         """scan existing backups and insert stats in database"""
-        registered = [b['backup_location'] for b in self.dbstat.query('select distinct backup_location from stats where backup_name=?',self.backup_name)]
+        registered = [b['backup_location'] for b in self.dbstat.query('select distinct backup_location from stats where backup_name=?',[self.backup_name])]
         raise Exception('Abstract method')
 
     def export_latestbackup(self,destdir):

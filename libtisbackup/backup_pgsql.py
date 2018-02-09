@@ -86,12 +86,14 @@ class backup_pgsql(backup_generic):
     def do_pgsqldump(self,stats):
         t = datetime.datetime.now()
         backup_start_date =  t.strftime('%Y%m%d-%Hh%Mm%S')
-        # dump db
-        cmd = " su -  postgres -c 'pg_dump -E %(encoding)s %(db_name)s > %(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql'" % {
+        params =  {
             'encoding':self.encoding,
             'db_name':self.db_name,
             'tmp_dir':self.tmp_dir,
+            'dest_dir':self.dest_dir,
             'backup_start_date':backup_start_date}
+        # dump db
+        cmd = "su -  postgres -c 'pg_dump -E %(encoding)s %(db_name)s > %(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql'" % params
         self.logger.debug('[%s] %s ',self.backup_name,cmd)
         if not self.dry_run:
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
@@ -100,7 +102,8 @@ class backup_pgsql(backup_generic):
                 raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
 
         # zip the file
-        cmd = 'gzip /tmp/' + self.db_name  + '-' + backup_start_date + '.sql'
+        cmd = 'gzip  %(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql' % params
+		
         self.logger.debug('[%s] %s ',self.backup_name,cmd)
         if not self.dry_run:
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
@@ -109,8 +112,8 @@ class backup_pgsql(backup_generic):
                 raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
 
         # get the file
-        filepath = '/tmp/' + self.db_name  + '-' + backup_start_date + '.sql.gz'
-        localpath = self.dest_dir + '/' + self.db_name  + '-' + backup_start_date + '.sql.gz'
+        filepath = '%(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql' % params
+        localpath = '%(dest_dir)s/%(db_name)s-%(backup_start_date)s.sql.gz' % params
         self.logger.debug('[%s] get the file using sftp from "%s" to "%s" ',self.backup_name,filepath,localpath)
         if not self.dry_run:
             transport =  self.ssh.get_transport()
