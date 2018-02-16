@@ -130,9 +130,6 @@ class tis_backup:
                 nagiosoutput = ''
                 for backup_item in self.backup_list:
                     if not sections or backup_item.backup_name in sections:
-                        assert(isinstance(backup_item,backup_generic))
-                        if not maxage_hours:
-                            maxage_hours = backup_item.maximum_backup_age
                         (nagiosstatus,log) = backup_item.checknagios()
                         if nagiosstatus == nagiosStateCritical:
                             critical.append((backup_item.backup_name,log))
