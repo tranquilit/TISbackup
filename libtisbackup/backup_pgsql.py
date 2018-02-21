@@ -103,7 +103,7 @@ class backup_pgsql(backup_generic):
 
         # zip the file
         cmd = 'gzip  %(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql' % params
-		
+
         self.logger.debug('[%s] %s ',self.backup_name,cmd)
         if not self.dry_run:
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
@@ -112,7 +112,7 @@ class backup_pgsql(backup_generic):
                 raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
 
         # get the file
-        filepath = '%(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql' % params
+        filepath = '%(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql.gz' % params
         localpath = '%(dest_dir)s/%(db_name)s-%(backup_start_date)s.sql.gz' % params
         self.logger.debug('[%s] get the file using sftp from "%s" to "%s" ',self.backup_name,filepath,localpath)
         if not self.dry_run:
