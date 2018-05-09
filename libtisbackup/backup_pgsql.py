@@ -129,7 +129,7 @@ class backup_pgsql(backup_generic):
         stats['log'] = '%s "%s"' % (stats['log'] ,self.db_name)
         stats['backup_location'] = self.dest_dir
 
-        cmd = 'rm -f  /tmp/' + self.db_name  + '-' + backup_start_date + '.sql.gz'
+        cmd = 'rm -f %(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql.gz' % params
         self.logger.debug('[%s] %s ',self.backup_name,cmd)
         if not self.dry_run:
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
