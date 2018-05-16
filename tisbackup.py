@@ -28,6 +28,7 @@ import sys
 import getopt
 import os.path
 import logging
+import errno
 from libtisbackup.common import *
 from libtisbackup.backup_mysql import backup_mysql
 from libtisbackup.backup_rsync import backup_rsync
@@ -369,9 +370,15 @@ def main():
 
     # if we run the nagios check, we don't create log file, everything is piped to stdout
     if action!='checknagios':
-        hdlr = logging.FileHandler(os.path.join(log_dir,'tisbackup_%s.log' % (backup_start_date)))
-        hdlr.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-        logger.addHandler(hdlr)
+        try:
+            hdlr = logging.FileHandler(os.path.join(log_dir,'tisbackup_%s.log' % (backup_start_date)))
+            hdlr.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+            logger.addHandler(hdlr)
+        except Exception, e:
+            if action == 'cleanup' and e.errno == errno.ENOSPC:
+                logger.warning("No space left on device, disabling file logging.")
+            else:
+                raise e
 
     # Main
     backup = tis_backup(dry_run=dry_run,verbose=verbose,backup_base_dir=backup_base_dir)
