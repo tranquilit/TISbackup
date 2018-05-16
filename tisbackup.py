@@ -374,7 +374,7 @@ def main():
             hdlr = logging.FileHandler(os.path.join(log_dir,'tisbackup_%s.log' % (backup_start_date)))
             hdlr.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
             logger.addHandler(hdlr)
-        except Exception, e:
+        except IOError, e:
             if action == 'cleanup' and e.errno == errno.ENOSPC:
                 logger.warning("No space left on device, disabling file logging.")
             else:
