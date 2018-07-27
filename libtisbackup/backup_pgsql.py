@@ -93,17 +93,9 @@ class backup_pgsql(backup_generic):
             'dest_dir':self.dest_dir,
             'backup_start_date':backup_start_date}
         # dump db
-        cmd = "su -  postgres -c 'pg_dump -E %(encoding)s %(db_name)s > %(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql'" % params
-        self.logger.debug('[%s] %s ',self.backup_name,cmd)
-        if not self.dry_run:
-            (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
-            self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
-            if error_code:
-                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
-
-        # zip the file
-        cmd = 'gzip  %(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql' % params
-
+        filepath = '%(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql.gz' % params
+        cmd = "su -  postgres -c 'pg_dump -E %(encoding)s -Z9 %(db_name)s'" % params
+        cmd += ' > ' + filepath
         self.logger.debug('[%s] %s ',self.backup_name,cmd)
         if not self.dry_run:
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
@@ -112,7 +104,6 @@ class backup_pgsql(backup_generic):
                 raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
 
         # get the file
-        filepath = '%(tmp_dir)s/%(db_name)s-%(backup_start_date)s.sql.gz' % params
         localpath = '%(dest_dir)s/%(db_name)s-%(backup_start_date)s.sql.gz' % params
         self.logger.debug('[%s] get the file using sftp from "%s" to "%s" ',self.backup_name,filepath,localpath)
         if not self.dry_run:
