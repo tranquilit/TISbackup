@@ -51,7 +51,6 @@ BASE_DIR = cp.get('general','base_config_dir')
 
 tisbackup_config_file= CONFIG[0]
 config_number=0
-print tisbackup_config_file
 
 cp = ConfigParser()
 cp.read(tisbackup_config_file)
