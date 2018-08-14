@@ -18,12 +18,13 @@
 #
 # -----------------------------------------------------------------------
 import os,sys
+from os.path import isfile, join
 tisbackup_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(os.path.join(tisbackup_root_dir,'lib'))
 
 
 from shutil import *
-from iniparse import ConfigParser
+from iniparse import ConfigParser,RawConfigParser
 from libtisbackup.common import *
 import time 
 from flask import request, Flask,  session, g, appcontext_pushed, redirect, url_for, abort, render_template, flash, jsonify, Response
@@ -46,10 +47,11 @@ cp.read("/etc/tis/tisbackup_gui.ini")
 CONFIG = cp.get('general','config_tisbackup').split(",")
 SECTIONS = cp.get('general','sections')
 ADMIN_EMAIL = cp.get('general','ADMIN_EMAIL')
+BASE_DIR = cp.get('general','base_config_dir')
 
 tisbackup_config_file= CONFIG[0]
 config_number=0
-
+print tisbackup_config_file
 
 cp = ConfigParser()
 cp.read(tisbackup_config_file)
@@ -64,6 +66,110 @@ app.config['PROPAGATE_EXCEPTIONS'] = True
 
 tasks_db = os.path.join(tisbackup_root_dir,"tasks.sqlite")
 
+
+def read_all_configs(base_dir):
+    raw_configs = []
+    list_config = []
+    config_base_dir = base_dir
+    
+    for file in os.listdir(base_dir):
+        if isfile(join(base_dir,file)): 
+            raw_configs.append(join(base_dir,file))
+    
+    for elem in raw_configs:
+        line = open(elem).readline()
+        if 'global' in line:
+            list_config.append(elem)
+
+    backup_dict = {}
+    backup_dict['rsync_ssh_list'] = []
+    backup_dict['rsync_btrfs_list'] = []
+    backup_dict['rsync_list'] = []
+    backup_dict['null_list'] = []
+    backup_dict['pgsql_list'] = []
+    backup_dict['mysql_list'] = []
+    backup_dict['sqlserver_list'] = []
+    backup_dict['xva_list'] = []
+    backup_dict['metadata_list'] = []
+    backup_dict['switch_list'] = []
+    backup_dict['oracle_list'] = []
+
+    result = []
+    cp = ConfigParser()
+    for config_file in list_config:
+        cp.read(config_file)
+
+        backup_base_dir = cp.get('global', 'backup_base_dir')
+        backup = tis_backup(backup_base_dir=backup_base_dir)
+        backup.read_ini_file(config_file)
+
+        backup_sections = SECTIONS or []
+
+        all_sections = [backup_item.backup_name for backup_item in backup.backup_list]
+        if not backup_sections:
+            backup_sections = all_sections
+        else:
+            for b in backup_sections:
+                if not b in all_sections:
+                    raise Exception('Section %s is not defined in config file' % b)
+
+        if not backup_sections:
+            sections = [backup_item.backup_name for backup_item in backup.backup_list]
+
+        for backup_item in backup.backup_list:
+            if backup_item.backup_name in backup_sections:
+                b = {}
+                for attrib_name in backup_item.required_params + backup_item.optional_params:
+                    if hasattr(backup_item, attrib_name):
+                        b[attrib_name] = getattr(backup_item, attrib_name)
+                result.append(b)
+
+    for row in result:
+        backup_name = row['backup_name']
+        server_name = row['server_name']
+        backup_type = row['type']
+        if backup_type == "xcp-dump-metadata":
+            backup_dict['metadata_list'].append(
+                [server_name, backup_name, backup_type, ""])
+        if backup_type == "rsync+ssh":
+            remote_dir = row['remote_dir']
+            backup_dict['rsync_ssh_list'].append(
+                [server_name, backup_name, backup_type, remote_dir])
+        if backup_type == "rsync+btrfs+ssh":
+            remote_dir = row['remote_dir']
+            backup_dict['rsync_btrfs_list'].append(
+                [server_name, backup_name, backup_type, remote_dir])
+        if backup_type == "rsync":
+            remote_dir = row['remote_dir']
+            backup_dict['rsync_list'].append(
+                [server_name, backup_name, backup_type, remote_dir])
+        if backup_type == "null":
+            backup_dict['null_list'].append(
+                [server_name, backup_name, backup_type, ""])
+        if backup_type == "pgsql+ssh":
+            db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
+            backup_dict['pgsql_list'].append(
+                [server_name, backup_name, backup_type, db_name])
+        if backup_type == "mysql+ssh":
+            db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
+            backup_dict['mysql_list'].append(
+                [server_name, backup_name, backup_type, db_name])
+        if backup_type == "sqlserver+ssh":
+            db_name = row['db_name']
+            backup_dict['sqlserver_list'].append(
+                [server_name, backup_name, backup_type, db_name])
+        if backup_type == "oracle+ssh":
+            db_name = row['db_name']
+            backup_dict['oracle_list'].append(
+                [server_name, backup_name, backup_type, db_name])
+        if backup_type == "xen-xva":
+            backup_dict['xva_list'].append(
+                [server_name, backup_name, backup_type, ""])
+        if backup_type == "switch":
+            backup_dict['switch_list'].append(
+                [server_name, backup_name, backup_type, ""])
+            
+    return backup_dict
 
 
 def read_config():
@@ -126,18 +232,18 @@ def read_config():
             backup_dict['rsync_list'].append([server_name, backup_name, backup_type,remote_dir])
         if backup_type == "null":
             backup_dict['null_list'].append([server_name, backup_name, backup_type, ""])
-	if backup_type == "pgsql+ssh":
-	    db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
-	    backup_dict['pgsql_list'].append([server_name, backup_name, backup_type, db_name])
-	if backup_type == "mysql+ssh":
-	    db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
-	    backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
+        if backup_type == "pgsql+ssh":
+            db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
+            backup_dict['pgsql_list'].append([server_name, backup_name, backup_type, db_name])
+        if backup_type == "mysql+ssh":
+            db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
+            backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "sqlserver+ssh":
             db_name = row['db_name']
             backup_dict['sqlserver_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "oracle+ssh":
-	    db_name = row['db_name']
-	    backup_dict['oracle_list'].append([server_name, backup_name, backup_type, db_name])	    
+            db_name = row['db_name']
+            backup_dict['oracle_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "xen-xva":
             backup_dict['xva_list'].append([server_name, backup_name, backup_type, ""])
         if backup_type == "switch":
@@ -158,6 +264,13 @@ def set_config_number(id=None):
         config_number=id
         read_config()
     return  jsonify(configs=CONFIG,config_number=config_number)
+
+
+@app.route('/all_json')
+def backup_all_json():
+    backup_dict = read_all_configs(BASE_DIR)
+    return json.dumps(backup_dict['rsync_list']+backup_dict['sqlserver_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+  backup_dict['switch_list'])
+
 
 @app.route('/json')
 def backup_json():
