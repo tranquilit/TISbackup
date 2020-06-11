@@ -15,7 +15,7 @@ for backup in backups:
     base_dir = os.path.join(backup_base_dir,backup)
     dest_dir = os.path.join(base_dir, 'last_backup')
     if not os.path.isdir(dest_dir):              
-        cmd = "/sbin/btrfs subvolume create %s"%dest_dir
+        cmd = "/bin/btrfs subvolume create %s"%dest_dir
         print 'btrfs subvolume create "%s"' %dest_dir
         print subprocess.check_output(cmd, shell=True)
 
