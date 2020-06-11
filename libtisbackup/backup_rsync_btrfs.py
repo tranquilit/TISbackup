@@ -68,7 +68,7 @@ class backup_rsync_btrfs(backup_generic):
                 dest_dir = os.path.join(self.backup_dir,'last_backup')
                 if not os.path.isdir(dest_dir):
                     if not self.dry_run:
-                        cmd = "/sbin/btrfs subvolume create %s"%dest_dir
+                        cmd = "/bin/btrfs subvolume create %s"%dest_dir
                         process = subprocess.Popen(cmd, shell=True,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
                         log = monitor_stdout(process,'',self)
                         returncode = process.returncode
@@ -210,7 +210,7 @@ class backup_rsync_btrfs(backup_generic):
                 self.logger.debug("[%s] snapshoting last_backup directory from %s to %s" ,self.backup_name,dest_dir,finaldest)
                 if not os.path.isdir(finaldest):
                     if not self.dry_run:
-                        cmd = "/sbin/btrfs subvolume snapshot %s %s"%(dest_dir,finaldest)
+                        cmd = "/bin/btrfs subvolume snapshot %s %s"%(dest_dir,finaldest)
                         process = subprocess.Popen(cmd, shell=True,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
                         log = monitor_stdout(process,'',self)
                         returncode = process.returncode
