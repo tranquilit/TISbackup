@@ -28,14 +28,15 @@ from iniparse import ConfigParser
 import sqlite3
 import shutil
 import select
+import traceback
 
 import sys
 
 try:
     sys.stderr = open('/dev/null')       # Silence silly warnings from paramiko
     import paramiko
-except ImportError,e:
-    print "Error : can not load paramiko library %s" % e
+except ImportError as e:
+    print("Error : can not load paramiko library %s" % e)
     raise
 
 sys.stderr = sys.__stderr__
@@ -121,7 +122,7 @@ def check_string(test_string):
     pattern = r'[^\.A-Za-z0-9\-_]'
     if re.search(pattern, test_string):
         #Character other then . a-z 0-9 was found
-        print 'Invalid : %r' % (test_string,)
+        print('Invalid : %r' % (test_string,))
 
 def convert_bytes(bytes):
     if bytes is None:
@@ -227,7 +228,7 @@ def monitor_stdout(aprocess, onoutputdata,context):
     assert(isinstance(aprocess,subprocess.Popen))
     read_set = []
     stdout = []
-    line = ''
+    line = b''
 
     if aprocess.stdout:
         read_set.append(aprocess.stdout)
@@ -237,7 +238,7 @@ def monitor_stdout(aprocess, onoutputdata,context):
     while read_set:
         try:
             rlist, wlist, xlist = select.select(read_set, [], [])
-        except select.error, e:
+        except select.error as e:
             if e.args[0] == errno.EINTR:
                 continue
             raise
@@ -245,38 +246,38 @@ def monitor_stdout(aprocess, onoutputdata,context):
         # Reads one line from stdout
         if aprocess.stdout in rlist:
             data = os.read(aprocess.stdout.fileno(), 1)
-            if data == "":
+            if data == b"":
                 aprocess.stdout.close()
                 read_set.remove(aprocess.stdout)
-            while data and not data in ('\n','\r'):
+            while data and not data in (b'\n',b'\r'):
                 line += data
                 data = os.read(aprocess.stdout.fileno(), 1)
-            if line or data in ('\n','\r'):
-                stdout.append(line)
+            if line or data in (b'\n',b'\r'):
+                stdout.append(line.decode('utf8'))
                 if onoutputdata:
-                    onoutputdata(line,context)
-            line=''
+                    onoutputdata(line.decode('utf8'),context)
+            line=b''
 
         # Reads one line from stderr
         if aprocess.stderr in rlist:
             data = os.read(aprocess.stderr.fileno(), 1)
-            if data == "":
+            if data == b"":
                 aprocess.stderr.close()
                 read_set.remove(aprocess.stderr)
-            while data and not data in ('\n','\r'):
+            while data and not data in (b'\n',b'\r'):
                 line += data
                 data = os.read(aprocess.stderr.fileno(), 1)
-            if line or data in ('\n','\r'):
-                stdout.append(line)
+            if line or data in (b'\n',b'\r'):
+                stdout.append(line.decode('utf8'))
                 if onoutputdata:
-                    onoutputdata(line,context)
-            line=''
+                    onoutputdata(line.decode('utf8'),context)
+            line=b''
 
     aprocess.wait()
     if line:
-        stdout.append(line)
+        stdout.append(line.decode('utf8'))
         if onoutputdata:
-            onoutputdata(line,context)
+            onoutputdata(line.decode('utf8'),context)
     return "\n".join(stdout)
 
 
@@ -442,7 +443,7 @@ CREATE INDEX idx_stats_backup_name_start on stats(backup_name,backup_start);""")
                 return value
 
         #for r in self.query('select  * from stats where backup_name=? order by backup_end desc limit ?',(backup_name,count)):
-        print pp(cur,None,1,fcb)
+        print(pp(cur,None,1,fcb))
 
 
     def fcb(self,fields,fieldname,value):
@@ -544,11 +545,12 @@ class backup_generic:
        'optional':",".join(cls.optional_params)}
 
     def check_required_params(self):
-        for name in self.required_params:
-            if not hasattr(self,name) or not getattr(self,name):
-                raise Exception('[%s] Config Attribute %s is required' % (self.backup_name,name))
-        if (self.preexec or self.postexec) and (not self.private_key or not self.remote_user):
-            raise Exception('[%s] remote_user and private_key file required if preexec or postexec is used' % self.backup_name)
+        #for name in self.required_params:
+        #    if not hasattr(self,name) or not getattr(self,name):
+        #        raise Exception('[%s] Config Attribute %s is required' % (self.backup_name,name))
+        #if (self.preexec or self.postexec) and (not self.private_key or not self.remote_user):
+        #    raise Exception('[%s] remote_user and private_key file required if preexec or postexec is used' % self.backup_name)
+        pass
 
 
     def read_config(self,iniconf):
@@ -695,7 +697,7 @@ class backup_generic:
             self.logger.info('[%s] ######### Backup finished : %s',self.backup_name,stats['log'])
             return stats
 
-        except BaseException, e:
+        except BaseException as  e:
             stats['status']='ERROR'
             stats['log']=str(e)
             endtime = time.time()
@@ -713,6 +715,8 @@ class backup_generic:
                                    backup_location=stats['backup_location'])
 
             self.logger.error('[%s] ######### Backup finished with ERROR: %s',self.backup_name,stats['log'])
+            self.logger.debug(traceback.format_exc())
+  
             raise
 
 
@@ -797,7 +801,7 @@ class backup_generic:
                         if not self.dry_run:
                             self.dbstat.db.execute('update stats set TYPE="CLEAN" where backup_name=? and backup_location=?',(self.backup_name,oldbackup_location))
                             self.dbstat.db.commit()
-                    except BaseException,e:
+                    except BaseException as e:
                         self.logger.error('cleanup_backup : Unable to remove directory/file "%s". Error %s', oldbackup_location,e)
                     removed.append((self.backup_name,oldbackup_location))
             else:
@@ -845,9 +849,9 @@ class backup_generic:
                     raise Exception('Backup source %s doesn\'t exists' % backup_source)
 
                 # ensure there is a slash at end
-                if os.path.isdir(backup_source) and backup_source[-1] <> '/':
+                if os.path.isdir(backup_source) and backup_source[-1] != '/':
                     backup_source += '/'
-                    if backup_dest[-1] <> '/':
+                    if backup_dest[-1] != '/':
                         backup_dest += '/'
 
                 if not os.path.isdir(backup_dest):
@@ -873,7 +877,7 @@ class backup_generic:
                     process = subprocess.Popen(cmd, shell=True,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
                     def ondata(data,context):
                         if context.verbose:
-                            print data
+                            print(data)
                         context.logger.debug(data)
 
                     log = monitor_stdout(process,ondata,self)
@@ -897,7 +901,7 @@ class backup_generic:
                         self.logger.error("[" + self.backup_name + "] shell program exited with error code ")
                         raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)
                 else:
-                    print cmd
+                    print(cmd)
 
                 stats['status']='OK'
                 self.logger.info('export backup from %s to %s OK, %d bytes written for %d changed files' % (backup_source,backup_dest,stats['written_bytes'],stats['written_files_count']))

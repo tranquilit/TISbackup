@@ -86,6 +86,7 @@ class ConfigNamespace(object):
     def __setstate__(self, state):
         self.__dict__.update(state)
 
+
 class Undefined(object):
     """Helper class used to hold undefined names until assignment.
 
@@ -143,16 +144,16 @@ class BasicConfig(ConfigNamespace):
 
     >>> n.aaa = 42
     >>> del n.x
-    >>> print n
+    >>> print(n)
     aaa = 42
     name.first = paramjit
     name.last = oberoi
 
-    Nested namepsaces are also namespaces:
+    Nested namespaces are also namespaces:
 
     >>> isinstance(n.name, ConfigNamespace)
     True
-    >>> print n.name
+    >>> print(n.name)
     first = paramjit
     last = oberoi
     >>> sorted(list(n.name))
@@ -160,7 +161,7 @@ class BasicConfig(ConfigNamespace):
 
     Finally, values can be read from a file as follows:
 
-    >>> from StringIO import StringIO
+    >>> from six import StringIO
     >>> sio = StringIO('''
     ... # comment
     ... ui.height = 100
@@ -171,7 +172,7 @@ class BasicConfig(ConfigNamespace):
     ... ''')
     >>> n = BasicConfig()
     >>> n._readfp(sio)
-    >>> print n
+    >>> print(n)
     complexity = medium
     data.secret.password = goodness=gracious me
     have_python
@@ -199,7 +200,7 @@ class BasicConfig(ConfigNamespace):
 
     def __str__(self, prefix=''):
         lines = []
-        keys = self._data.keys()
+        keys = list(self._data.keys())
         keys.sort()
         for name in keys:
             value = self._data[name]
@@ -258,7 +259,7 @@ def update_config(target, source):
     >>> n.ui.display_clock = True
     >>> n.ui.display_qlength = True
     >>> n.ui.width = 150
-    >>> print n
+    >>> print(n)
     playlist.expand_playlist = True
     ui.display_clock = True
     ui.display_qlength = True
@@ -267,7 +268,7 @@ def update_config(target, source):
     >>> from iniparse import ini
     >>> i = ini.INIConfig()
     >>> update_config(i, n)
-    >>> print i
+    >>> print(i)
     [playlist]
     expand_playlist = True
     <BLANKLINE>
@@ -277,7 +278,7 @@ def update_config(target, source):
     width = 150
 
     """
-    for name in source:
+    for name in sorted(source):
         value = source[name]
         if isinstance(value, ConfigNamespace):
             if name in target:
@@ -289,6 +290,3 @@ def update_config(target, source):
             update_config(myns, value)
         else:
             target[name] = value
-
-
-

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -32,18 +32,17 @@ from libtisbackup.common import *
 from libtisbackup.backup_mysql import backup_mysql
 from libtisbackup.backup_rsync import backup_rsync
 from libtisbackup.backup_rsync import backup_rsync_ssh
-from libtisbackup.backup_oracle import backup_oracle
-from libtisbackup.backup_rsync_btrfs import backup_rsync_btrfs
-from libtisbackup.backup_rsync_btrfs import backup_rsync__btrfs_ssh
-from libtisbackup.backup_pgsql import backup_pgsql
-from libtisbackup.backup_xva import backup_xva
-from libtisbackup.backup_vmdk import backup_vmdk
-from libtisbackup.backup_switch import backup_switch
+#from libtisbackup.backup_oracle import backup_oracle
+#from libtisbackup.backup_rsync_btrfs import backup_rsync_btrfs
+#from libtisbackup.backup_rsync_btrfs import backup_rsync__btrfs_ssh
+#from libtisbackup.backup_pgsql import backup_pgsql
+#from libtisbackup.backup_xva import backup_xva
+#from libtisbackup.backup_switch import backup_switch
 from libtisbackup.backup_null import backup_null
-from libtisbackup.backup_xcp_metadata import backup_xcp_metadata
-from libtisbackup.copy_vm_xcp import copy_vm_xcp
-from libtisbackup.backup_sqlserver import backup_sqlserver
-from libtisbackup.backup_samba4 import backup_samba4
+#from libtisbackup.backup_xcp_metadata import backup_xcp_metadata
+#from libtisbackup.copy_vm_xcp import copy_vm_xcp
+#from libtisbackup.backup_sqlserver import backup_sqlserver
+#from libtisbackup.backup_samba4 import backup_samba4
 
 usage="""\
 %prog -c configfile action
@@ -176,15 +175,15 @@ class tis_backup:
                     nagiosoutput = 'ALL backups OK %s' % (','.join(sections))
 
 
-            except BaseException,e:
+            except BaseException as e:
                 worst_nagiosstatus = nagiosStateCritical
                 nagiosoutput = 'EXCEPTION',"Critical : %s" % str(e)
                 raise
 
         finally:
             self.logger.debug('worst nagios status :"%i"',worst_nagiosstatus)
-            print '%s (tisbackup V%s)' %(nagiosoutput,version)
-            print '\n'.join(["[%s]:%s" % (l[0],l[1]) for l in globallog])
+            print('%s (tisbackup V%s)' %(nagiosoutput,version))
+            print('\n'.join(["[%s]:%s" % (l[0],l[1]) for l in globallog]))
             sys.exit(worst_nagiosstatus)
 
     def process_backup(self,sections=[]):
@@ -201,7 +200,7 @@ class tis_backup:
                     self.logger.info('Processing [%s]',(backup_item.backup_name))
                     stats = backup_item.process_backup()
                     processed.append((backup_item.backup_name,stats))
-                except BaseException,e:
+                except BaseException as e:
                     self.logger.critical('Backup [%s] processed with error : %s',backup_item.backup_name,e)
                     errors.append((backup_item.backup_name,str(e)))
         if not processed and not errors:
@@ -227,7 +226,7 @@ class tis_backup:
                     self.logger.info('Processing [%s]',(backup_item.backup_name))
                     stats = backup_item.export_latestbackup(destdir=exportdir)
                     processed.append((backup_item.backup_name,stats))
-                except BaseException,e:
+                except BaseException as e:
                     self.logger.critical('Export Backup [%s] processed with error : %s',backup_item.backup_name,e)
                     errors.append((backup_item.backup_name,str(e)))
         if not processed and not errors:
@@ -262,7 +261,7 @@ class tis_backup:
                         self.logger.info('Processing [%s]',(backup_item.backup_name))
                         stats = backup_item.process_backup()
                         processed.append((backup_item.backup_name,stats))
-                    except BaseException,e:
+                    except BaseException as e:
                         self.logger.critical('Backup [%s] not processed, error : %s',backup_item.backup_name,e)
                         errors.append((backup_item.backup_name,str(e)))
             if not processed and not errors:
@@ -290,7 +289,7 @@ class tis_backup:
                     self.logger.info('Processing cleanup of [%s]',(backup_item.backup_name))
                     backup_item.cleanup_backup()
                     processed = True
-                except BaseException,e:
+                except BaseException as e:
                     self.logger.critical('Cleanup of [%s] not processed, error : %s',backup_item.backup_name,e)
         if not processed:
             self.logger.critical('No cleanup properly finished or processed')
@@ -322,7 +321,7 @@ def main():
     (options,args)=parser.parse_args()
 
     if len(args) != 1:
-        print "ERROR : You must provide one action to perform"
+        print("ERROR : You must provide one action to perform")
         parser.print_usage()
         sys.exit(2)
 
@@ -332,7 +331,7 @@ def main():
     action = args[0]
     if action == "listdrivers":
         for t in backup_drivers:
-            print backup_drivers[t].get_help()
+            print(backup_drivers[t].get_help())
         sys.exit(0)
 
     config_file =options.config

@@ -20,7 +20,7 @@
 
 import os
 import datetime
-from common import *
+from libtisbackup.common import *
 import time
 import logging
 import re
@@ -69,7 +69,7 @@ class backup_rsync(backup_generic):
                     if not self.dry_run:
                         os.makedirs(dest_dir)
                     else:
-                        print 'mkdir "%s"' % dest_dir
+                        print('mkdir "%s"' % dest_dir)
                 else:
                     raise Exception('backup destination directory already exists : %s' % dest_dir)
 
@@ -80,7 +80,7 @@ class backup_rsync(backup_generic):
                 if self.dry_run:
                     options.append('-d')
 
-                if self.overload_args <> None:
+                if self.overload_args is not None:
                     options.append(self.overload_args)
                 elif not "cygdrive" in self.remote_dir:
                     # we don't preserve owner, group, links, hardlinks, perms for windows/cygwin as it is not reliable nor useful
@@ -118,7 +118,7 @@ class backup_rsync(backup_generic):
                     try:
                         # newsettings with exclude_list='too','titi', parsed as a str python list content
                         excludes = eval('[%s]' % self.exclude_list)
-                    except Exception,e:
+                    except Exception as e:
                         raise Exception('Error reading exclude list : value %s, eval error %s (don\'t forget quotes and comma...)' % (self.exclude_list,e))
                 options.extend(['--exclude="%s"' % x for x in excludes])
 
@@ -146,13 +146,13 @@ class backup_rsync(backup_generic):
                         ssh_params.append('-i %s' % self.private_key)
                     if self.cipher_spec:
                         ssh_params.append('-c %s' % self.cipher_spec)
-                    if self.ssh_port <> 22:
+                    if self.ssh_port != 22:
                         ssh_params.append('-p %i' % self.ssh_port)
                     options.append('-e "/usr/bin/ssh %s"' % (" ".join(ssh_params)))
                     backup_source = '%s@%s:%s' % (self.remote_user,self.server_name,self.remote_dir)
 
                 # ensure there is a slash at end
-                if backup_source[-1] <> '/':
+                if backup_source[-1] != '/':
                     backup_source += '/'
 
                 options_params = " ".join(options)
@@ -165,25 +165,20 @@ class backup_rsync(backup_generic):
                     process = subprocess.Popen(cmd, shell=True,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
                     def ondata(data,context):
                         if context.verbose:
-                            print data
+                            print(data)
                         context.logger.debug(data)
 
                     log = monitor_stdout(process,ondata,self)
 
-                    reg_total_files = re.compile('Number of files: (?P<file>\d+)')
-                    reg_transferred_files = re.compile('Number of .*files transferred: (?P<file>\d+)')
                     for l in log.splitlines():
-                        line = l.replace(',','')
-                        m = reg_total_files.match(line)
-                        if m:
-                            stats['total_files_count'] += int(m.groupdict()['file'])
-                        m = reg_transferred_files.match(line)
-                        if m:
-                            stats['written_files_count'] += int(m.groupdict()['file'])
-                        if line.startswith('Total file size:'):
-                            stats['total_bytes'] += int(line.split(':')[1].split()[0])
-                        if line.startswith('Total transferred file size:'):
-                            stats['written_bytes'] += int(line.split(':')[1].split()[0])
+                        if l.startswith('Number of files:'):
+                            stats['total_files_count'] += int(re.sub("[^0-9]", "", l.split(':')[1]))
+                        if l.startswith('Number of files transferred:'):
+                            stats['written_files_count'] += int(re.sub("[^0-9]", "", l.split(':')[1]))
+                        if l.startswith('Total file size:'):
+                            stats['total_bytes'] += int(re.sub("[^0-9]", "", l.split(':')[1].split()[0]))
+                        if l.startswith('Total transferred file size:'):
+                            stats['written_bytes'] += int(re.sub("[^0-9]", "", l.split(':')[1].split()[0]))
 
                     returncode = process.returncode
                     ## deal with exit code 24 (file vanished)
@@ -195,7 +190,7 @@ class backup_rsync(backup_generic):
                         self.logger.error("[" + self.backup_name + "] shell program exited with error code " + str(returncode))
                         raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd, log[-512:])
                 else:
-                    print cmd
+                    print(cmd)
 
                 #we suppress the .rsync suffix if everything went well
                 finaldest = os.path.join(self.backup_dir,self.backup_start_date)
@@ -203,14 +198,14 @@ class backup_rsync(backup_generic):
                 if not self.dry_run:
                     os.rename(dest_dir, finaldest)
                     self.logger.debug("[%s] touching datetime of target directory %s" ,self.backup_name,finaldest)
-                    print os.popen('touch "%s"' % finaldest).read()
+                    print(os.popen('touch "%s"' % finaldest).read())
                 else:
-                    print "mv" ,dest_dir,finaldest
+                    print("mv" ,dest_dir,finaldest)
                 stats['backup_location'] = finaldest
                 stats['status']='OK'
                 stats['log']='ssh+rsync backup from %s OK, %d bytes written for %d changed files' % (backup_source,stats['written_bytes'],stats['written_files_count'])
 
-            except BaseException , e:
+            except BaseException as e:
                 stats['status']='ERROR'
                 stats['log']=str(e)
                 raise
@@ -340,5 +335,5 @@ if __name__=='__main__':
     b = backup_rsync('htouvet','/backup/data/htouvet',dbstat)
     b.read_config(cp)
     b.process_backup()
-    print b.checknagios()
+    print(b.checknagios())
 

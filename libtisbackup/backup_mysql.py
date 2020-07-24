@@ -24,13 +24,13 @@ import sys
 try:
     sys.stderr = open('/dev/null')       # Silence silly warnings from paramiko
     import paramiko
-except ImportError,e:
-    print "Error : can not load paramiko library %s" % e
+except ImportError as e:
+    print("Error : can not load paramiko library %s" % e)
     raise
 
 sys.stderr = sys.__stderr__
 
-from common import *
+from libtisbackup.common import *
 
 class backup_mysql(backup_generic):
     """Backup a mysql database as gzipped sql file through ssh"""
@@ -52,7 +52,7 @@ class backup_mysql(backup_generic):
             if not self.dry_run:
                 os.makedirs(self.dest_dir)
             else:
-                print 'mkdir "%s"' % self.dest_dir
+                print('mkdir "%s"' % self.dest_dir)
         else:
             raise Exception('backup destination directory already exists : %s' % self.dest_dir)
 
@@ -100,7 +100,7 @@ class backup_mysql(backup_generic):
         self.logger.debug('[%s] Dump DB : %s',self.backup_name,cmd)
         if not self.dry_run:
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
-            print output
+            print(output)
             self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
             if error_code:
                 raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))

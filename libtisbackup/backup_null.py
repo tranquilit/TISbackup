@@ -20,7 +20,7 @@
 
 import os
 import datetime
-from common import *
+from libtisbackup.common import *
 
 
 class backup_null(backup_generic):
