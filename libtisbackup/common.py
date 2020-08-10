@@ -476,7 +476,8 @@ def ssh_exec(command,ssh=None,server_name='',remote_user='',private_key='',ssh_p
         try:
             mykey = paramiko.RSAKey.from_private_key_file(private_key)
         except paramiko.SSHException:
-            mykey = paramiko.DSSKey.from_private_key_file(private_key)
+            #mykey = paramiko.DSSKey.from_private_key_file(private_key)
+            mykey = paramiko.Ed25519Key.from_private_key_file(self.private_key)
 
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
