@@ -34,13 +34,13 @@ from common import *
 
 class backup_mysql(backup_generic):
     """Backup a mysql database as gzipped sql file through ssh"""
-    type = 'mysql+ssh'    
+    type = 'mysql+ssh'
     required_params = backup_generic.required_params + ['db_user','db_passwd','private_key']
     optional_params = backup_generic.optional_params + ['db_name']
 
-    db_name='' 
+    db_name=''
     db_user=''
-    db_passwd='' 
+    db_passwd=''
 
     dest_dir = ""
 
@@ -60,7 +60,8 @@ class backup_mysql(backup_generic):
         try:
             mykey = paramiko.RSAKey.from_private_key_file(self.private_key)
         except paramiko.SSHException:
-            mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+            #mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+            mykey = paramiko.Ed25519Key.from_private_key_file(self.private_key)
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -75,14 +76,14 @@ class backup_mysql(backup_generic):
             (error_code,output) = ssh_exec(cmd,ssh=self.ssh)
             self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
             if error_code:
-                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))            
+                raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
             databases = output.split('\n')
             for database in databases:
-                if database != "": 
+                if database != "":
                     self.db_name = database.rstrip()
                     self.do_mysqldump(stats)
 
-        else:        
+        else:
             stats['log']= "Successfully backup processed to the following database :"
             self.do_mysqldump(stats)
 
@@ -130,9 +131,9 @@ class backup_mysql(backup_generic):
             stats['total_files_count']=1 + stats.get('total_files_count', 0)
             stats['written_files_count']=1 + stats.get('written_files_count', 0)
             stats['total_bytes']=os.stat(localpath).st_size + stats.get('total_bytes', 0)
-            stats['written_bytes']=os.stat(localpath).st_size  +  stats.get('written_bytes', 0)  
+            stats['written_bytes']=os.stat(localpath).st_size  +  stats.get('written_bytes', 0)
         stats['log'] = '%s "%s"' % (stats['log'] ,self.db_name)
-        stats['backup_location'] = self.dest_dir 
+        stats['backup_location'] = self.dest_dir
 
         stats['status']='RMTemp'
         cmd = 'rm -f  /tmp/' + self.db_name  + '-' + backup_start_date + '.sql.gz'
@@ -151,7 +152,7 @@ class backup_mysql(backup_generic):
 
         filelist = os.listdir(self.backup_dir)
         filelist.sort()
-        p = re.compile('^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$') 
+        p = re.compile('^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$')
         for item in filelist:
             if p.match(item):
                 dir_name = os.path.join(self.backup_dir,item)

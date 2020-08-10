@@ -37,10 +37,10 @@ from common import *
 
 class backup_sqlserver(backup_generic):
     """Backup a SQLSERVER database as gzipped sql file through ssh"""
-    type = 'sqlserver+ssh'    
+    type = 'sqlserver+ssh'
     required_params = backup_generic.required_params + ['db_name','private_key']
     optional_params = ['username', 'remote_backup_dir', 'sqlserver_before_2005', 'db_server_name', 'db_user', 'db_password']
-    db_name='' 
+    db_name=''
     db_user=''
     db_password=''
     userdb = "-E"
@@ -48,15 +48,16 @@ class backup_sqlserver(backup_generic):
     remote_backup_dir =  r'c:/WINDOWS/Temp/'
     sqlserver_before_2005 = False
     db_server_name = "localhost"
-    
+
 
     def do_backup(self,stats):
 
         try:
             mykey = paramiko.RSAKey.from_private_key_file(self.private_key)
         except paramiko.SSHException:
-            mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
-        
+            #mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+            mykey = paramiko.Ed25519Key.from_private_key_file(self.private_key)
+
         self.logger.debug('[%s] Connecting to %s with user root and key %s',self.backup_name,self.server_name,self.private_key)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -64,7 +65,7 @@ class backup_sqlserver(backup_generic):
 
         t = datetime.datetime.now()
         backup_start_date =  t.strftime('%Y%m%d-%Hh%Mm%S')
-        
+
         backup_file = self.remote_backup_dir + '/' + self.db_name  + '-' + backup_start_date + '.bak'
     	if not self.db_user == '':
 	   self.userdb = '-U %s -P %s' % ( self.db_user, self.db_password )
@@ -72,14 +73,14 @@ class backup_sqlserver(backup_generic):
         # dump db
         stats['status']='Dumping'
 	if self.sqlserver_before_2005:
-		cmd =  """osql -E -Q "BACKUP DATABASE [%s] 
-				      TO DISK='%s' 
+		cmd =  """osql -E -Q "BACKUP DATABASE [%s]
+				      TO DISK='%s'
 				      WITH FORMAT" """ % ( self.db_name, backup_file )
-	
+
 	else:
-        	cmd =  """sqlcmd %s -S "%s" -d master -Q "BACKUP DATABASE [%s] 
-                	                                       TO DISK = N'%s' 
-                        	                               WITH INIT, NOUNLOAD , 
+        	cmd =  """sqlcmd %s -S "%s" -d master -Q "BACKUP DATABASE [%s]
+                	                                       TO DISK = N'%s'
+                        	                               WITH INIT, NOUNLOAD ,
                                 	                       NAME = N'Backup %s', NOSKIP ,STATS = 10, NOFORMAT" """ % (self.userdb, self.db_server_name, self.db_name, backup_file ,self.db_name )
         self.logger.debug('[%s] Dump DB : %s',self.backup_name,cmd)
         try:
@@ -88,7 +89,7 @@ class backup_sqlserver(backup_generic):
                 self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
                 if error_code:
                     raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
-    
+
             # zip the file
             stats['status']='Zipping'
             cmd = 'gzip "%s"' % backup_file
@@ -98,7 +99,7 @@ class backup_sqlserver(backup_generic):
                 self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
                 if error_code:
                     raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
-    
+
             # get the file
             stats['status']='SFTP'
             filepath = backup_file + '.gz'
@@ -109,15 +110,15 @@ class backup_sqlserver(backup_generic):
                 sftp = paramiko.SFTPClient.from_transport(transport)
                 sftp.get(filepath, localpath)
                 sftp.close()
-    
+
             if not self.dry_run:
                 stats['total_files_count']=1
                 stats['written_files_count']=1
                 stats['total_bytes']=os.stat(localpath).st_size
-                stats['written_bytes']=os.stat(localpath).st_size    
+                stats['written_bytes']=os.stat(localpath).st_size
             stats['log']='gzip dump of DB %s:%s (%d bytes) to %s' % (self.server_name,self.db_name, stats['written_bytes'], localpath)
             stats['backup_location'] = localpath
-            
+
         finally:
             stats['status']='RMTemp'
             cmd = 'rm -f "%s" "%s"' % ( backup_file + '.gz', backup_file )
@@ -126,10 +127,10 @@ class backup_sqlserver(backup_generic):
                 (error_code,output) = ssh_exec(cmd,ssh=ssh)
                 self.logger.debug("[%s] Output of %s :\n%s",self.backup_name,cmd,output)
                 if error_code:
-                    raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))            
-            
+                    raise Exception('Aborting, Not null exit code (%i) for "%s"' % (error_code,cmd))
 
-        
+
+
         stats['status']='OK'
 
     def register_existingbackups(self):
@@ -139,7 +140,7 @@ class backup_sqlserver(backup_generic):
 
         filelist = os.listdir(self.backup_dir)
         filelist.sort()
-        p = re.compile('^%s-(?P<date>\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}).bak.gz$' % self.db_name) 
+        p = re.compile('^%s-(?P<date>\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}).bak.gz$' % self.db_name)
         for item in filelist:
             sr = p.match(item)
             if sr:
@@ -149,7 +150,7 @@ class backup_sqlserver(backup_generic):
                     self.logger.info('Registering %s from %s',file_name,fileisodate(file_name))
                     size_bytes = int(os.popen('du -sb "%s"' % file_name).read().split('\t')[0])
                     self.logger.debug('  Size in bytes : %i',size_bytes)
-                    if not self.dry_run:        
+                    if not self.dry_run:
                         self.dbstat.add(self.backup_name,self.server_name,'',\
                                         backup_start=start,backup_end=fileisodate(file_name),status='OK',total_bytes=size_bytes,backup_location=file_name)
                 else:

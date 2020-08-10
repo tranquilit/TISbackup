@@ -49,7 +49,8 @@ class backup_oracle(backup_generic):
         try:
             mykey = paramiko.RSAKey.from_private_key_file(self.private_key)
         except paramiko.SSHException:
-            mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+            #mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+			mykey = paramiko.Ed25519Key.from_private_key_file(self.private_key)
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())

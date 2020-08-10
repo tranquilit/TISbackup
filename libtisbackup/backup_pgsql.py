@@ -53,7 +53,8 @@ class backup_pgsql(backup_generic):
         try:
             mykey = paramiko.RSAKey.from_private_key_file(self.private_key)
         except paramiko.SSHException:
-            mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+            #mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+            mykey = paramiko.Ed25519Key.from_private_key_file(self.private_key)
 
         self.logger.debug('[%s] Trying to connect to "%s" with username root and key "%s"',self.backup_name,self.server_name,self.private_key)
         self.ssh = paramiko.SSHClient()
