@@ -1,0 +1,253 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Tranquil IT
+# This file is distributed under the same license as the TISBackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TISBackup 1.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-19 18:37+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:8
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:24
+msgid "Technical background for TISBackup"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:8
+msgid "Documentation, TISBackup, technical background"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:26
+msgid ""
+"The deduplication of this solution is based on the hardlinks of ext3/4 "
+"file systems used for storing backup files."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:29
+msgid ""
+"The backup server must run :program:`rsync` in server mode, and the "
+"workstations to be backed up must be equipped with :program:`rsync` and "
+":program:`ssh` (usually basic on machines running GNU/Linux, with "
+":program:`cygwin` (or another tool like :program:`cwrsync`) for machines "
+"running MS Windows)."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:36
+msgid "tisbackup"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:38
+msgid ""
+":program:`tisbackup` is a python script that the backup server runs at "
+"regular intervals. The configuration file :file:`tisbackup.ini` contains "
+"the details of the tasks to be executed."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:42
+msgid ""
+":program:`tisbackup` has different options for its execution, available "
+"in the :command:`tisbackup --help` command, the main ones being the "
+"following:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:46
+msgid ":command:`backup`: executes all scheduled backups;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:48
+msgid ""
+":command:`cleanup`: examines the backups and deletes those that are older"
+" than the defined maximum retention time ;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:51
+msgid ":command:`checknagios`: returns the content that can be viewed by nagios ;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:53
+msgid ":command:`retryfailed`: redoes the backups that previously failed;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:55
+msgid ""
+":command:`exportbackup`: exports the last valid backups to the specified "
+"location (remote, external media, ...);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:58
+msgid ""
+":command:`register_existing`: scans the backups that have been made and "
+"adds the missing ones to the database;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:62
+msgid "tisbackup.ini"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:64
+msgid ""
+":file:`tisbackup.ini` defines the backups to be executed and supervised. "
+"It is written with a simple formalism."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:67
+msgid "The different types of backups are:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:69
+msgid "``rsync``: the backup of a directory by rsync using the rsync protocol;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:71
+msgid "``rsync+ssh``: the backup of a directory by rsync with the ssh protocol;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:73
+msgid ""
+"``mysql+ssh``: saving a mysql database in a gzipped sql file, with the "
+"ssh protocol;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:76
+msgid ""
+"``pgsql+ssh``: the backup of a postgresql database in a gzipped sql file,"
+" with the ssh protocol;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:79
+msgid ""
+"``xen-xva``: the backup of a virtual machine running on an XCP server as "
+"an XVA file;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:82
+msgid ""
+"``xen-meta-data``: the backup of XCP metadata from a virtualization "
+"server;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:84
+msgid "``switch``: the backup of switches;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:86
+msgid ""
+"``null``: null backup of a server that does not require a backup but for "
+"which it is known to be taken into account (Nagios supervision);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:89
+msgid ""
+"The first part of the :file:`tisbackup.ini` file, starting with the "
+"``[Global]`` tag, determines:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:92
+msgid "the path to the folder where the backups will be stored;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:94
+msgid "the maximum retention time of a backup (in days);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:96
+msgid "the maximum delay before triggering a nagios critical message (in hours);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:98
+msgid "possibly the limit of usable bandwidth;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:100
+msgid ""
+"The rest of the file lists the different backups to be made, with "
+"specific parameters for each type of backup:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:103
+msgid "name of the directory in the backup;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:105
+msgid "backup type;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:107
+msgid "server name;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:109
+msgid "directory (in case of a directory backup);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:111
+msgid "directories to be excluded (idem);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:113
+msgid "location of the ssh key to be used (private key on the backup server);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:115
+msgid "name of the database (in case of mysql or postgresql database backup);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:117
+msgid "ssh port number to use;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:119
+msgid ""
+"database user and password (in case of mysql or postgresql database "
+"backup);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:122
+msgid "tisbackup.sql"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:124
+msgid ""
+":file:`tisbackup.sql` is the :program:`sqlite` database available on the "
+"backup server, in which the backup information of each of the backed up "
+"areas is stored. It is used in particular to gather the information "
+"necessary for Nagios."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:130
+msgid "TISbackup GUI"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:132
+msgid ""
+"Also developed in python, TISbackup GUI is a graphical interface that "
+"allows you to:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:135
+msgid "visualize the last backups;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:137
+msgid "export a backup to a USB media;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:139
+msgid "visualize the backups to be made;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/presenting_tisbackup.rst:141
+msgid ""
+"|clap| You may now go on to the next step and :ref:`install TISBackup on "
+"your Debian<base_debian_server_install>`."
+msgstr ""
+

@@ -1,0 +1,125 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Tranquil IT
+# This file is distributed under the same license as the TISBackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TISBackup 1.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-19 18:44+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:8
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:17
+msgid "Using TISBackup"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:8
+msgid "Documentation, TISBackup, usage, options, exporting"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:21
+msgid ""
+"As seen in the :ref:`section on installing "
+"TISbackup<install_tisbackup_debian>`, once the TISBackup installation is "
+"up and running, we have the choice of these actions:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:36
+msgid "The 3 following options can be used with any tisbackup action."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:38
+msgid ""
+"the ``-c`` *config_file* option allows to specify a backup file, by "
+"default :file:`/etc/tis/tisbackup-config.ini` is used:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:45
+msgid ""
+"the ``-s`` *section_name* option allows to launch only the action on the "
+"specified section:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:52
+msgid ""
+"the ``-d`` option allows you to simulate an action in order to see the "
+"commands launched by it."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:59
+msgid ":command:`backup` launches a backup action:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:65
+msgid ""
+":command:`cleanup` removes backups older than the time specified in the "
+"``backup_retention_time`` parameter of the configuration file:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:72
+msgid ""
+":command:`checknagios` allows the backup information to be uploaded to "
+"the nagios monitoring server:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:79
+msgid ""
+":command:`dumpstat` displays all information about the last 20 backups in"
+" tabular format:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:86
+msgid ":command:`retryfailed` restarts only the backup of the failed sections:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:92
+msgid ""
+":command:`listdrivers` lists all the possible types of backups and their "
+"parameters:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:99
+msgid ""
+":command:`exportbackup` copies the last good backup to a directory, you "
+"must use the ``--exportdir`` option to specify or copy the export:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:107
+msgid ""
+":command:`register_existing` checks the backup directory and saves "
+"information from previous backups to tisbackup in the database;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:111
+msgid "Exporting backups"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:113
+msgid ""
+"With this procedure, you will be able to export your backups on USB Hard "
+"Disk Drives for your off-line backup needs."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:116
+msgid ""
+"The partition of your HDD must be **ext4** formated and labeled "
+"*tisbackup*."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:136
+msgid "Exporting a backup to an external USB HDD"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/using_tisbackup.rst:143
+msgid "Status of exported backups"
+msgstr ""
+

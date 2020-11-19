@@ -1,0 +1,58 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Tranquil IT
+# This file is distributed under the same license as the TISBackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TISBackup 1.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-19 18:37+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:8
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:16
+msgid "Contacting Tranquil IT"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:8
+msgid ""
+"WAPT, documentation, website, editor, Twitter, Linkedin, Forum, Mailing "
+"List, official website"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:18
+msgid "Contact us for more informations:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:20
+msgid "Tranquil IT: https://www.tranquil.it/"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:21
+msgid "Twitter: https://twitter.com/tranquil_it"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:22
+msgid "Linkedin: https://www.linkedin.com/company/tranquil-it"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:23
+msgid "Forum in French: https://forum.tranquil.it/"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:24
+msgid "Forum in English: https://www.reddit.com/r/WAPT"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/tranquil-it-contacts.rst:25
+msgid "Mailing-list: https://lists.tranquil.it/listinfo/wapt"
+msgstr ""
+

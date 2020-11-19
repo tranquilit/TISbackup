@@ -79,11 +79,17 @@ would have been difficult to develop as an overlay of the existing one:
   :maxdepth: 2
   :caption: Presenting TISBackup
 
+  presenting_tisbackup.rst
+  installing_tisbackup.rst
+  configuring_tisbackup.rst
+  using_tisbackup.rst
+
 .. toctree::
   :maxdepth: 1
   :caption: Appendix
 
   tranquil-it-contacts.rst
+  screenshots.rst
 
 Indices and tables
 ==================
