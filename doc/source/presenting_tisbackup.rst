@@ -13,6 +13,13 @@
   :scale: 50%
   :alt: Clapping hands
 
+.. |date| date::
+
+.. figure:: wapt-resources/tisbackup_logo.png
+  :align: center
+  :scale: 100%
+  :alt: TISBackup Logo
+
 Technical background for TISBackup
 ==================================
 

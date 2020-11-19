@@ -1,0 +1,158 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Tranquil IT
+# This file is distributed under the same license as the TISBackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TISBackup 1.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-19 18:37+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:78
+msgid "Presenting TISBackup"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:82
+msgid "Appendix"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:8
+msgid "TISBackup Documentation"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:8
+msgid "Documentation, TISBackup, introduction, welcome page, Welcome"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:14
+msgid ""
+"The objective of TISbackup is to benefit from file backups and "
+"centralized alert feedback on \"reasonable\" data volumes (of the order "
+"of a few TB)."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:18
+msgid "TISBackup allows:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:20
+msgid "to know if a recent backup exists;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:22
+msgid ""
+"to keep a history with deduplication at the file level (no duplicate "
+"backups);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:24
+msgid ""
+"to have an immediate view of the contents of a server or a server area "
+"for data restoration ;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:27
+msgid ""
+"to export the last backup to an external media in order to transfer it to"
+" a secure location;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:30
+msgid ""
+"to configure the backup cycle with a simple and readable :mimetype:`.ini`"
+" file;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:33
+msgid ""
+"to work with a module mechanism to extend the type of backups (https, "
+"rsync, postgres, mysql,) of virtual machines;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:36
+msgid ""
+"Satisfying these needs stems from the need for a tool to manage a vast "
+"pool of machines each hosting a multitude of different software or "
+"services (different editors, different hardware platforms and operating "
+"environments, etc.). Finally, as the backup procedures of a publisher "
+"changed without any warning, the remote backup mechanisms were regularly "
+"broken, which caused us some scares with the mechanisms we were using "
+"before."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:45
+msgid "Overview of existing solutions"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:47
+msgid "Different open source solutions exist but did not meet our specifications."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:50
+msgid "Baccula"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:52
+msgid ""
+":program:`Baccula` is a high-performance solution for full backups on "
+"tape and removable media. However, a restore can take a long time and the"
+" storage of a history can be voluminous. The backup is saved on a file "
+"system that is not readable by a Windows system. An uninitiated \"backup "
+"manager\" will not be able to check the contents of his backup from home."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:60
+msgid "r-snapshot"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:62
+msgid ""
+":program:`r-snapshot` almost corresponds to the specifications but is "
+"complex to configure and any necessary modification would have been "
+"difficult to develop as an overlay of the existing one:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:66
+msgid ""
+"the backups are organized by date then by zone which is the opposite of "
+"what was desired;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:69
+msgid ""
+"it is not possible to configure different backup frequencies according to"
+" the criticality levels of the servers;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:72
+msgid ""
+"finally, the deletion of obsolete backups is done in the same process as "
+"the backups, which can be very long and can be problematic if there is a "
+"problem during the backup."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:76
+msgid "**... and now TISbackup ...**"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:89
+msgid "Indices and tables"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:91
+msgid ":ref:`genindex`"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/index.rst:93
+msgid ":ref:`search`"
+msgstr ""
+

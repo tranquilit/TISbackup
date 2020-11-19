@@ -13,7 +13,7 @@ Modify the following files in order to get a proper named
 
 In the following example:
 
-* the :term:`FQDN` name is *srvbackup.mydomain.lan*;
+* the FQDN name is *srvbackup.mydomain.lan*;
 
 * the short-name of the TISBackup Server is *srvbackup*;
 

@@ -1,0 +1,264 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2020, Tranquil IT
+# This file is distributed under the same license as the TISBackup package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TISBackup 1.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-19 18:54+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:8
+msgid "Installing and configuring TISBackup"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:8
+msgid "Documentation, TISBackup, installation, configuration"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:17
+msgid "Installing and configuring TISBackup on Debian"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:22
+msgid "Setting up the GNU/Linux Debian server"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:24
+msgid ""
+"In order to install a fresh Debian Linux 10 *Buster* (physical or "
+"virtual) without graphical interface, please refer to the `Debian "
+"GNU/Linux Installation Guide "
+"<https://www.debian.org/releases/buster/amd64/>`_."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:29
+msgid "Configuring network parameters"
+msgstr ""
+
+#: source/wapt-resources/linux-server-naming.txt:8
+msgid ""
+"The different parameters presented below are not specific to TISBackup; "
+"you may adapt them as required for your environment."
+msgstr ""
+
+#: source/wapt-resources/linux-server-naming.txt:11
+msgid ""
+"Modify the following files in order to get a proper named :abbr:`FQDN "
+"(Fully Qualified Domain Name)` and network addressing strategy."
+msgstr ""
+
+#: source/wapt-resources/linux-server-naming.txt:14
+msgid "In the following example:"
+msgstr ""
+
+#: source/wapt-resources/linux-server-naming.txt:16
+msgid "the FQDN name is *srvbackup.mydomain.lan*;"
+msgstr ""
+
+#: source/wapt-resources/linux-server-naming.txt:18
+msgid "the short-name of the TISBackup Server is *srvbackup*;"
+msgstr ""
+
+#: source/wapt-resources/linux-server-naming.txt:20
+msgid "the :abbr:`DNS (Domain Name Service)` suffix is *mydomain.lan*;"
+msgstr ""
+
+#: source/wapt-resources/linux-server-naming.txt:22
+msgid "the IP address is *10.0.0.10/24*;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:34
+msgid "Configuring the name of the Debian server"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:38
+msgid ""
+"The short name of the future TISBackup server must not be longer than "
+"**15 characters** (the limit is due to *sAMAccountName* restriction in "
+"Active Directory)."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:42
+msgid ""
+"The name of the TISBackup server must be a :abbr:`FQDN (Fully Qualified "
+"Domain Name)`, that is to say it has both the server name and the DNS "
+"suffix."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:45
+msgid "modify the :file:`/etc/hostname` file and write the FQDN of the server;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:52
+msgid ""
+"configure the :file:`/etc/hosts` file, be sure to put both the FQDN and "
+"the short name of the server;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:64
+msgid ""
+"on the line defining the DNS server IP address, be sure to have the IP of"
+" the server (not 127.0.0.1), then the FQDN, then the short name;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:67
+msgid "do not change the line with *localhost*;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:70
+msgid "Configuring the IP address of the Debian server"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:72
+msgid ""
+"configure the IP address of the Debian Server in the "
+":file:`/etc/network/interfaces`;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:84
+msgid ""
+"apply the network configuration by rebooting the machine with a "
+":code:`reboot`;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:87
+msgid ""
+"if it has not already been done, create the DNS entry for the WAPT Server"
+" in the Organization's Active Directory;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:90
+msgid ""
+"after reboot, configure the system language in English in order to have "
+"non-localized logs for easier searching of common errors;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:99
+msgid "check that the machine clock is on time (with NTP installed);"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:109
+msgid "If the NTP package is not installed."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:117
+msgid "update and upgrade your Debian;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:124
+msgid "install systemd;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:130
+msgid "restart the Debian server;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:136
+msgid ""
+"|clap| The Debian server is now ready. You may now go on to the next step"
+" and :ref:`install TISBackup on your Debian<install_tisbackup_debian>`."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:142
+msgid "Installing the TISBackup server on Debian Linux"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:144
+msgid "install the required dependencies:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:150
+msgid ""
+"retrieve the git sources from https://github.com/tranquilit/TISbackup and"
+" place them in the :file:`/opt` folder on your server:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:162
+msgid ""
+"the :command:`tisbackup` command must return all *tisbackup* actions "
+"directly to you. For more information on the actions go to :ref:`the "
+"section on using TISBackup<using_tisbackup>`;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:185
+msgid "Configuring TISBackup"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:187
+msgid "create the directory for TISBackup configuration files:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:193
+msgid ""
+"in the directory :file:`/opt/tisbackup/samples/`, you will find the files"
+" :file:`config.ini.sample` and :file:`tisbackup-config.ini` which you can"
+" use as examples. Copy one of these two files into the :file:`/etc/tis` "
+"directory and we will describe in the next section how to customize this "
+"files;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:204
+msgid "Launching the backup scheduled task"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:210
+msgid ""
+"modify the :file:`/etc/cron.d/tisbackup` file to indicate when to launch "
+"the task;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:214
+msgid "Generating the public and private certificates"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:216
+msgid "as root:"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:222
+msgid "press :kbd:`Enter` for each one of the steps;"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:224
+msgid ""
+"|clap| You may now go on to the next step and :ref:`configure the backup "
+"jobs for your TISBackup<configuring_backup_jobs>`."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:228
+msgid "Setting up the graphical user interface for the TISBackup server"
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:245
+msgid ""
+"You can now access your interface through the url of your TISBackup "
+"server on port 8080."
+msgstr ""
+
+#: /mnt/c/Users/vcardon/Desktop/git/tisbackup/doc/source/installing_tisbackup.rst:253
+msgid "TISBackup Web interface"
+msgstr ""
+
+#~ msgid ""
+#~ msgstr ""
+
+#~ msgid "the :term:`FQDN` name is *srvbackup.mydomain.lan*;"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "retrieve the git sources from "
+#~ "`https://github.com/tranquilit/TISbackup`_ and place "
+#~ "them in the :file:`/opt` folder on "
+#~ "your server:"
+#~ msgstr ""
+

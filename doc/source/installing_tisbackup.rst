@@ -23,7 +23,7 @@ Setting up the GNU/Linux Debian server
 
 In order to install a fresh Debian Linux 10 *Buster* (physical or virtual)
 without graphical interface, please refer to the
-`Debian GNU/Linux Installation Guide<https://www.debian.org/releases/buster/amd64/>`_.
+`Debian GNU/Linux Installation Guide <https://www.debian.org/releases/buster/amd64/>`_.
 
 Configuring network parameters
 ++++++++++++++++++++++++++++++
@@ -147,7 +147,7 @@ Installing the TISBackup server on Debian Linux
 
      apt-get install unzip ssh rsync python-paramiko python-pyvmomi python-pexpect
 
-* retrieve the git sources from https://github.com/tranquilit/TISbackup_
+* retrieve the git sources from https://github.com/tranquilit/TISbackup
   and place them in the :file:`/opt` folder on your server:
 
   .. code-block:: bash
@@ -160,7 +160,8 @@ Installing the TISBackup server on Debian Linux
     ln -sb /opt/tisbackup/tisbackup.py /usr/local/bin/tisbackup
 
 * the :command:`tisbackup` command must return all *tisbackup* actions
-  directly to you. For more information on the actions go to :ref:``;
+  directly to you. For more information on the actions
+  go to :ref:`the section on using TISBackup<using_tisbackup>`;
 
   .. code-block:: bash
 
@@ -222,3 +223,31 @@ Generating the public and private certificates
 
 |clap| You may now go on to the next step
 and :ref:`configure the backup jobs for your TISBackup<configuring_backup_jobs>`.
+
+Setting up the graphical user interface for the TISBackup server
+----------------------------------------------------------------
+
+.. code-block:: bash
+
+  apt-get install python2.7  python-simplejson python-flask python-setuptools sudo
+  python /usr/lib/python2.7/dist-packages/easy_install.py "huey<=0.4.9"
+
+.. code-block:: bash
+
+  cp /opt/tisbackup/samples/tisbackup_gui.ini /etc/tis/
+  cp /opt/tisbackup/scripts/tisbackup_gui /etc/init.d/tisbackup_gui
+  cp /opt/tisbackup/scripts/tisbackup_huey /etc/init.d/tisbackup_huey
+  chmod +x /etc/init.d/tisbackup_gui
+  chmod +x /etc/init.d/tisbackup_huey
+  update-rc.d tisbackup_huey defaults
+  update-rc.d tisbackup_gui defaults
+
+You can now access your interface through the url
+of your TISBackup server on port 8080.
+
+.. figure:: wapt-resources/tisbackup_gui.png
+  :align: center
+  :scale: 100%
+  :alt: TISBackup Web interface
+
+  TISBackup Web interface
