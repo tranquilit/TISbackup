@@ -1,16 +1,54 @@
-tisbackup
-=========
+TIS-backup Documentation
+========================
 
-Le script tisbackup se base sur un fichier de configuration .ini. Cf le fichier d'exemple pour le format
+This is the documentation repository of the TIS-backup project.
+The documentation is provided under the license CC-BY-SA.
 
-Pour lancer le backup, lancer la commande
-./tisbackup.py -c fichierconf.ini 
+How to contribute?
+==================
 
-Pour lancer une section particulière du fichier .ini
-./tisbackup.py -c fichierconf.ini -s section_choisi
+You must install documentation tools and requirements before doing anything:
 
-Pour mettre le mode debug
-./tisbackup.py -c fichierconf.ini -l debug 
+```bash
+sudo sh ./install_requirements.sh
+```
 
+Once installed, pre-commit checks (lint/syntax) are launched prior
+to committing your changes. To launch tests manually, you can run the following:
 
-Pour plus d'informations aller voir le site : http://dev.tranquil.it/
+```bash
+pre-commit run --all-files
+```
+
+This should (take a while because sphinx-build) return :
+
+```bash
+Trim Trailing Whitespace.................................................Passed
+Fix End of Files.........................................................Passed
+rst ``code`` is two backticks............................................Passed
+sphinx build.............................................................Passed
+```
+
+How to push documentation to public ?
+=====================================
+
+Pushing the documentation through a rsync is bad.
+
+To publish WAPT documentation to public, a 'release-' tag must be set using git.
+
+Once a release tag has been set, it creates a tagged build which
+must be launched manually in Jenkins.
+
+```bash
+git add *
+git commit -m 'I have checked it builds without errors, trust me'
+git push
+git tag -a release-1.8.1.6694-doc -m "WAPT documentation publish for 1.8.1.6694"
+git push origin --tags
+```
+
+Once that tag has been pushed, in Jenkins you have to re-scan
+the multi-branche project and go to `Tags` tab, select your tag and build it.
+
+Wait for the entire build to go through, it will publish everything
+according to JenkinsFile procedure.
