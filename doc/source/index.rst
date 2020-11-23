@@ -11,6 +11,14 @@
 
 .. |date| date::
 
+.. figure:: tisbackup-resources/tisbackup_logo.png
+  :align: center
+  :scale: 100%
+  :alt: TISBackup Logo
+
+Presenting TISBackup
+====================
+
 The objective of TISbackup is to benefit from file backups
 and centralized alert feedback on "reasonable" data volumes
 (of the order of a few TB).
@@ -42,12 +50,12 @@ the remote backup mechanisms were regularly broken, which caused us some scares
 with the mechanisms we were using before.
 
 Overview of existing solutions
-==============================
+------------------------------
 
 Different open source solutions exist but did not meet our specifications.
 
 Baccula
--------
++++++++
 
 :program:`Baccula` is a high-performance solution for full backups on tape
 and removable media. However, a restore can take a long time
@@ -57,7 +65,7 @@ An uninitiated "backup manager" will not be able to check the contents
 of his backup from home.
 
 r-snapshot
-----------
+++++++++++
 
 :program:`r-snapshot` almost corresponds to the specifications
 but is complex to configure and any necessary modification

@@ -41,14 +41,14 @@ Screenshots of TISBackup
 
 .. figure:: tisbackup-resources/tisbackup_backup_list.png
   :align: center
-  :scale: 100%
+  :scale: 20%
   :alt: Overview of current backups
 
   Overview of current backups
 
 .. figure:: tisbackup-resources/tisbackup_successful_backups.png
   :align: center
-  :scale: 100%
+  :scale: 20%
   :alt: Overview of successful backups
 
   Overview of successful backups
@@ -62,7 +62,7 @@ Screenshots of TISBackup
 
 .. figure:: tisbackup-resources/tisbackup_action_menu.png
   :align: center
-  :scale: 100%
+  :scale: 20%
   :alt: TISBackup action menu
 
   TISBackup action menu

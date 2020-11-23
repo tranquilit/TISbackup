@@ -15,11 +15,6 @@
 
 .. |date| date::
 
-.. figure:: tisbackup-resources/tisbackup_logo.png
-  :align: center
-  :scale: 100%
-  :alt: TISBackup Logo
-
 Technical background for TISBackup
 ==================================
 
