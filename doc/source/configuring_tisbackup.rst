@@ -9,7 +9,7 @@
   :description: Configuring the backup jobs
   :keywords: Documentation, TISBackup, configuration, backup jobs
 
-.. |clap| image:: wapt-resources/clapping-hands-microsoft.png
+.. |clap| image:: tisbackup-resources/clapping-hands-microsoft.png
   :scale: 50%
   :alt: Clapping hands
 

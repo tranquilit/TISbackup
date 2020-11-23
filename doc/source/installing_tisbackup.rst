@@ -9,7 +9,7 @@
   :description: Installing and configuring TISBackup
   :keywords: Documentation, TISBackup, installation, configuration
 
-.. |clap| image:: wapt-resources/clapping-hands-microsoft.png
+.. |clap| image:: tisbackup-resources/clapping-hands-microsoft.png
   :scale: 50%
   :alt: Clapping hands
 
@@ -28,7 +28,7 @@ without graphical interface, please refer to the
 Configuring network parameters
 ++++++++++++++++++++++++++++++
 
-.. include:: wapt-resources/linux-server-naming.txt
+.. include:: tisbackup-resources/linux-server-naming.txt
 
 Configuring the name of the Debian server
 +++++++++++++++++++++++++++++++++++++++++
@@ -54,7 +54,7 @@ that is to say it has both the server name and the DNS suffix.
 
 .. code-block:: bash
 
-  # /etc/hosts du waptserver
+  # /etc/hosts of the server
   127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
   ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
   10.0.0.10   srvbackup.mydomain.lan     srvbackup
@@ -84,7 +84,7 @@ Configuring the IP address of the Debian server
 * apply the network configuration by rebooting the machine
   with a :code:`reboot`;
 
-* if it has not already been done, create the DNS entry for the WAPT Server
+* if it has not already been done, create the DNS entry for the Server
   in the Organization's Active Directory;
 
 * after reboot, configure the system language in English in order to have
@@ -245,7 +245,7 @@ Setting up the graphical user interface for the TISBackup server
 You can now access your interface through the url
 of your TISBackup server on port 8080.
 
-.. figure:: wapt-resources/tisbackup_gui.png
+.. figure:: tisbackup-resources/tisbackup_gui.png
   :align: center
   :scale: 100%
   :alt: TISBackup Web interface

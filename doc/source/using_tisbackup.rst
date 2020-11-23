@@ -9,7 +9,7 @@
   :description: Using TISBackup
   :keywords: Documentation, TISBackup, usage, options, exporting
 
-.. |clap| image:: wapt-resources/clapping-hands-microsoft.png
+.. |clap| image:: tisbackup-resources/clapping-hands-microsoft.png
   :scale: 50%
   :alt: Clapping hands
 
@@ -128,14 +128,14 @@ The partition of your HDD must be **ext4** formated and labeled *tisbackup*.
   mkfs.ext4 /dev/xvdc1
   e2label /dev/xvdc1 tisbackup
 
-.. figure:: wapt-resources/tisbackup_hdd_export.png
+.. figure:: tisbackup-resources/tisbackup_hdd_export.png
   :align: center
   :scale: 100%
   :alt: Exporting a backup to an external USB HDD
 
   Exporting a backup to an external USB HDD
 
-.. figure:: wapt-resources/tisbackup_hdd_export_status.png
+.. figure:: tisbackup-resources/tisbackup_hdd_export_status.png
   :align: center
   :scale: 100%
   :alt: Status of exported backups

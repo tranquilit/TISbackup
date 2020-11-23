@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# WAPT documentation build configuration file, created by
+# TISBackup documentation build configuration file, created by
 # sphinx-quickstart on Wed Nov 30 14:29:50 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -158,7 +158,7 @@ except ImportError as e:
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = 'WAPT v1.0'
+# html_title = 'TISBackup v1.0'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -266,18 +266,12 @@ htmlhelp_basename = 'tisbackupdoc'
 
 linkcheck_ignore = [r'http.*://.*mydomain.lan.*',
                     r'http.*://.*host_fqdn.*',
-                    r'http://wapt.otherorganization.com/wapt/',
-                    r'https://otherwapt.tranquil.it/waptdev',
                     r'http://user:pwd@host_fqdn:port']
 
 
 # -- Options for LaTeX output ---------------------------------------------
 
 
-########## NOTE TIS
-#  le format de bouquin lulu n'est pas standard, il faut le rajouter dans le
-# fichier en patchant le fichier /usr/share/texlive/texmf-dist/tex/latex/base/report.cls
-#
 # diff -r a/report.cls b/report.cls
 # 71a72,74
 # > \DeclareOption{lulupaper}

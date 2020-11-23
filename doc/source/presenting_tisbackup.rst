@@ -9,13 +9,13 @@
   :description: Technical background for TISBackup
   :keywords: Documentation, TISBackup, technical background
 
-.. |clap| image:: wapt-resources/clapping-hands-microsoft.png
+.. |clap| image:: tisbackup-resources/clapping-hands-microsoft.png
   :scale: 50%
   :alt: Clapping hands
 
 .. |date| date::
 
-.. figure:: wapt-resources/tisbackup_logo.png
+.. figure:: tisbackup-resources/tisbackup_logo.png
   :align: center
   :scale: 100%
   :alt: TISBackup Logo

@@ -7,7 +7,7 @@
 
 .. meta::
   :description: Contacting Tranquil IT
-  :keywords: WAPT, documentation, website, editor,
+  :keywords: TISBackup, documentation, website, editor,
                Twitter, official website
 
 .. _contact_tranquil_it:
