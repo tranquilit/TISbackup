@@ -46,6 +46,8 @@ from libtisbackup.copy_vm_xcp import copy_vm_xcp
 from libtisbackup.backup_sqlserver import backup_sqlserver
 from libtisbackup.backup_samba4 import backup_samba4
 
+__version__="1.1"
+
 usage="""\
 %prog -c configfile action
 

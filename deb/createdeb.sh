@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-VERSION=`git rev-list HEAD --count` 
+
+VERSION_SHORT=$(cat ../tisbackup.py  | grep "__version__" | cut -d "=" -f 2 | sed 's/"//g')
+GIT_COUNT=`git rev-list HEAD --count` 
+VERSION="${VERSION_SHORT}.${GIT_COUNT}"
 
 rm -f *.deb
 rm -Rf builddir
@@ -8,7 +11,7 @@ mkdir builddir/DEBIAN
 cp ./control ./builddir/DEBIAN
 cp ./postinst ./builddir/DEBIAN
 
-sed "s/VERSION/$VERSION/" -i ./builddir/DEBIAN/control
+sed "s/__VERSION__/$VERSION/" -i ./builddir/DEBIAN/control
 
 mkdir -p builddir/opt/tisbackup/
 mkdir -p ./builddir/usr/lib/systemd/system/
@@ -25,6 +28,6 @@ rsync -aP ../lib/huey/bin/huey_consumer.py  ./builddir/opt/tisbackup/
 
 chmod 755 /opt/tisbackup/tisbackup.py
 
-dpkg-deb --build builddir tis-tisbackup-${VERSION}.deb
+dpkg-deb --build builddir tis-tisbackup-1:${VERSION}.deb
 
 
