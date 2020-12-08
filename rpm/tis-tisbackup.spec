@@ -30,7 +30,7 @@ mkdir -p %{buildroot}/etc/cron.d/
 mkdir -p %{buildroot}/etc/tis
 mkdir -p %{buildroot}/usr/bin/
 
-rsync --exclude="rpm" --exclude=".git" -aP ../../../tisbackup/  %{buildroot}/opt/tisbackup/
+rsync --exclude "deb/" --exclude "doc/" --exclude "rpm/" --exclude ".git"  -aP ../../../tisbackup/  %{buildroot}/opt/tisbackup/
 rsync -aP ../../../tisbackup/scripts/tisbackup_gui.service  %{buildroot}/usr/lib/systemd/system/
 rsync -aP ../../../tisbackup/scripts/tisbackup_huey.service  %{buildroot}/usr/lib/systemd/system/
 rsync -aP ../../../tisbackup/samples/tisbackup.cron  %{buildroot}/etc/cron.d/tisbackup

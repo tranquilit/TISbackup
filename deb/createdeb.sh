@@ -15,7 +15,7 @@ mkdir -p ./builddir/usr/lib/systemd/system/
 mkdir -p ./builddir/etc/tis
 mkdir -p ./builddir/etc/cron.d/
 
-rsync -aP --exclude="rpm" --exclude=".git" --exclude=deb ../ ./builddir/opt/tisbackup
+rsync -aP --exclude "deb/" --exclude "doc/" --exclude "rpm/" --exclude ".git" ../ ./builddir/opt/tisbackup
 rsync -aP ../scripts/tisbackup_gui.service  ./builddir/usr/lib/systemd/system/
 rsync -aP ../scripts/tisbackup_huey.service  ./builddir/usr/lib/systemd/system/
 rsync -aP ../samples/tisbackup.cron  ./builddir/etc/cron.d/tisbackup
