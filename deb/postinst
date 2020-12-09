@@ -5,3 +5,8 @@ systemctl enable tisbackup_gui
 if [ ! -f /usr/bin/tisbackup ]; then
     ln -s /opt/tisbackup/tisbackup.py  /usr/bin/tisbackup
 fi
+
+if [ ! -f /etc/cron.d/tisbackup ]; then
+    cp  /opt/tisbackup/samples/tisbackup.cron  /etc/cron.d/tisbackup
+fi
+

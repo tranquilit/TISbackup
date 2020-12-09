@@ -21,7 +21,6 @@ mkdir -p ./builddir/etc/cron.d/
 rsync -aP --exclude "deb/" --exclude "doc/" --exclude "rpm/" --exclude ".git" ../ ./builddir/opt/tisbackup
 rsync -aP ../scripts/tisbackup_gui.service  ./builddir/usr/lib/systemd/system/
 rsync -aP ../scripts/tisbackup_huey.service  ./builddir/usr/lib/systemd/system/
-rsync -aP ../samples/tisbackup.cron  ./builddir/etc/cron.d/tisbackup
 rsync -aP ../samples/tisbackup_gui.ini  ./builddir/etc/tis
 rsync -aP ../samples/tisbackup-config.ini.sample  ./builddir/etc/tis/tisbackup-config.ini.sample
 rsync -aP ../lib/huey/bin/huey_consumer.py  ./builddir/opt/tisbackup/
