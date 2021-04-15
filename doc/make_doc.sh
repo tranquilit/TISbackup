@@ -18,3 +18,4 @@ cp ./robots.txt build/en/doc
 mkdir ./build/en/doc/.well-known
 cp security.txt ./build/en/doc/.well-known
 touch ./build/en/doc/.nojekyll
+mv ./build/en/doc/ ../html
