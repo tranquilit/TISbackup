@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<meta content="Technical background for TISBackup" name="description" />
+<meta content="Documentation, TISBackup, technical background" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Technical background for TISBackup &mdash; TISBackup 1.8.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/ribbon.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installing and configuring TISBackup on Debian" href="installing_tisbackup.html" />
+    <link rel="prev" title="Presenting TISBackup" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> TISBackup
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Presenting TISBackup</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Technical background for TISBackup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tisbackup">tisbackup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tisbackup-ini">tisbackup.ini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tisbackup-sql">tisbackup.sql</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tisbackup-gui">TISbackup GUI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installing_tisbackup.html">Installing and configuring TISBackup on Debian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring_tisbackup.html">Configuring the backup jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_tisbackup.html">Using TISBackup</a></li>
+</ul>
+<p><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tranquil-it-contacts.html">Contacting Tranquil IT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="screenshots.html">Screenshots of TISBackup</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TISBackup</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Technical background for TISBackup</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/presenting_tisbackup.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="technical-background-for-tisbackup">
+<h1>Technical background for TISBackup<a class="headerlink" href="#technical-background-for-tisbackup" title="Permalink to this headline">¶</a></h1>
+<p>The deduplication of this solution is based on the hardlinks
+of ext3/4 file systems used for storing backup files.</p>
+<p>The backup server must run <strong class="program">rsync</strong> in server mode,
+and the workstations to be backed up must be equipped with <strong class="program">rsync</strong>
+and <strong class="program">ssh</strong> (usually basic on machines running GNU/Linux,
+with <strong class="program">cygwin</strong> (or another tool like <strong class="program">cwrsync</strong>)
+for machines running MS Windows).</p>
+<section id="tisbackup">
+<h2>tisbackup<a class="headerlink" href="#tisbackup" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">tisbackup</strong> is a python script that the backup server runs
+at regular intervals. The configuration file <code class="file docutils literal notranslate"><span class="pre">tisbackup.ini</span></code> contains
+the details of the tasks to be executed.</p>
+<p><strong class="program">tisbackup</strong> has different options for its execution,
+available in the <strong class="command">tisbackup --help</strong> command,
+the main ones being the following:</p>
+<ul class="simple">
+<li><p><strong class="command">backup</strong>: executes all scheduled backups;</p></li>
+<li><p><strong class="command">cleanup</strong>: examines the backups and deletes those
+that are older than the defined maximum retention time ;</p></li>
+<li><p><strong class="command">checknagios</strong>: returns the content that can be viewed by nagios ;</p></li>
+<li><p><strong class="command">retryfailed</strong>: redoes the backups that previously failed;</p></li>
+<li><p><strong class="command">exportbackup</strong>: exports the last valid backups
+to the specified location (remote, external media, …);</p></li>
+<li><p><strong class="command">register_existing</strong>: scans the backups that have been made
+and adds the missing ones to the database;</p></li>
+</ul>
+</section>
+<section id="tisbackup-ini">
+<h2>tisbackup.ini<a class="headerlink" href="#tisbackup-ini" title="Permalink to this headline">¶</a></h2>
+<p><code class="file docutils literal notranslate"><span class="pre">tisbackup.ini</span></code> defines the backups to be executed and supervised.
+It is written with a simple formalism.</p>
+<p>The different types of backups are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rsync</span></code>: the backup of a directory by rsync using the rsync protocol;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rsync+ssh</span></code>: the backup of a directory by rsync with the ssh protocol;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mysql+ssh</span></code>: saving a mysql database in a gzipped sql file,
+with the ssh protocol;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pgsql+ssh</span></code>: the backup of a postgresql database in a gzipped sql file,
+with the ssh protocol;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xen-xva</span></code>: the backup of a virtual machine running on an XCP server
+as an XVA file;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xen-meta-data</span></code>: the backup of XCP metadata from a virtualization server;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">switch</span></code>: the backup of switches;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">null</span></code>: null backup of a server that does not require a backup but for which
+it is known to be taken into account (Nagios supervision);</p></li>
+</ul>
+<p>The first part of the <code class="file docutils literal notranslate"><span class="pre">tisbackup.ini</span></code> file,
+starting with the <code class="docutils literal notranslate"><span class="pre">[Global]</span></code> tag, determines:</p>
+<ul class="simple">
+<li><p>the path to the folder where the backups will be stored;</p></li>
+<li><p>the maximum retention time of a backup (in days);</p></li>
+<li><p>the maximum delay before triggering a nagios critical message (in hours);</p></li>
+<li><p>possibly the limit of usable bandwidth;</p></li>
+</ul>
+<p>The rest of the file lists the different backups to be made,
+with specific parameters for each type of backup:</p>
+<ul class="simple">
+<li><p>name of the directory in the backup;</p></li>
+<li><p>backup type;</p></li>
+<li><p>server name;</p></li>
+<li><p>directory (in case of a directory backup);</p></li>
+<li><p>directories to be excluded (idem);</p></li>
+<li><p>location of the ssh key to be used (private key on the backup server);</p></li>
+<li><p>name of the database (in case of mysql or postgresql database backup);</p></li>
+<li><p>ssh port number to use;</p></li>
+<li><p>database user and password (in case of mysql or postgresql database backup);</p></li>
+</ul>
+</section>
+<section id="tisbackup-sql">
+<h2>tisbackup.sql<a class="headerlink" href="#tisbackup-sql" title="Permalink to this headline">¶</a></h2>
+<p><code class="file docutils literal notranslate"><span class="pre">tisbackup.sql</span></code> is the <strong class="program">sqlite</strong> database available
+on the backup server, in which the backup information of each
+of the backed up areas is stored. It is used in particular to gather
+the information necessary for Nagios.</p>
+</section>
+<section id="tisbackup-gui">
+<h2>TISbackup GUI<a class="headerlink" href="#tisbackup-gui" title="Permalink to this headline">¶</a></h2>
+<p>Also developed in python, TISbackup GUI is a graphical interface
+that allows you to:</p>
+<ul class="simple">
+<li><p>visualize the last backups;</p></li>
+<li><p>export a backup to a USB media;</p></li>
+<li><p>visualize the backups to be made;</p></li>
+</ul>
+<p><a class="reference internal" href="_images/clapping-hands-microsoft.png"><img alt="Clapping hands" src="_images/clapping-hands-microsoft.png" style="width: 36.0px; height: 36.0px;" /></a> You may now go on to the next step
+and <a class="reference internal" href="installing_tisbackup.html#base-debian-server-install"><span class="std std-ref">install TISBackup on your Debian</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="installing_tisbackup.html" class="btn btn-neutral float-right" title="Installing and configuring TISBackup on Debian" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Presenting TISBackup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, Tranquil IT.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-89790248-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'UA-89790248-2');
+</script>
+
+
+
+</body>
+</html>

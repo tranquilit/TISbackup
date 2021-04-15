@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<meta content="TISBackup Documentation" name="description" />
+<meta content="Documentation, TISBackup, introduction, welcome page, Welcome" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Presenting TISBackup &mdash; TISBackup 1.8.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/ribbon.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Technical background for TISBackup" href="presenting_tisbackup.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> TISBackup
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Presenting TISBackup</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="presenting_tisbackup.html">Technical background for TISBackup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing_tisbackup.html">Installing and configuring TISBackup on Debian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring_tisbackup.html">Configuring the backup jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_tisbackup.html">Using TISBackup</a></li>
+</ul>
+<p><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tranquil-it-contacts.html">Contacting Tranquil IT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="screenshots.html">Screenshots of TISBackup</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">TISBackup</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Presenting TISBackup</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <figure class="align-center">
+<a class="reference internal image-reference" href="_images/tisbackup_logo.png"><img alt="TISBackup Logo" src="_images/tisbackup_logo.png" style="width: 700.0px; height: 206.0px;" /></a>
+</figure>
+<section id="presenting-tisbackup">
+<h1>Presenting TISBackup<a class="headerlink" href="#presenting-tisbackup" title="Permalink to this headline">¶</a></h1>
+<p>The objective of TISbackup is to benefit from file backups
+and centralized alert feedback on “reasonable” data volumes
+(of the order of a few TB).</p>
+<p>TISBackup allows:</p>
+<ul class="simple">
+<li><p>to know if a recent backup exists;</p></li>
+<li><p>to keep a history with deduplication at the file level (no duplicate backups);</p></li>
+<li><p>to have an immediate view of the contents of a server or a server area
+for data restoration ;</p></li>
+<li><p>to export the last backup to an external media in order to transfer
+it to a secure location;</p></li>
+<li><p>to configure the backup cycle with a simple
+and readable <em class="mimetype">.ini</em> file;</p></li>
+<li><p>to work with a module mechanism to extend the type of backups
+(https, rsync, postgres, mysql,) of virtual machines;</p></li>
+</ul>
+<p>Satisfying these needs stems from the need for a tool
+to manage a vast pool of machines each hosting a multitude
+of different software or services (different editors,
+different hardware platforms and operating environments, etc.).
+Finally, as the backup procedures of a publisher changed without any warning,
+the remote backup mechanisms were regularly broken, which caused us some scares
+with the mechanisms we were using before.</p>
+<section id="overview-of-existing-solutions">
+<h2>Overview of existing solutions<a class="headerlink" href="#overview-of-existing-solutions" title="Permalink to this headline">¶</a></h2>
+<p>Different open source solutions exist but did not meet our specifications.</p>
+<section id="baccula">
+<h3>Baccula<a class="headerlink" href="#baccula" title="Permalink to this headline">¶</a></h3>
+<p><strong class="program">Baccula</strong> is a high-performance solution for full backups on tape
+and removable media. However, a restore can take a long time
+and the storage of a history can be voluminous.
+The backup is saved on a file system that is not readable by a Windows system.
+An uninitiated “backup manager” will not be able to check the contents
+of his backup from home.</p>
+</section>
+<section id="r-snapshot">
+<h3>r-snapshot<a class="headerlink" href="#r-snapshot" title="Permalink to this headline">¶</a></h3>
+<p><strong class="program">r-snapshot</strong> almost corresponds to the specifications
+but is complex to configure and any necessary modification
+would have been difficult to develop as an overlay of the existing one:</p>
+<ul class="simple">
+<li><p>the backups are organized by date then by zone which is the opposite
+of what was desired;</p></li>
+<li><p>it is not possible to configure different backup frequencies
+according to the criticality levels of the servers;</p></li>
+<li><p>finally, the deletion of obsolete backups is done in the same process
+as the backups, which can be very long and can be problematic
+if there is a problem during the backup.</p></li>
+</ul>
+<p><strong>… and now TISbackup …</strong></p>
+<div class="toctree-wrapper compound">
+<p><span class="caption-text">Presenting TISBackup</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="presenting_tisbackup.html">Technical background for TISBackup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="presenting_tisbackup.html#tisbackup">tisbackup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presenting_tisbackup.html#tisbackup-ini">tisbackup.ini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presenting_tisbackup.html#tisbackup-sql">tisbackup.sql</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presenting_tisbackup.html#tisbackup-gui">TISbackup GUI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installing_tisbackup.html">Installing and configuring TISBackup on Debian</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installing_tisbackup.html#setting-up-the-gnu-linux-debian-server">Setting up the GNU/Linux Debian server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installing_tisbackup.html#setting-up-the-graphical-user-interface-for-the-tisbackup-server">Setting up the graphical user interface for the TISBackup server</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuring_tisbackup.html">Configuring the backup jobs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuring_tisbackup.html#global-section">[global] section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_tisbackup.html#backup-types">Backup types</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using_tisbackup.html">Using TISBackup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="using_tisbackup.html#exporting-backups">Exporting backups</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tranquil-it-contacts.html">Contacting Tranquil IT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="screenshots.html">Screenshots of TISBackup</a></li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="presenting_tisbackup.html" class="btn btn-neutral float-right" title="Technical background for TISBackup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, Tranquil IT.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-89790248-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'UA-89790248-2');
+</script>
+
+
+
+</body>
+</html>

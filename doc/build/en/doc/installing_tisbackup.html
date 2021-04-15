@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<meta content="Installing and configuring TISBackup" name="description" />
+<meta content="Documentation, TISBackup, installation, configuration" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Installing and configuring TISBackup on Debian &mdash; TISBackup 1.8.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/ribbon.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuring the backup jobs" href="configuring_tisbackup.html" />
+    <link rel="prev" title="Technical background for TISBackup" href="presenting_tisbackup.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> TISBackup
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Presenting TISBackup</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="presenting_tisbackup.html">Technical background for TISBackup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installing and configuring TISBackup on Debian</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-the-gnu-linux-debian-server">Setting up the GNU/Linux Debian server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-network-parameters">Configuring network parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-the-name-of-the-debian-server">Configuring the name of the Debian server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-the-ip-address-of-the-debian-server">Configuring the IP address of the Debian server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-the-tisbackup-server-on-debian-linux">Installing the TISBackup server on Debian Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-tisbackup">Configuring TISBackup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#launching-the-backup-scheduled-task">Launching the backup scheduled task</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generating-the-public-and-private-certificates">Generating the public and private certificates</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-the-graphical-user-interface-for-the-tisbackup-server">Setting up the graphical user interface for the TISBackup server</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuring_tisbackup.html">Configuring the backup jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_tisbackup.html">Using TISBackup</a></li>
+</ul>
+<p><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tranquil-it-contacts.html">Contacting Tranquil IT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="screenshots.html">Screenshots of TISBackup</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TISBackup</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Installing and configuring TISBackup on Debian</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/installing_tisbackup.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="installing-and-configuring-tisbackup-on-debian">
+<h1>Installing and configuring TISBackup on Debian<a class="headerlink" href="#installing-and-configuring-tisbackup-on-debian" title="Permalink to this headline">¶</a></h1>
+<section id="setting-up-the-gnu-linux-debian-server">
+<span id="base-debian-server-install"></span><h2>Setting up the GNU/Linux Debian server<a class="headerlink" href="#setting-up-the-gnu-linux-debian-server" title="Permalink to this headline">¶</a></h2>
+<p>In order to install a fresh Debian Linux 10 <em>Buster</em> (physical or virtual)
+without graphical interface, please refer to the
+<a class="reference external" href="https://www.debian.org/releases/buster/amd64/">Debian GNU/Linux Installation Guide</a>.</p>
+<section id="configuring-network-parameters">
+<h3>Configuring network parameters<a class="headerlink" href="#configuring-network-parameters" title="Permalink to this headline">¶</a></h3>
+<p>The different parameters presented below are not specific to TISBackup;
+you may adapt them as required for your environment.</p>
+<p>Modify the following files in order to get a proper named
+<abbr title="Fully Qualified Domain Name">FQDN</abbr> and network addressing strategy.</p>
+<p>In the following example:</p>
+<ul class="simple">
+<li><p>the FQDN name is <em>srvbackup.mydomain.lan</em>;</p></li>
+<li><p>the short-name of the TISBackup Server is <em>srvbackup</em>;</p></li>
+<li><p>the <abbr title="Domain Name Service">DNS</abbr> suffix is <em>mydomain.lan</em>;</p></li>
+<li><p>the IP address is <em>10.0.0.10/24</em>;</p></li>
+</ul>
+</section>
+<section id="configuring-the-name-of-the-debian-server">
+<h3>Configuring the name of the Debian server<a class="headerlink" href="#configuring-the-name-of-the-debian-server" title="Permalink to this headline">¶</a></h3>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>The short name of the future TISBackup server must not be longer
+than <strong>15 characters</strong> (the limit is due to <em>sAMAccountName</em> restriction
+in Active Directory).</p>
+</div>
+<p>The name of the TISBackup server must be a <abbr title="Fully Qualified Domain Name">FQDN</abbr>,
+that is to say it has both the server name and the DNS suffix.</p>
+<ul class="simple">
+<li><p>modify the <code class="file docutils literal notranslate"><span class="pre">/etc/hostname</span></code> file and write the FQDN of the server;</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># /etc/hostname of the TISBackup server</span>
+srvbackup.mydomain.lan
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>configure the <code class="file docutils literal notranslate"><span class="pre">/etc/hosts</span></code> file, be sure to put both the FQDN
+and the short name of the server;</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># /etc/hosts of the server</span>
+<span class="m">127</span>.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+<span class="m">10</span>.0.0.10   srvbackup.mydomain.lan     srvbackup
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<ul class="simple">
+<li><p>on the line defining the DNS server IP address, be sure to have the IP
+of the server (not 127.0.0.1), then the FQDN, then the short name;</p></li>
+<li><p>do not change the line with <em>localhost</em>;</p></li>
+</ul>
+</div>
+</section>
+<section id="configuring-the-ip-address-of-the-debian-server">
+<h3>Configuring the IP address of the Debian server<a class="headerlink" href="#configuring-the-ip-address-of-the-debian-server" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>configure the IP address of the Debian Server
+in the <code class="file docutils literal notranslate"><span class="pre">/etc/network/interfaces</span></code>;</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># /etc/network/interfaces of the Debian server</span>
+auto eth0
+iface eth0 inet static
+  address <span class="m">10</span>.0.0.10
+  netmask <span class="m">255</span>.255.255.0
+  gateway <span class="m">10</span>.0.0.254
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>apply the network configuration by rebooting the machine
+with a <code class="code docutils literal notranslate"><span class="pre">reboot</span></code>;</p></li>
+<li><p>if it has not already been done, create the DNS entry for the Server
+in the Organization’s Active Directory;</p></li>
+<li><p>after reboot, configure the system language in English in order to have
+non-localized logs for easier searching of common errors;</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt install locales-all
+localectl set-locale <span class="nv">LANG</span><span class="o">=</span>en_US.UTF-8
+localectl status
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>check that the machine clock is on time (with NTP installed);</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>dpkg -l <span class="p">|</span> grep ntp
+service ntp status
+date
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>If the NTP package is not installed.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt install ntp
+systemctl <span class="nb">enable</span> ntp
+systemctl start ntp
+</pre></div>
+</div>
+</div>
+<ul>
+<li><p>update and upgrade your Debian;</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt update
+apt upgrade -y
+</pre></div>
+</div>
+</li>
+<li><p>install systemd;</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt install systemd
+</pre></div>
+</div>
+</li>
+<li><p>restart the Debian server;</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>reboot
+</pre></div>
+</div>
+</li>
+</ul>
+<p><a class="reference internal" href="_images/clapping-hands-microsoft.png"><img alt="Clapping hands" src="_images/clapping-hands-microsoft.png" style="width: 36.0px; height: 36.0px;" /></a> The Debian server is now ready. You may now go on to the next step
+and <a class="reference internal" href="#install-tisbackup-debian"><span class="std std-ref">install TISBackup on your Debian</span></a>.</p>
+</section>
+<section id="installing-the-tisbackup-server-on-debian-linux">
+<span id="install-tisbackup-debian"></span><h3>Installing the TISBackup server on Debian Linux<a class="headerlink" href="#installing-the-tisbackup-server-on-debian-linux" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>install the required dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get install unzip ssh rsync python-paramiko python-pyvmomi python-pexpect
+</pre></div>
+</div>
+</li>
+<li><p>retrieve the git sources from <a class="reference external" href="https://github.com/tranquilit/TISbackup">https://github.com/tranquilit/TISbackup</a>
+and place them in the <code class="file docutils literal notranslate"><span class="pre">/opt</span></code> folder on your server:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /opt/
+wget --no-check-certificate https://github.com/tranquilit/TISbackup/archive/master.zip
+unzip master.zip
+mv TISbackup-master tisbackup
+chmod <span class="m">755</span> /opt/tisbackup/tisbackup.py
+ln -sb /opt/tisbackup/tisbackup.py /usr/local/bin/tisbackup
+</pre></div>
+</div>
+</li>
+<li><p>the <strong class="command">tisbackup</strong> command must return all <em>tisbackup</em> actions
+directly to you. For more information on the actions
+go to <a class="reference internal" href="using_tisbackup.html#id1"><span class="std std-ref">the section on using TISBackup</span></a>;</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>root@srvbackup.mydomain.lan tisbackup<span class="o">]</span><span class="c1"># tisbackup</span>
+ERROR : You must provide one action to perform
+Usage: tisbackup -c configfile action
+
+TIS Files Backup system.
+
+action is either :
+backup : launch all backups or a specific one <span class="k">if</span> -s option is used
+cleanup : removed backups older than retention period
+checknagios : check all or a specific backup against max_backup_age parameter
+dumpstat : dump the content of database <span class="k">for</span> the last <span class="m">20</span> backups
+retryfailed : try to relaunch the last failed backups
+listdrivers : list available backup types and parameters <span class="k">for</span> config inifile
+exportbackup : copy lastest OK backups from <span class="nb">local</span> to location defined by --exportdir parameter
+register_existing : scan backup directories and add missing backups to database
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="configuring-tisbackup">
+<h3>Configuring TISBackup<a class="headerlink" href="#configuring-tisbackup" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>create the directory for TISBackup configuration files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir /etc/tis/
+</pre></div>
+</div>
+</li>
+<li><p>in the directory <code class="file docutils literal notranslate"><span class="pre">/opt/tisbackup/samples/</span></code>, you will find the files
+<code class="file docutils literal notranslate"><span class="pre">config.ini.sample</span></code> and <code class="file docutils literal notranslate"><span class="pre">tisbackup-config.ini</span></code>
+which you can use as examples. Copy one of these two files
+into the <code class="file docutils literal notranslate"><span class="pre">/etc/tis</span></code> directory and we will describe in the next section
+how to customize this files;</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp /opt/tisbackup/samples/tisbackup-config.ini.sample /etc/tis/tisbackup-config.ini
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="launching-the-backup-scheduled-task">
+<h3>Launching the backup scheduled task<a class="headerlink" href="#launching-the-backup-scheduled-task" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp /opt/tisbackup/samples/tisbackup.cron /etc/cron.d/tisbackup
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>modify the <code class="file docutils literal notranslate"><span class="pre">/etc/cron.d/tisbackup</span></code> file to indicate when to launch
+the task;</p></li>
+</ul>
+</section>
+<section id="generating-the-public-and-private-certificates">
+<h3>Generating the public and private certificates<a class="headerlink" href="#generating-the-public-and-private-certificates" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>as root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ssh-keygen -t rsa -b <span class="m">2048</span>
+</pre></div>
+</div>
+</li>
+<li><p>press <kbd class="kbd docutils literal notranslate">Enter</kbd> for each one of the steps;</p></li>
+</ul>
+<p><a class="reference internal" href="_images/clapping-hands-microsoft.png"><img alt="Clapping hands" src="_images/clapping-hands-microsoft.png" style="width: 36.0px; height: 36.0px;" /></a> You may now go on to the next step
+and <a class="reference internal" href="configuring_tisbackup.html#configuring-backup-jobs"><span class="std std-ref">configure the backup jobs for your TISBackup</span></a>.</p>
+</section>
+</section>
+<section id="setting-up-the-graphical-user-interface-for-the-tisbackup-server">
+<h2>Setting up the graphical user interface for the TISBackup server<a class="headerlink" href="#setting-up-the-graphical-user-interface-for-the-tisbackup-server" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt-get install python2.7  python-simplejson python-flask python-setuptools sudo
+python /usr/lib/python2.7/dist-packages/easy_install.py <span class="s2">&quot;huey&lt;=0.4.9&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp /opt/tisbackup/samples/tisbackup_gui.ini /etc/tis/
+cp /opt/tisbackup/scripts/tisbackup_gui /etc/init.d/tisbackup_gui
+cp /opt/tisbackup/scripts/tisbackup_huey /etc/init.d/tisbackup_huey
+chmod +x /etc/init.d/tisbackup_gui
+chmod +x /etc/init.d/tisbackup_huey
+update-rc.d tisbackup_huey defaults
+update-rc.d tisbackup_gui defaults
+</pre></div>
+</div>
+<p>You can now access your interface through the url
+of your TISBackup server on port 8080.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="_images/tisbackup_gui.png"><img alt="TISBackup Web interface" src="_images/tisbackup_gui.png" style="width: 946.0px; height: 539.0px;" /></a>
+<figcaption>
+<p><span class="caption-text">TISBackup Web interface</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="configuring_tisbackup.html" class="btn btn-neutral float-right" title="Configuring the backup jobs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="presenting_tisbackup.html" class="btn btn-neutral float-left" title="Technical background for TISBackup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, Tranquil IT.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-89790248-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'UA-89790248-2');
+</script>
+
+
+
+</body>
+</html>

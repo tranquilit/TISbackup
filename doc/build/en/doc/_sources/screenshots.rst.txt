@@ -1,0 +1,68 @@
+.. Reminder for header structure:
+  Level 1: ====================
+  Level 2: --------------------
+  Level 3: ++++++++++++++++++++
+  Level 4: """"""""""""""""""""
+  Level 5: ^^^^^^^^^^^^^^^^^^^^
+
+.. meta::
+  :description: Screenshots of TISBackup
+  :keywords: Documentation, TISBackup, screenshots
+
+.. |clap| image:: tisbackup-resources/clapping-hands-microsoft.png
+  :scale: 50%
+  :alt: Clapping hands
+
+Screenshots of TISBackup
+========================
+
+.. _tisbackup_screenshots:
+
+.. figure:: tisbackup-resources/tisbackup_gui.png
+  :align: center
+  :scale: 100%
+  :alt: TISBackup Web interface
+
+  TISBackup Web interface
+
+.. figure:: tisbackup-resources/tisbackup_hdd_export.png
+  :align: center
+  :scale: 100%
+  :alt: Exporting a backup to an external USB HDD
+
+  Exporting a backup to an external USB HDD
+
+.. figure:: tisbackup-resources/tisbackup_hdd_export_status.png
+  :align: center
+  :scale: 100%
+  :alt: Status of exported backups
+
+  Status of exported backups
+
+.. figure:: tisbackup-resources/tisbackup_backup_list.png
+  :align: center
+  :scale: 20%
+  :alt: Overview of current backups
+
+  Overview of current backups
+
+.. figure:: tisbackup-resources/tisbackup_successful_backups.png
+  :align: center
+  :scale: 20%
+  :alt: Overview of successful backups
+
+  Overview of successful backups
+
+.. figure:: tisbackup-resources/tisbackup_searching_backups.png
+  :align: center
+  :scale: 100%
+  :alt: Searching for past backups
+
+  Searching for past backups
+
+.. figure:: tisbackup-resources/tisbackup_action_menu.png
+  :align: center
+  :scale: 20%
+  :alt: TISBackup action menu
+
+  TISBackup action menu

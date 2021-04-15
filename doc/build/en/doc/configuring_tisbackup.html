@@ -1,0 +1,502 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<meta content="Configuring the backup jobs" name="description" />
+<meta content="Documentation, TISBackup, configuration, backup jobs" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Configuring the backup jobs &mdash; TISBackup 1.8.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/ribbon.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using TISBackup" href="using_tisbackup.html" />
+    <link rel="prev" title="Installing and configuring TISBackup on Debian" href="installing_tisbackup.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> TISBackup
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Presenting TISBackup</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="presenting_tisbackup.html">Technical background for TISBackup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing_tisbackup.html">Installing and configuring TISBackup on Debian</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuring the backup jobs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#global-section">[global] section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#backup-types">Backup types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#backing-up-a-mysql-database">Backing up a MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backing-up-a-postgresql-database">Backing up a PostgreSQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backing-up-a-file-server">Backing up a file server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backing-up-a-xencenter-virtual-machine">Backing up a XenCenter virtual machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#on-local-storage">On local storage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#on-remote-storage">On remote storage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#xencenter-metadata">XenCenter metadata</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using_tisbackup.html">Using TISBackup</a></li>
+</ul>
+<p><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tranquil-it-contacts.html">Contacting Tranquil IT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="screenshots.html">Screenshots of TISBackup</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TISBackup</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Configuring the backup jobs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/configuring_tisbackup.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="configuring-the-backup-jobs">
+<h1>Configuring the backup jobs<a class="headerlink" href="#configuring-the-backup-jobs" title="Permalink to this headline">¶</a></h1>
+<p id="configuring-backup-jobs">The configuration of the backups is done in an <em class="mimetype">.ini</em> file,
+by default <code class="file docutils literal notranslate"><span class="pre">/etc/tis/tisbackup-config.ini</span></code>:</p>
+<ul class="simple">
+<li><p>a global section where general parameters are specified;</p></li>
+<li><p>then for each backup a section will be created;</p></li>
+</ul>
+<section id="global-section">
+<h2>[global] section<a class="headerlink" href="#global-section" title="Permalink to this headline">¶</a></h2>
+<p>Here are the mandatory parameters of the global section.</p>
+<ul>
+<li><p>the beginning of the global section starts with:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[global]</span>
+</pre></div>
+</div>
+</li>
+<li><p>specify directory where to store backups:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">backup_base_dir</span> <span class="o">=</span> <span class="s">/backup/data/</span>
+</pre></div>
+</div>
+</li>
+<li><p>define the maximum age of the backups (variable used by the cleanup function):</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">backup_retention_time</span><span class="o">=</span><span class="s">140</span>
+</pre></div>
+</div>
+</li>
+<li><p>define the maximum time in hours between each backup.
+When this time is exceeded, then <strong class="program">checknagios</strong> goes critical:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">maximum_backup_age</span><span class="o">=</span><span class="s">30</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Another non-mandatory parameter allows to define the rsync compression level:
+<code class="docutils literal notranslate"><span class="pre">compression_level=7</span></code>.</p>
+</section>
+<section id="backup-types">
+<h2>Backup types<a class="headerlink" href="#backup-types" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>to test with a Windows box</p>
+</div>
+<p>Globally, the backups are done through an SSH connection and the steps are:</p>
+<ul class="simple">
+<li><p>creating the <strong>section</strong> in the configuration file;</p></li>
+<li><p>installing ssh on the Linux client;</p></li>
+<li><p>making an ssh key exchange between the tisbackup server
+and the client to back up;</p></li>
+</ul>
+<p>Here are the different types of backup possible with <strong class="program">tisbackup</strong>.</p>
+<section id="backing-up-a-mysql-database">
+<h3>Backing up a MySQL database<a class="headerlink" href="#backing-up-a-mysql-database" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[srvintranet_mysql_mediawiki]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">mysql+ssh</span>
+<span class="na">server_name</span><span class="o">=</span><span class="s">srvintranet</span>
+<span class="na">private_key</span><span class="o">=</span><span class="s">/root/.ssh/id_dsa</span>
+<span class="na">db_name</span><span class="o">=</span><span class="s">mediawiki</span>
+<span class="na">db_user</span><span class="o">=</span><span class="s">user</span>
+<span class="na">db_passwd</span><span class="o">=</span><span class="s">password</span>
+</pre></div>
+</div>
+<p>Mandatory parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[srvintranet_mysql_mediawiki]</span></code>: name of the section starts
+with the name you give to it;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>: specifies the backup type for the Mysql database dump;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">server_name</span></code>: defines the server to be backed up
+by its DNS name or IP address;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">private_key</span></code>: defines the name of the private key to be used
+to connect to the client;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">db_name</span></code>: defines the name of the database to dump;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">db_user</span></code>: defines the name of a user with the right to dump on the basis of;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">db_passwd</span></code>: defines the user’s password;</p></li>
+</ul>
+</section>
+<section id="backing-up-a-postgresql-database">
+<h3>Backing up a PostgreSQL database<a class="headerlink" href="#backing-up-a-postgresql-database" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[srvasterisk-pgsql]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">pgsql+ssh</span>
+<span class="na">server_name</span><span class="o">=</span><span class="s">srvasterisk</span>
+<span class="na">private_key</span><span class="o">=</span><span class="s">/root/.ssh/id_rsa</span>
+<span class="na">db_name</span><span class="o">=</span><span class="s">asterisk</span>
+</pre></div>
+</div>
+<p>Mandatory parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[srvasterisk-pgsql]</span></code>: name of the section starts
+with the name you give to it;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>: specifies the backup type for the Mysql database dump;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">server_name</span></code>: defines the server to be backed up
+by its DNS name or IP address;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">private_key</span></code>: defines the name of the private key to be used
+to connect to the client;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">db_name</span></code>: defines the name of the database to dump;</p></li>
+</ul>
+</section>
+<section id="backing-up-a-file-server">
+<h3>Backing up a file server<a class="headerlink" href="#backing-up-a-file-server" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[srvfiles-home]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">rsync+ssh</span>
+<span class="na">server_name</span><span class="o">=</span><span class="s">srvfiles</span>
+<span class="na">remote_dir</span><span class="o">=</span><span class="s">/home</span>
+<span class="na">private_key</span><span class="o">=</span><span class="s">/root/.ssh/id_dsa</span>
+<span class="na">exclude_list</span><span class="o">=</span><span class="s">&quot;.mozilla&quot;,&quot;.thunderbird&quot;,&quot;.x2go&quot;,&quot;*.avi&quot;</span>
+<span class="na">bwlimit</span> <span class="o">=</span> <span class="s">100</span>
+</pre></div>
+</div>
+<p>Mandatory parameters:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">[srvfiles-home]</span></code>: name of the section starts
+with the name you give to it;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>: specifies the backup type for the Mysql database dump;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">server_name</span></code>: defines the server to be backed up
+by its DNS name or IP address;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remote_dir</span></code>: defines the folder on the remote host to backup;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">private_key</span></code>: defines the name of the private key to be used
+to connect to the client;</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>In case of Windows client, specificities are to be expected:</p>
+<p>By default we use the root user for backups, for windows we will use
+the Administrator account (pay attention to the sensitive box).</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">remote_user</span><span class="o">=</span><span class="s">Administrator</span>
+</pre></div>
+</div>
+<p>Through <strong class="program">cygwin</strong>, the directory to be backed up will always start
+with <code class="file docutils literal notranslate"><span class="pre">/cygdrive</span></code>, so it must be specified
+in the <code class="docutils literal notranslate"><span class="pre">remote_dir</span></code> parameter.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">remote_dir</span><span class="o">=</span><span class="s">/cygdrive/c/WINDOWS/</span>
+</pre></div>
+</div>
+</div>
+</li>
+</ul>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Other non-mandatory parameters can be used. The <code class="docutils literal notranslate"><span class="pre">listdrivers</span></code> option
+allows you to see them. The two most frequently used parameters are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">exclude_list</span></code>: defines the files to be excluded from the backup;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bwlimit</span></code>: defines the maximum speed of the backup;</p></li>
+</ul>
+</div>
+</section>
+<section id="backing-up-a-xencenter-virtual-machine">
+<h3>Backing up a XenCenter virtual machine<a class="headerlink" href="#backing-up-a-xencenter-virtual-machine" title="Permalink to this headline">¶</a></h3>
+<section id="on-local-storage">
+<h4>On local storage<a class="headerlink" href="#on-local-storage" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[wsmanage]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">xen-xva</span>
+<span class="na">xcphost</span><span class="o">=</span><span class="s">srvxen1</span>
+<span class="na">server_name</span><span class="o">=</span><span class="s">wsmanage</span>
+<span class="na">password_file</span><span class="o">=</span><span class="s">/root/xen_passwd</span>
+<span class="na">backup_retention_time</span><span class="o">=</span><span class="s">2</span>
+<span class="na">halt_vm</span><span class="o">=</span><span class="s">True</span>
+<span class="na">enable_https</span><span class="o">=</span><span class="s">False</span>
+</pre></div>
+</div>
+<p>Mandatory parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[wsmanage]</span></code>: name of the section starts
+with the name you give to it;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>: specifies the backup type for the Mysql database dump;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xcphost</span></code>: defines the XCP server where the VM is found by its DNS name or IP;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">server_name</span></code>: defines the server to be backed up
+by its DNS name or IP address;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">password_file</span></code>: defines a file where are stored the user and the password
+to be used for exporting the <em class="mimetype">.xva</em> file;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backup_retention_time</span></code>: defines the maximum number of exports
+for the virtual machine;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">halt_vm</span></code>: <strong>True</strong> = stop the virtual machine then export,
+<strong>False</strong> = snapshot the virtual machine then export the <code class="file docutils literal notranslate"><span class="pre">xva</span></code>
+without stopping the virtual machine;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_https</span></code>: activate or deactivate https protocol for transfer;</p></li>
+</ul>
+</section>
+<section id="on-remote-storage">
+<h4>On remote storage<a class="headerlink" href="#on-remote-storage" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[srvads-copy]</span>
+<span class="na">type</span><span class="o">=</span><span class="s">copy-vm-xcp</span>
+<span class="na">server_name</span><span class="o">=</span><span class="s">srvxen1</span>
+<span class="na">vm_name</span><span class="o">=</span><span class="s">srvads</span>
+<span class="na">storage_name</span><span class="o">=</span><span class="s">iscsi-sr1</span>
+<span class="na">password_file</span><span class="o">=</span><span class="s">/root/xen_passwd</span>
+<span class="na">network_name</span><span class="o">=</span><span class="s">test-dcardon</span>
+<span class="na">max_copies</span><span class="o">=</span><span class="s">3</span>
+</pre></div>
+</div>
+<p>Mandatory parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[srvads-copy]</span></code>: name of the section starts
+with the name you give to it;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>: specifies the backup type for the Mysql database dump;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">server_name</span></code>: defines the server to be backed up
+by its DNS name or IP address;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vm_name</span></code>: defines the virtual machine to be backed up
+(its name-label in XCP);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">storage_name</span></code>: defines the storage to where to copy the virtual machine
+(its name-label in XCP);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">password_file</span></code>: defines a file where are stored the user and the password
+to be used for exporting the <em class="mimetype">.xva</em> file;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">network_name</span></code>: defines the network to which to copy the VM
+(its name-label in XCP);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_copies</span></code>: maximum number of exports for the virtual machine;</p></li>
+</ul>
+</section>
+<section id="xencenter-metadata">
+<h4>XenCenter metadata<a class="headerlink" href="#xencenter-metadata" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<p>[srvxen1-metadata]
+type=xcp-dump-metadata
+server_name=srvxen1
+password_file=/root/xen_passwd</p>
+<p>Mandatory parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[srvxen1-metadata]</span></code>: name of the section starts
+with the name you give to it;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>: specifies the backup type for the Mysql database dump;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">server_name</span></code>: defines the server to be backed up
+by its DNS name or IP address;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">password_file</span></code>: defines a file where are stored the user and the password
+to be used for exporting the <em class="mimetype">.xva</em> file;</p></li>
+</ul>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>For maximum security put the password file in the root directory
+with read-write access only for it.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vi /root/xen_passwd
+</pre></div>
+</div>
+<p>example of the content of the file:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">user</span>
+<span class="na">password</span>
+</pre></div>
+</div>
+<p>implementation of restricted rights</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chmod <span class="m">600</span> /root/xen_passwd
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="using_tisbackup.html" class="btn btn-neutral float-right" title="Using TISBackup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installing_tisbackup.html" class="btn btn-neutral float-left" title="Installing and configuring TISBackup on Debian" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, Tranquil IT.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-89790248-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'UA-89790248-2');
+</script>
+
+
+
+</body>
+</html>
