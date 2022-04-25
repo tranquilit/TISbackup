@@ -1,0 +1,3 @@
+#!/bin/bash
+
+find /opt/tisbackup/ -name *.pyo -exec rm -f {} \;

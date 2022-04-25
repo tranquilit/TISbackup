@@ -21,9 +21,9 @@ Installing and configuring TISBackup on Debian
 Setting up the GNU/Linux Debian server
 --------------------------------------
 
-In order to install a fresh Debian Linux 10 *Buster* (physical or virtual)
+In order to install a fresh Debian Linux 11 *Bullseye* (physical or virtual)
 without graphical interface, please refer to the
-`Debian GNU/Linux Installation Guide <https://www.debian.org/releases/buster/amd64/>`_.
+`Debian GNU/Linux Installation Guide <https://www.debian.org/releases/bullseye/amd64/>`_.
 
 Configuring network parameters
 ++++++++++++++++++++++++++++++
@@ -138,14 +138,51 @@ and :ref:`install TISBackup on your Debian<install_tisbackup_debian>`.
 
 .. _install_tisbackup_debian:
 
-Installing the TISBackup server on Debian Linux
-+++++++++++++++++++++++++++++++++++++++++++++++
+Installing the TISBackup server
++++++++++++++++++++++++++++++++
+
+From Tranquil IT's repository
+"""""""""""""""""""""""""""""
+
+The easiest way is to install the package from Tranquil IT repository :
+
+.. tabs::
+
+  .. code-tab:: bash On CentOS8 and derivate
+
+    wget https://srvinstallation.tranquil.it/tisbackup/tis-tisbackup-162-1.el8.x86_64.rpm -O tis-tisbackup.rpm
+    yum install -y tis-tisbackup.rpm
+
+  .. code-tab:: bash On CentOS7
+
+    wget https://srvinstallation.tranquil.it/tisbackup/tis-tisbackup-162-1.el7.x86_64.rpm -O tis-tisbackup.rpm
+    yum install -y  tis-tisbackup.rpm
+
+  .. code-tab:: bash On Debian 11
+
+    wget https://srvinstallation.tranquil.it/tisbackup/tis-tisbackup-1-2.0.163-deb11.deb -O tis-tisbackup.deb
+    apt install unzip python3-paramiko python3-pyvmomi python3-pexpect python3-flask python3-simplejson python3-pip
+    dpkg -i tis-tisbackup.deb
+
+
+From sources
+""""""""""""
 
 * install the required dependencies:
 
-  .. code-block:: bash
+.. tabs::
 
-     apt-get install unzip ssh rsync python-paramiko python-pyvmomi python-pexpect
+  .. code-tab:: bash On CentOS8 and derivate
+
+    unzip, ssh, rsync, python3-paramiko, python3-pyvmomi, python3-pexpect, python3-flask,python3-simplejson, python3-pip
+
+  .. code-tab:: bash On CentOS7 and derivate
+
+    unzip rsync python3-paramiko python3-pyvmomi nfs-utils  python3-flask python3-simplejson autofs python3-pexpect
+
+  .. code-tab:: bash on Debian 11
+
+    unzip rsync python36-paramiko python3-pyvmomi nfs-utils  python3-flask python3-simplejson autofs pexpect
 
 * retrieve the git sources from https://github.com/tranquilit/TISbackup
   and place them in the :file:`/opt` folder on your server:
@@ -156,6 +193,7 @@ Installing the TISBackup server on Debian Linux
     wget --no-check-certificate https://github.com/tranquilit/TISbackup/archive/master.zip
     unzip master.zip
     mv TISbackup-master tisbackup
+    pip3 install huey iniparse -t /opt/tisbackup/lib
     chmod 755 /opt/tisbackup/tisbackup.py
     ln -sb /opt/tisbackup/tisbackup.py /usr/local/bin/tisbackup
 
@@ -226,11 +264,6 @@ and :ref:`configure the backup jobs for your TISBackup<configuring_backup_jobs>`
 
 Setting up the graphical user interface for the TISBackup server
 ----------------------------------------------------------------
-
-.. code-block:: bash
-
-  apt-get install python2.7  python-simplejson python-flask python-setuptools sudo
-  python /usr/lib/python2.7/dist-packages/easy_install.py "huey<=0.4.9"
 
 .. code-block:: bash
 

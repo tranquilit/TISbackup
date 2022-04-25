@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -20,7 +20,7 @@
 
 import os
 import datetime
-from common import *
+from .common import *
 
 
 class backup_null(backup_generic):

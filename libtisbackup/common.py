@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -18,6 +18,7 @@
 #
 # -----------------------------------------------------------------------
 
+from abc import ABC, abstractmethod
 import os
 import subprocess
 import re
@@ -34,8 +35,8 @@ import sys
 try:
     sys.stderr = open('/dev/null')       # Silence silly warnings from paramiko
     import paramiko
-except ImportError,e:
-    print "Error : can not load paramiko library %s" % e
+except ImportError as e:
+    print(("Error : can not load paramiko library %s" % e))
     raise
 
 sys.stderr = sys.__stderr__
@@ -121,7 +122,7 @@ def check_string(test_string):
     pattern = r'[^\.A-Za-z0-9\-_]'
     if re.search(pattern, test_string):
         #Character other then . a-z 0-9 was found
-        print 'Invalid : %r' % (test_string,)
+        print(('Invalid : %r' % (test_string,)))
 
 def convert_bytes(bytes):
     if bytes is None:
@@ -207,7 +208,7 @@ def html_table(cur,callback=None):
             yield dict((cur.description[idx][0], value)
                        for idx, value in enumerate(row))
 
-    head=u"<tr>"+"".join(["<th>"+c[0]+"</th>" for c in cur.description])+"</tr>"
+    head="<tr>"+"".join(["<th>"+c[0]+"</th>" for c in cur.description])+"</tr>"
     lines=""
     if callback:
         for r in itermap(cur):
@@ -237,7 +238,7 @@ def monitor_stdout(aprocess, onoutputdata,context):
     while read_set:
         try:
             rlist, wlist, xlist = select.select(read_set, [], [])
-        except select.error, e:
+        except select.error as e:
             if e.args[0] == errno.EINTR:
                 continue
             raise
@@ -245,12 +246,14 @@ def monitor_stdout(aprocess, onoutputdata,context):
         # Reads one line from stdout
         if aprocess.stdout in rlist:
             data = os.read(aprocess.stdout.fileno(), 1)
+            data = data.decode('utf-8')
             if data == "":
                 aprocess.stdout.close()
                 read_set.remove(aprocess.stdout)
             while data and not data in ('\n','\r'):
                 line += data
                 data = os.read(aprocess.stdout.fileno(), 1)
+                data = data.decode('utf-8')
             if line or data in ('\n','\r'):
                 stdout.append(line)
                 if onoutputdata:
@@ -260,12 +263,14 @@ def monitor_stdout(aprocess, onoutputdata,context):
         # Reads one line from stderr
         if aprocess.stderr in rlist:
             data = os.read(aprocess.stderr.fileno(), 1)
+            data = data.decode('utf-8')
             if data == "":
                 aprocess.stderr.close()
                 read_set.remove(aprocess.stderr)
             while data and not data in ('\n','\r'):
                 line += data
                 data = os.read(aprocess.stderr.fileno(), 1)
+                data = data.decode('utf-8')
             if line or data in ('\n','\r'):
                 stdout.append(line)
                 if onoutputdata:
@@ -442,7 +447,7 @@ CREATE INDEX idx_stats_backup_name_start on stats(backup_name,backup_start);""")
                 return value
 
         #for r in self.query('select  * from stats where backup_name=? order by backup_end desc limit ?',(backup_name,count)):
-        print pp(cur,None,1,fcb)
+        print((pp(cur,None,1,fcb)))
 
 
     def fcb(self,fields,fieldname,value):
@@ -492,12 +497,13 @@ def ssh_exec(command,ssh=None,server_name='',remote_user='',private_key='',ssh_p
 
     chan.exec_command(command)
     stdout.flush()
-    output = stdout.read()
+    output_base = stdout.read()
+    output = output_base.decode(encoding='UTF-8').replace("'","")
     exit_code = chan.recv_exit_status()
     return (exit_code,output)
 
 
-class backup_generic:
+class backup_generic(ABC):
     """Generic ancestor class for backups, not registered"""
     type = 'generic'
     required_params = ['type','backup_name','backup_dir','server_name','backup_retention_time','maximum_backup_age']
@@ -696,7 +702,7 @@ class backup_generic:
             self.logger.info('[%s] ######### Backup finished : %s',self.backup_name,stats['log'])
             return stats
 
-        except BaseException, e:
+        except BaseException as e:
             stats['status']='ERROR'
             stats['log']=str(e)
             endtime = time.time()
@@ -798,7 +804,7 @@ class backup_generic:
                         if not self.dry_run:
                             self.dbstat.db.execute('update stats set TYPE="CLEAN" where backup_name=? and backup_location=?',(self.backup_name,oldbackup_location))
                             self.dbstat.db.commit()
-                    except BaseException,e:
+                    except BaseException as e:
                         self.logger.error('cleanup_backup : Unable to remove directory/file "%s". Error %s', oldbackup_location,e)
                     removed.append((self.backup_name,oldbackup_location))
             else:
@@ -809,10 +815,12 @@ class backup_generic:
         self.logger.info('[%s] Cleanup finished : removed : %s' , self.backup_name,','.join([('[%s]-"%s"') % r for r in removed]) or 'Nothing')
         return removed
 
+    @abstractmethod
     def register_existingbackups(self):
-        """scan existing backups and insert stats in database"""
-        registered = [b['backup_location'] for b in self.dbstat.query('select distinct backup_location from stats where backup_name=?',[self.backup_name])]
-        raise Exception('Abstract method')
+        pass
+        # """scan existing backups and insert stats in database"""
+        # registered = [b['backup_location'] for b in self.dbstat.query('select distinct backup_location from stats where backup_name=?',[self.backup_name])]
+        # raise Exception('Abstract method')
 
     def export_latestbackup(self,destdir):
         """Copy (rsync) latest OK backup to external storage located at locally mounted "destdir"
@@ -846,9 +854,9 @@ class backup_generic:
                     raise Exception('Backup source %s doesn\'t exists' % backup_source)
 
                 # ensure there is a slash at end
-                if os.path.isdir(backup_source) and backup_source[-1] <> '/':
+                if os.path.isdir(backup_source) and backup_source[-1] != '/':
                     backup_source += '/'
-                    if backup_dest[-1] <> '/':
+                    if backup_dest[-1] != '/':
                         backup_dest += '/'
 
                 if not os.path.isdir(backup_dest):
@@ -874,7 +882,7 @@ class backup_generic:
                     process = subprocess.Popen(cmd, shell=True,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
                     def ondata(data,context):
                         if context.verbose:
-                            print data
+                            print(data)
                         context.logger.debug(data)
 
                     log = monitor_stdout(process,ondata,self)
@@ -898,7 +906,7 @@ class backup_generic:
                         self.logger.error("[" + self.backup_name + "] shell program exited with error code ")
                         raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd)
                 else:
-                    print cmd
+                    print(cmd)
 
                 stats['status']='OK'
                 self.logger.info('export backup from %s to %s OK, %d bytes written for %d changed files' % (backup_source,backup_dest,stats['written_bytes'],stats['written_files_count']))

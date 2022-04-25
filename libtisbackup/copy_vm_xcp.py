@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -20,8 +20,8 @@
 
 import os
 import datetime
-from common import *
-import XenAPI
+from .common import *
+from . import XenAPI
 import time
 import logging
 import re
@@ -29,7 +29,7 @@ import os.path
 import os
 import datetime
 import select
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import base64
 import socket
 from stat import *
@@ -66,7 +66,7 @@ class copy_vm_xcp(backup_generic):
             session = XenAPI.Session('https://'+self.server_name)
             try:
                 session.login_with_password(user_xen,password_xen)
-            except XenAPI.Failure, error:
+            except XenAPI.Failure as error:
                 msg,ip = error.details
     
                 if msg == 'HOST_IS_SLAVE':
@@ -81,7 +81,7 @@ class copy_vm_xcp(backup_generic):
             #get storage opaqueRef
             try:
                 storage = session.xenapi.SR.get_by_name_label(storage_name)[0]
-            except IndexError,error:
+            except IndexError as error:
                 result = (1,"error get SR opaqueref %s"%(error))
                 return result
             
@@ -89,14 +89,14 @@ class copy_vm_xcp(backup_generic):
             #get vm to copy opaqueRef    
             try:
                 vm = session.xenapi.VM.get_by_name_label(vm_name)[0]
-            except IndexError,error:
+            except IndexError as error:
                 result = (1,"error get VM opaqueref %s"%(error))
                 return result
 
             # get vm backup network opaqueRef
             try:
                 networkRef = session.xenapi.network.get_by_name_label(self.network_name)[0]
-            except IndexError, error:
+            except IndexError as error:
                 result = (1, "error get VM network opaqueref %s" % (error))
                 return result
             
@@ -104,9 +104,9 @@ class copy_vm_xcp(backup_generic):
                 status_vm = session.xenapi.VM.get_power_state(vm)                
                 self.logger.debug("[%s] Status of VM: %s",self.backup_name,status_vm)
                 if status_vm == "Running":
-                    self.logger.debug("[%s] Shudown in progress",self.backup_name)
+                    self.logger.debug("[%s] Shutdown in progress",self.backup_name)
                     if dry_run:
-                        print "session.xenapi.VM.clean_shutdown(vm)" 
+                        print("session.xenapi.VM.clean_shutdown(vm)") 
                     else:
                         session.xenapi.VM.clean_shutdown(vm)     
                 snapshot = vm
@@ -115,7 +115,7 @@ class copy_vm_xcp(backup_generic):
                 self.logger.debug("[%s] Snapshot in progress",self.backup_name)
                 try:
                     snapshot = session.xenapi.VM.snapshot(vm,"tisbackup-%s"%(vm_name))
-                except XenAPI.Failure, error:
+                except XenAPI.Failure as error:
                     result = (1,"error when snapshot %s"%(error))
                     return result
             
@@ -165,7 +165,7 @@ class copy_vm_xcp(backup_generic):
                                         session.xenapi.VDI.destroy(vdi)
                                 
                             session.xenapi.VM.destroy(oldest_backup_vm)                
-                        except XenAPI.Failure, error:
+                        except XenAPI.Failure as error:
                             result = (1,"error when destroy old backup vm %s"%(error))
                             return result
                     
@@ -173,7 +173,7 @@ class copy_vm_xcp(backup_generic):
             self.logger.debug("[%s] Copy %s in progress on %s",self.backup_name,vm_name,storage_name)
             try:
                 backup_vm = session.xenapi.VM.copy(snapshot,vm_backup_name+now.strftime("%Y-%m-%d %H:%M"),storage)
-            except XenAPI.Failure, error:
+            except XenAPI.Failure as error:
                 result = (1,"error when copy %s"%(error))
                 return result
             
@@ -184,7 +184,7 @@ class copy_vm_xcp(backup_generic):
             #change the network of the new VM
             try:
                 vifDestroy = session.xenapi.VM.get_VIFs(backup_vm)
-            except IndexError,error:
+            except IndexError as error:
                 result = (1,"error get VIF opaqueref %s"%(error))
                 return result
             
@@ -213,7 +213,7 @@ class copy_vm_xcp(backup_generic):
                         }
                 try:
                     session.xenapi.VIF.create(data)
-                except Exception, error:
+                except Exception as error:
                     result = (1,error)
                     return result
             
@@ -237,7 +237,7 @@ class copy_vm_xcp(backup_generic):
                 return result
             
             #Disable automatic boot
-            if session.xenapi.VM.get_other_config(backup_vm).has_key('auto_poweron'):
+            if 'auto_poweron' in session.xenapi.VM.get_other_config(backup_vm):
                 session.xenapi.VM.remove_from_other_config(backup_vm, "auto_poweron")
 
             if not str2bool(self.halt_vm):
@@ -251,14 +251,14 @@ class copy_vm_xcp(backup_generic):
                             if not 'NULL' in  vdi:
                                 session.xenapi.VDI.destroy(vdi)
                     session.xenapi.VM.destroy(snapshot)
-                except XenAPI.Failure, error:
+                except XenAPI.Failure as error:
                     result = (1,"error when destroy snapshot %s"%(error))
                     return result
             else:
                 if status_vm == "Running":
                     self.logger.debug("[%s] Starting in progress",self.backup_name)
                     if dry_run:
-                        print "session.xenapi.VM.start(vm,False,True)" 
+                        print("session.xenapi.VM.start(vm,False,True)") 
                     else:
                         session.xenapi.VM.start(vm,False,True)
                 
@@ -282,9 +282,14 @@ class copy_vm_xcp(backup_generic):
                 stats['status']='ERROR'
                 stats['log']=cmd[1]
 
-        except BaseException,e:
+        except BaseException as e:
             stats['status']='ERROR'
             stats['log']=str(e)
             raise
+
+    def register_existingbackups(self):
+        """scan backup dir and insert stats in database"""
+        #This backup is on target server, no data available on this server
+        pass
 
 register_driver(copy_vm_xcp)

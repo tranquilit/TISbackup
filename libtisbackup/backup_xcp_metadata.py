@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -20,7 +20,7 @@
 
 
 
-from common import *
+from .common import *
 import paramiko
 
 class backup_xcp_metadata(backup_generic):

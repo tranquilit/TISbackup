@@ -4,6 +4,9 @@ set -ex
 rm -rf ./builddir/ ./BUILD  *.rpm ./RPMS
 mkdir -p BUILD RPMS
 
+
+
+
 VERSION=`git rev-list HEAD --count` 
 echo $VERSION > __VERSION__
 

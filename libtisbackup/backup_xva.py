@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -17,20 +17,21 @@
 #    along with TISBackup.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -----------------------------------------------------------------------
-from __future__ import with_statement
+
 import logging
 import re
 import os
 import datetime
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import socket
 import tarfile
 import hashlib
 from stat import *
 import ssl
+import requests
 
-from common import *
-import XenAPI
+from .common import *
+from . import XenAPI
 
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -72,7 +73,7 @@ class backup_xva(backup_generic):
         session = XenAPI.Session('https://'+self.xcphost)
         try:
             session.login_with_password(user_xen,password_xen)
-        except XenAPI.Failure, error:
+        except XenAPI.Failure as error:
             msg,ip = error.details
 
             if msg == 'HOST_IS_SLAVE':
@@ -117,7 +118,7 @@ class backup_xva(backup_generic):
                                 if not 'NULL' in  vdi:
                                     session.xenapi.VDI.destroy(vdi)
                         session.xenapi.VM.destroy(old_snapshot)
-                    except XenAPI.Failure, error:
+                    except XenAPI.Failure as error:
                         return("error when destroy snapshot %s"%(error))
 
                 now = datetime.datetime.now()
@@ -125,7 +126,7 @@ class backup_xva(backup_generic):
                 try:
                     snapshot = session.xenapi.VM.snapshot(vm,"tisbackup-%s"%(vdi_name))
                     self.logger.debug("[%s] got snapshot %s", vdi_name, snapshot)
-                except XenAPI.Failure, error:
+                except XenAPI.Failure as error:
                     return("error when snapshot %s"%(error))
                 #get snapshot opaqueRef
                 vm = session.xenapi.VM.get_by_name_label("tisbackup-%s"%(vdi_name))[0]
@@ -135,7 +136,7 @@ class backup_xva(backup_generic):
             if status_vm == "Running":
                 self.logger.debug("[%s] Shudown in progress",self.backup_name)
                 if dry_run:
-                    print "session.xenapi.VM.clean_shutdown(vm)"
+                    print("session.xenapi.VM.clean_shutdown(vm)")
                 else:
                     session.xenapi.VM.clean_shutdown(vm)
         try:
@@ -150,8 +151,13 @@ class backup_xva(backup_generic):
                     scheme = "https://"
                 url = scheme+user_xen+":"+password_xen+"@"+self.xcphost+"/export?use_compression="+self.use_compression+"&uuid="+session.xenapi.VM.get_uuid(vm)
 
-                urllib.urlretrieve(url, filename_temp)
-                urllib.urlcleanup()
+
+
+
+                top_level_url = scheme+self.xcphost+"/export?use_compression="+self.use_compression+"&uuid="+session.xenapi.VM.get_uuid(vm)
+                r = requests.get(top_level_url, auth=(user_xen, password_xen))
+                open(filename_temp, 'wb').write(r.content)
+
 
             except Exception as e:
                 self.logger.error("[%s] error when fetching snap: %s", "tisbackup-%s"%(vdi_name), e)
@@ -171,13 +177,13 @@ class backup_xva(backup_generic):
                             if not 'NULL' in  vdi:
                                 session.xenapi.VDI.destroy(vdi)
                     session.xenapi.VM.destroy(snapshot)
-                except XenAPI.Failure, error:
+                except XenAPI.Failure as error:
                     return("error when destroy snapshot %s"%(error))
 
             elif status_vm == "Running":
                 self.logger.debug("[%s] Starting in progress",self.backup_name)
                 if dry_run:
-                    print "session.xenapi.Async.VM.start(vm,False,True)"
+                    print("session.xenapi.Async.VM.start(vm,False,True)")
                 else:
                     session.xenapi.Async.VM.start(vm,False,True)
 
@@ -219,7 +225,7 @@ class backup_xva(backup_generic):
             else:
                 raise Exception(cmd)
 
-        except BaseException , e:
+        except BaseException as e:
             stats['status']='ERROR'
             stats['log']=str(e)
             raise

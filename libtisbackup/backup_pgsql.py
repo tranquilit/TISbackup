@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -21,13 +21,13 @@ import sys
 try:
     sys.stderr = open('/dev/null')       # Silence silly warnings from paramiko
     import paramiko
-except ImportError,e:
-    print "Error : can not load paramiko library %s" % e
+except ImportError as e:
+    print(("Error : can not load paramiko library %s" % e))
     raise
 
 sys.stderr = sys.__stderr__
 
-from common import *
+from .common import *
 
 class backup_pgsql(backup_generic):
     """Backup a postgresql database as gzipped sql file through ssh"""
@@ -46,7 +46,7 @@ class backup_pgsql(backup_generic):
             if not self.dry_run:
                 os.makedirs(self.dest_dir)
             else:
-                print 'mkdir "%s"' % self.dest_dir
+                print(('mkdir "%s"' % self.dest_dir))
         else:
             raise Exception('backup destination directory already exists : %s' % self.dest_dir)
 

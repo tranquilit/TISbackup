@@ -21,8 +21,8 @@ import sys
 try:
     sys.stderr = open('/dev/null')       # Silence silly warnings from paramiko
     import paramiko
-except ImportError,e:
-    print "Error : can not load paramiko library %s" % e
+except ImportError as e:
+    print(("Error : can not load paramiko library %s" % e))
     raise
 
 sys.stderr = sys.__stderr__
@@ -30,7 +30,7 @@ sys.stderr = sys.__stderr__
 import datetime
 import base64
 import os
-from common import *
+from libtisbackup.common import *
 import re
 
 class backup_oracle(backup_generic):
@@ -49,8 +49,8 @@ class backup_oracle(backup_generic):
         try:
             mykey = paramiko.RSAKey.from_private_key_file(self.private_key)
         except paramiko.SSHException:
-            #mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
-			mykey = paramiko.Ed25519Key.from_private_key_file(self.private_key)
+		#mykey = paramiko.DSSKey.from_private_key_file(self.private_key)
+                mykey = paramiko.Ed25519Key.from_private_key_file(self.private_key)
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -66,7 +66,7 @@ class backup_oracle(backup_generic):
             if not self.dry_run:
                 os.makedirs(self.dest_dir)
             else:
-                print 'mkdir "%s"' % self.dest_dir
+                print(('mkdir "%s"' % self.dest_dir))
         else:
             raise Exception('backup destination directory already exists : %s' % self.dest_dir)        
         # dump db

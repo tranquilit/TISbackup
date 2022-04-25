@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -20,13 +20,13 @@
 
 import os
 import datetime
-from common import *
+from .common import *
 import time
 import logging
 import re
 import os.path
 import datetime
-from common import *
+from .common import *
 
 
 class backup_rsync_btrfs(backup_generic):
@@ -78,7 +78,7 @@ class backup_rsync_btrfs(backup_generic):
                         else:
                             self.logger.info("[" + self.backup_name + "] create btrs volume: %s"%dest_dir)
                     else:
-                        print 'btrfs subvolume create "%s"' %dest_dir
+                        print(('btrfs subvolume create "%s"' %dest_dir))
 
 
 
@@ -89,7 +89,7 @@ class backup_rsync_btrfs(backup_generic):
                 if self.dry_run:
                     options.append('-d')
 
-                if self.overload_args <> None:
+                if self.overload_args != None:
                     options.append(self.overload_args)
                 elif not "cygdrive" in self.remote_dir:
                     # we don't preserve owner, group, links, hardlinks, perms for windows/cygwin as it is not reliable nor useful
@@ -128,7 +128,7 @@ class backup_rsync_btrfs(backup_generic):
                     try:
                         # newsettings with exclude_list='too','titi', parsed as a str python list content
                         excludes = eval('[%s]' % self.exclude_list)
-                    except Exception,e:
+                    except Exception as e:
                         raise Exception('Error reading exclude list : value %s, eval error %s (don\'t forget quotes and comma...)' % (self.exclude_list,e))
                 options.extend(['--exclude="%s"' % x for x in excludes])
 
@@ -154,13 +154,13 @@ class backup_rsync_btrfs(backup_generic):
                         ssh_params.append('-i %s' % self.private_key)
                     if self.cipher_spec:
                         ssh_params.append('-c %s' % self.cipher_spec)
-                    if self.ssh_port <> 22:
+                    if self.ssh_port != 22:
                         ssh_params.append('-p %i' % self.ssh_port)
                     options.append('-e "/usr/bin/ssh %s"' % (" ".join(ssh_params)))
                     backup_source = '%s@%s:%s' % (self.remote_user,self.server_name,self.remote_dir)
 
                 # ensure there is a slash at end
-                if backup_source[-1] <> '/':
+                if backup_source[-1] != '/':
                     backup_source += '/'
 
                 options_params = " ".join(options)
@@ -173,7 +173,7 @@ class backup_rsync_btrfs(backup_generic):
                     process = subprocess.Popen(cmd, shell=True,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
                     def ondata(data,context):
                         if context.verbose:
-                            print data
+                            print(data)
                         context.logger.debug(data)
 
                     log = monitor_stdout(process,ondata,self)
@@ -203,7 +203,7 @@ class backup_rsync_btrfs(backup_generic):
                         self.logger.error("[" + self.backup_name + "] shell program exited with error code ", str(returncode))
                         raise Exception("[" + self.backup_name + "] shell program exited with error code " + str(returncode), cmd, log[-512:])
                 else:
-                    print cmd
+                    print(cmd)
 
                 #we take a snapshot of last_backup if everything went well
                 finaldest = os.path.join(self.backup_dir,self.backup_start_date)
@@ -220,16 +220,16 @@ class backup_rsync_btrfs(backup_generic):
                         else:
                             self.logger.info("[" + self.backup_name + "] snapshot directory created %s"%finaldest)
                     else:
-                        print "btrfs snapshot of %s to %s"%(dest_dir,finaldest)
+                        print(("btrfs snapshot of %s to %s"%(dest_dir,finaldest)))
                 else:
                     raise Exception('snapshot directory already exists : %s' %finaldest)
                 self.logger.debug("[%s] touching datetime of target directory %s" ,self.backup_name,finaldest)
-                print os.popen('touch "%s"' % finaldest).read()
+                print((os.popen('touch "%s"' % finaldest).read()))
                 stats['backup_location'] = finaldest
                 stats['status']='OK'
                 stats['log']='ssh+rsync+btrfs backup from %s OK, %d bytes written for %d changed files' % (backup_source,stats['written_bytes'],stats['written_files_count'])
 
-            except BaseException , e:
+            except BaseException as e:
                 stats['status']='ERROR'
                 stats['log']=str(e)
                 raise
@@ -358,5 +358,5 @@ if __name__=='__main__':
     b = backup_rsync('htouvet','/backup/data/htouvet',dbstat)
     b.read_config(cp)
     b.process_backup()
-    print b.checknagios()
+    print((b.checknagios()))
 

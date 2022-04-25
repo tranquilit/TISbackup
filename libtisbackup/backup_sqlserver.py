@@ -24,8 +24,8 @@ import sys
 try:
     sys.stderr = open('/dev/null')       # Silence silly warnings from paramiko
     import paramiko
-except ImportError,e:
-    print "Error : can not load paramiko library %s" % e
+except ImportError as e:
+    print("Error : can not load paramiko library %s" % e)
     raise
 
 sys.stderr = sys.__stderr__
@@ -33,7 +33,7 @@ sys.stderr = sys.__stderr__
 import datetime
 import base64
 import os
-from common import *
+from .common import *
 
 class backup_sqlserver(backup_generic):
     """Backup a SQLSERVER database as gzipped sql file through ssh"""
@@ -67,18 +67,17 @@ class backup_sqlserver(backup_generic):
         backup_start_date =  t.strftime('%Y%m%d-%Hh%Mm%S')
 
         backup_file = self.remote_backup_dir + '/' + self.db_name  + '-' + backup_start_date + '.bak'
-    	if not self.db_user == '':
-	   self.userdb = '-U %s -P %s' % ( self.db_user, self.db_password )
+        if not self.db_user == '':
+                self.userdb = '-U %s -P %s' % ( self.db_user, self.db_password )
 
         # dump db
         stats['status']='Dumping'
-	if self.sqlserver_before_2005:
-		cmd =  """osql -E -Q "BACKUP DATABASE [%s]
+        if self.sqlserver_before_2005:
+                cmd =  """osql -E -Q "BACKUP DATABASE [%s]
 				      TO DISK='%s'
 				      WITH FORMAT" """ % ( self.db_name, backup_file )
-
-	else:
-        	cmd =  """sqlcmd %s -S "%s" -d master -Q "BACKUP DATABASE [%s]
+        else:
+                cmd =  """sqlcmd %s -S "%s" -d master -Q "BACKUP DATABASE [%s]
                 	                                       TO DISK = N'%s'
                         	                               WITH INIT, NOUNLOAD ,
                                 	                       NAME = N'Backup %s', NOSKIP ,STATS = 10, NOFORMAT" """ % (self.userdb, self.db_server_name, self.db_name, backup_file ,self.db_name )

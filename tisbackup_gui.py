@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 #    This file is part of TISBackup
@@ -28,12 +28,12 @@ from iniparse import ConfigParser,RawConfigParser
 from libtisbackup.common import *
 import time 
 from flask import request, Flask,  session, g, appcontext_pushed, redirect, url_for, abort, render_template, flash, jsonify, Response
-from urlparse import urlparse
+from urllib.parse import urlparse
 import json
 import glob
 import time
 
-from config import huey 
+from huey import *
 from tasks import run_export_backup, get_task, set_task
 
 from tisbackup import tis_backup
@@ -87,11 +87,11 @@ def read_all_configs(base_dir):
     backup_dict['null_list'] = []
     backup_dict['pgsql_list'] = []
     backup_dict['mysql_list'] = []
-    backup_dict['sqlserver_list'] = []
+    #backup_dict['sqlserver_list'] = []
     backup_dict['xva_list'] = []
     backup_dict['metadata_list'] = []
-    backup_dict['switch_list'] = []
-    backup_dict['oracle_list'] = []
+    #backup_dict['switch_list'] = []
+    #backup_dict['oracle_list'] = []
 
     result = []
     cp = ConfigParser()
@@ -153,20 +153,20 @@ def read_all_configs(base_dir):
             db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
             backup_dict['mysql_list'].append(
                 [server_name, backup_name, backup_type, db_name])
-        if backup_type == "sqlserver+ssh":
-            db_name = row['db_name']
-            backup_dict['sqlserver_list'].append(
-                [server_name, backup_name, backup_type, db_name])
-        if backup_type == "oracle+ssh":
-            db_name = row['db_name']
-            backup_dict['oracle_list'].append(
-                [server_name, backup_name, backup_type, db_name])
+        # if backup_type == "sqlserver+ssh":
+        #     db_name = row['db_name']
+        #     backup_dict['sqlserver_list'].append(
+        #         [server_name, backup_name, backup_type, db_name])
+        # if backup_type == "oracle+ssh":
+        #     db_name = row['db_name']
+        #     backup_dict['oracle_list'].append(
+        #         [server_name, backup_name, backup_type, db_name])
         if backup_type == "xen-xva":
             backup_dict['xva_list'].append(
                 [server_name, backup_name, backup_type, ""])
-        if backup_type == "switch":
-            backup_dict['switch_list'].append(
-                [server_name, backup_name, backup_type, ""])
+        # if backup_type == "switch":
+        #     backup_dict['switch_list'].append(
+        #         [server_name, backup_name, backup_type, ""])
             
     return backup_dict
 
@@ -209,11 +209,11 @@ def read_config():
     backup_dict['null_list'] = []
     backup_dict['pgsql_list'] = []
     backup_dict['mysql_list'] = []
-    backup_dict['sqlserver_list'] = []
+    #backup_dict['sqlserver_list'] = []
     backup_dict['xva_list'] = []
     backup_dict['metadata_list'] = []
-    backup_dict['switch_list'] = []
-    backup_dict['oracle_list'] = []
+    #backup_dict['switch_list'] = []
+    #backup_dict['oracle_list'] = []
     for row in result:
         backup_name = row['backup_name']
         server_name = row['server_name']
@@ -237,16 +237,16 @@ def read_config():
         if backup_type == "mysql+ssh":
             db_name = row['db_name'] if len(row['db_name']) > 0 else '*'
             backup_dict['mysql_list'].append([server_name, backup_name, backup_type, db_name])
-        if backup_type == "sqlserver+ssh":
-            db_name = row['db_name']
-            backup_dict['sqlserver_list'].append([server_name, backup_name, backup_type, db_name])
-        if backup_type == "oracle+ssh":
-            db_name = row['db_name']
-            backup_dict['oracle_list'].append([server_name, backup_name, backup_type, db_name])
+        # if backup_type == "sqlserver+ssh":
+        #     db_name = row['db_name']
+        #     backup_dict['sqlserver_list'].append([server_name, backup_name, backup_type, db_name])
+        # if backup_type == "oracle+ssh":
+        #     db_name = row['db_name']
+        #     backup_dict['oracle_list'].append([server_name, backup_name, backup_type, db_name])
         if backup_type == "xen-xva":
             backup_dict['xva_list'].append([server_name, backup_name, backup_type, ""])
-        if backup_type == "switch":
-            backup_dict['switch_list'].append([server_name, backup_name, backup_type, ""])
+        # if backup_type == "switch":
+        #     backup_dict['switch_list'].append([server_name, backup_name, backup_type, ""])
     return backup_dict
 
 @app.route('/')
@@ -262,19 +262,21 @@ def set_config_number(id=None):
         global config_number
         config_number=id
         read_config()
-    return  jsonify(configs=CONFIG,config_number=config_number)
+    return jsonify(configs=CONFIG,config_number=config_number)
 
 
 @app.route('/all_json')
 def backup_all_json():
     backup_dict = read_all_configs(BASE_DIR)
-    return json.dumps(backup_dict['rsync_list']+backup_dict['sqlserver_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+  backup_dict['switch_list'])
+    return json.dumps(backup_dict['rsync_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list'])
+    #+  backup_dict['switch_list'])+backup_dict['sqlserver_list']
 
 
 @app.route('/json')
 def backup_json():
     backup_dict = read_config()
-    return json.dumps(backup_dict['rsync_list']+backup_dict['sqlserver_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list']+  backup_dict['switch_list'])
+    return json.dumps(backup_dict['rsync_list']+backup_dict['rsync_btrfs_list']+backup_dict['rsync_ssh_list']+backup_dict['pgsql_list']+backup_dict['mysql_list']+backup_dict['xva_list']+backup_dict['null_list']+backup_dict['metadata_list'])
+    #+  backup_dict['switch_list'])+backup_dict['sqlserver_list']
 
 
 def check_usb_disk():
@@ -289,23 +291,23 @@ def check_usb_disk():
     if len(usb_disk_list) == 0:
         raise_error("Cannot find any external usb disk", "You should plug the usb hard drive into the server")
         return ""
-    print usb_disk_list
+    print(usb_disk_list)
 
     usb_partition_list = []
     for usb_disk in usb_disk_list:
         cmd = "udevadm  info -q path -n %s" % usb_disk  + '1'
         output =  os.popen(cmd).read()
-        print "cmd : " + cmd
-        print "output : " + output
+        print("cmd : " + cmd)
+        print("output : " + output)
 
         if '/devices/pci'  in  output:
             #flash("partition found: %s1" % usb_disk)
             usb_partition_list.append(usb_disk + "1")
 
-    print usb_partition_list
+    print(usb_partition_list)
 
     if len(usb_partition_list) ==0:
-        raise_error("The dribe %s has no partition" % (usb_disk_list[0] ), "You should initialize the usb drive and format an ext4 partition with TISBACKUP label")
+        raise_error("The drive %s has no partition" % (usb_disk_list[0] ), "You should initialize the usb drive and format an ext4 partition with TISBACKUP label")
         return ""    
 
     tisbackup_partition_list = []
@@ -314,7 +316,7 @@ def check_usb_disk():
             flash("tisbackup backup partition found: %s" % usb_partition)
             tisbackup_partition_list.append(usb_partition)
 
-    print tisbackup_partition_list    
+    print(tisbackup_partition_list)    
 
     if len(tisbackup_partition_list) ==0:
         raise_error("No tisbackup partition exist on disk %s" % (usb_disk_list[0] ), "You should initialize the usb drive and format an ext4 partition with TISBACKUP label")
@@ -334,9 +336,9 @@ def check_already_mount(partition_name,refresh):
         for line in f.readlines():
             if line.startswith(partition_name):
                 mount_point = line.split(' ')[1]     
-		if not refresh:
-	            run_command("/bin/umount %s" % mount_point)
-        	    os.rmdir(mount_point)                   
+            if not refresh:
+                run_command("/bin/umount %s" % mount_point)
+                os.rmdir(mount_point)                   
     return mount_point
 
 def run_command(cmd, info=""):
@@ -411,13 +413,14 @@ def export_backup():
         if backup_types == "null_list":
             continue
         for section in backup_dict[backup_types]:
-            if section.count > 0:
+            #if section.count > 0:
+            if len(section) > 0:
                 sections.append(section[1])
 
     noJobs = (not runnings_backups())
-    if "start" in request.args.keys() or not noJobs:
+    if "start" in list(request.args.keys()) or not noJobs:
         start=True
-        if "sections" in request.args.keys():
+        if "sections" in list(request.args.keys()):
             backup_sections = request.args.getlist('sections')
         
 
@@ -435,9 +438,9 @@ def export_backup():
         global mindate 
         mindate =  datetime2isodate(datetime.datetime.now())
         if not error and start:
-	    print tisbackup_config_file
-            task = run_export_backup(base=backup_base_dir, config_file=CONFIG[config_number], mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections])) 
-	    set_task(task)
+            print(tisbackup_config_file)
+            task = run_export_backup(base=backup_base_dir, config_file=CONFIG[config_number], mount_point=mount_point, backup_sections=",".join([str(x) for x in backup_sections]))
+            set_task(task)
 		
             
     return render_template("export_backup.html", error=error, start=start, info=info, email=ADMIN_EMAIL, sections=sections)

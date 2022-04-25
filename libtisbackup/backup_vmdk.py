@@ -17,8 +17,8 @@
 #    along with TISBackup.  If not, see <http://www.gnu.org/licenses/>.
 #
 # -----------------------------------------------------------------------
-from __future__ import with_statement
-from common import *
+
+from .common import *
 import pyVmomi
 from pyVmomi import vim
 from pyVmomi import vmodl
@@ -101,7 +101,7 @@ class backup_vmdk(backup_generic):
         ovfDescParams = vim.OvfManager.CreateDescriptorParams()
         ovf = si.content.ovfManager.CreateDescriptor(vm, ovfDescParams)     
         root = ET.fromstring(ovf.ovfDescriptor)  
-        new_id = root[0][1].attrib.values()[0][1:3]
+        new_id = list(root[0][1].attrib.values())[0][1:3]
         ovfFiles = []
         for vmdk in vmdks:
             old_id =  vmdk['id'][1:3]
@@ -211,7 +211,7 @@ class backup_vmdk(backup_generic):
                 if not self.dry_run:
                     os.makedirs(dest_dir)
                 else:
-                    print 'mkdir "%s"' % dest_dir
+                    print('mkdir "%s"' % dest_dir)
             else:
                 raise Exception('backup destination directory already exists : %s' % dest_dir)            
             os.chdir(dest_dir)
@@ -271,7 +271,7 @@ class backup_vmdk(backup_generic):
             stats['status']='OK'    
             
 
-        except BaseException , e:
+        except BaseException as e:
             stats['status']='ERROR'
             stats['log']=str(e)
             raise

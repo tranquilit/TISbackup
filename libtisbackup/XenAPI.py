@@ -1,20 +1,30 @@
-#============================================================================
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of version 2.1 of the GNU Lesser General Public
-# License as published by the Free Software Foundation.
+# Copyright (c) Citrix Systems, Inc.
+# All rights reserved.
 #
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
 #
-# You should have received a copy of the GNU Lesser General Public
-# License along with this library; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-#============================================================================
-# Copyright (C) 2006-2007 XenSource Inc.
-#============================================================================
+#  1) Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
 #
+#  2) Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in
+#     the documentation and/or other materials provided with the
+#     distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# --------------------------------------------------------------------
 # Parts of this file are based upon xmlrpclib.py, the XML-RPC client
 # interface included in the Python distribution.
 #
@@ -45,26 +55,15 @@
 # --------------------------------------------------------------------
 
 import gettext
-import xmlrpclib
-import httplib
+import six.moves.xmlrpc_client as xmlrpclib
+import six.moves.http_client as httplib
 import socket
+import sys
 
 translation = gettext.translation('xen-xm', fallback = True)
 
 API_VERSION_1_1 = '1.1'
 API_VERSION_1_2 = '1.2'
-
-#
-# Methods that have different parameters between API versions 1.1 and 1.2, and
-# the number of parameters in 1.1.
-#
-COMPATIBILITY_METHODS_1_1 = [
-    ('SR.create'     , 8),
-    ('SR.introduce'  , 6),
-    ('SR.make'       , 7),
-    ('VDI.snapshot'  , 1),
-    ('VDI.clone'     , 1),
-    ]
 
 class Failure(Exception):
     def __init__(self, details):
@@ -73,17 +72,18 @@ class Failure(Exception):
     def __str__(self):
         try:
             return str(self.details)
-        except Exception, exn:
-            import sys
-            print >>sys.stderr, exn
-            return "Xen-API failure: %s" % str(self.details)
+        except Exception as exn:
+            msg = "Xen-API failure: %s" % exn
+            sys.stderr.write(msg)
+            return msg
 
     def _details_map(self):
         return dict([(str(i), self.details[i])
                      for i in range(len(self.details))])
 
 
-_RECONNECT_AND_RETRY = (lambda _ : ())
+# Just a "constant" that we use to decide whether to retry the RPC
+_RECONNECT_AND_RETRY = object()
 
 class UDSHTTPConnection(httplib.HTTPConnection):
     """HTTPConnection subclass to allow HTTP over Unix domain sockets. """
@@ -92,12 +92,26 @@ class UDSHTTPConnection(httplib.HTTPConnection):
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.sock.connect(path)
 
-class UDSHTTP(httplib.HTTP):
+class UDSHTTP(httplib.HTTPConnection):
     _connection_class = UDSHTTPConnection
 
 class UDSTransport(xmlrpclib.Transport):
+    def __init__(self, use_datetime=0):
+        self._use_datetime = use_datetime
+        self._extra_headers=[]
+        self._connection = (None, None)
+    def add_extra_header(self, key, value):
+        self._extra_headers += [ (key,value) ]
     def make_connection(self, host):
-        return UDSHTTP(host)
+        # Python 2.4 compatibility
+        if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
+            return UDSHTTP(host)
+        else:
+            return UDSHTTPConnection(host)
+    def send_request(self, connection, handler, request_body):
+        connection.putrequest("POST", handler)
+        for key, value in self._extra_headers:
+            connection.putheader(key, value)
 
 class Session(xmlrpclib.ServerProxy):
     """A server proxy and session manager for communicating with xapi using
@@ -106,15 +120,26 @@ class Session(xmlrpclib.ServerProxy):
     Example:
 
     session = Session('http://localhost/')
-    session.login_with_password('me', 'mypassword')
+    session.login_with_password('me', 'mypassword', '1.0', 'xen-api-scripts-xenapi.py')
     session.xenapi.VM.start(vm_uuid)
     session.xenapi.session.logout()
     """
 
     def __init__(self, uri, transport=None, encoding=None, verbose=0,
-                 allow_none=1):
-        xmlrpclib.ServerProxy.__init__(self, uri, transport, encoding,
-                                       verbose, allow_none)
+                 allow_none=1, ignore_ssl=False):
+
+        # Fix for CA-172901 (+ Python 2.4 compatibility)
+        # Fix for context=ctx ( < Python 2.7.9 compatibility)
+        if not (sys.version_info[0] <= 2 and sys.version_info[1] <= 7 and sys.version_info[2] <= 9 ) \
+                and ignore_ssl:
+            import ssl
+            ctx = ssl._create_unverified_context()
+            xmlrpclib.ServerProxy.__init__(self, uri, transport, encoding,
+                                           verbose, allow_none, context=ctx)
+        else:
+            xmlrpclib.ServerProxy.__init__(self, uri, transport, encoding,
+                                           verbose, allow_none)
+        self.transport = transport
         self._session = None
         self.last_login_method = None
         self.last_login_params = None
@@ -125,7 +150,7 @@ class Session(xmlrpclib.ServerProxy):
         if methodname.startswith('login'):
             self._login(methodname, params)
             return None
-        elif methodname == 'logout':
+        elif methodname == 'logout' or methodname == 'session.logout':
             self._logout()
             return None
         else:
@@ -133,7 +158,7 @@ class Session(xmlrpclib.ServerProxy):
             while retry_count < 3:
                 full_params = (self._session,) + params
                 result = _parse_result(getattr(self, methodname)(*full_params))
-                if result == _RECONNECT_AND_RETRY:
+                if result is _RECONNECT_AND_RETRY:
                     retry_count += 1
                     if self.last_login_method:
                         self._login(self.last_login_method,
@@ -145,21 +170,24 @@ class Session(xmlrpclib.ServerProxy):
             raise xmlrpclib.Fault(
                 500, 'Tried 3 times to get a valid session, but failed')
 
-
     def _login(self, method, params):
-        result = _parse_result(getattr(self, 'session.%s' % method)(*params))
-        if result == _RECONNECT_AND_RETRY:
-            raise xmlrpclib.Fault(
-                500, 'Received SESSION_INVALID when logging in')
-        self._session = result
-        self.last_login_method = method
-        self.last_login_params = params
-        if method.startswith("slave_local"):
-            self.API_version = API_VERSION_1_2
-        else:
+        try:
+            result = _parse_result(
+                getattr(self, 'session.%s' % method)(*params))
+            if result is _RECONNECT_AND_RETRY:
+                raise xmlrpclib.Fault(
+                    500, 'Received SESSION_INVALID when logging in')
+            self._session = result
+            self.last_login_method = method
+            self.last_login_params = params
             self.API_version = self._get_api_version()
+        except socket.error as e:
+            if e.errno == socket.errno.ETIMEDOUT:
+                raise xmlrpclib.Fault(504, 'The connection timed out')
+            else:
+                raise e
 
-    def logout(self):
+    def _logout(self):
         try:
             if self.last_login_method.startswith("slave_local"):
                 return _parse_result(self.session.local_logout(self._session))
@@ -174,11 +202,9 @@ class Session(xmlrpclib.ServerProxy):
     def _get_api_version(self):
         pool = self.xenapi.pool.get_all()[0]
         host = self.xenapi.pool.get_master(pool)
-        if (self.xenapi.host.get_API_version_major(host) == "1" and
-            self.xenapi.host.get_API_version_minor(host) == "2"):
-            return API_VERSION_1_2
-        else:
-            return API_VERSION_1_1
+        major = self.xenapi.host.get_API_version_major(host)
+        minor = self.xenapi.host.get_API_version_minor(host)
+        return "%s.%s"%(major,minor)
 
     def __getattr__(self, name):
         if name == 'handle':
@@ -187,11 +213,13 @@ class Session(xmlrpclib.ServerProxy):
             return _Dispatcher(self.API_version, self.xenapi_request, None)
         elif name.startswith('login') or name.startswith('slave_local'):
             return lambda *params: self._login(name, params)
+        elif name == 'logout':
+            return _Dispatcher(self.API_version, self.xenapi_request, "logout")
         else:
             return xmlrpclib.ServerProxy.__getattr__(self, name)
 
 def xapi_local():
-    return Session("http://_var_xapi_xapi/", transport=UDSTransport())
+    return Session("http://_var_lib_xcp_xapi/", transport=UDSTransport())
 
 def _parse_result(result):
     if type(result) != dict or 'Status' not in result:
@@ -233,10 +261,4 @@ class _Dispatcher:
             return _Dispatcher(self.__API_version, self.__send, "%s.%s" % (self.__name, name))
 
     def __call__(self, *args):
-        if self.__API_version == API_VERSION_1_1:
-            for m in COMPATIBILITY_METHODS_1_1:
-                if self.__name == m[0]:
-                    return self.__send(self.__name, args[0:m[1]])
-
         return self.__send(self.__name, args)
-

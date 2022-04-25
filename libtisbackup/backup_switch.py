@@ -20,15 +20,15 @@
 
 import os
 import datetime
-from common import *
-import XenAPI
+from .common import *
+from . import XenAPI
 import time
 import logging
 import re
 import os.path
 import datetime
 import select
-import urllib2, urllib
+import urllib.request, urllib.error, urllib.parse, urllib.request, urllib.parse, urllib.error
 import base64
 import socket
 import requests
@@ -149,8 +149,9 @@ class backup_switch(backup_generic):
         else:
             child.sendline(self.switch_user)
         child.expect(".*#")
-	child.sendline( "terminal datadump")
-	child.expect("#")
+	
+        child.sendline( "terminal datadump")
+        child.expect("#")
         child.sendline( "show startup-config")
         child.expect("#")
         lines = child.before
@@ -237,7 +238,7 @@ class backup_switch(backup_generic):
             stats['log']='Switch backup from %s OK, %d bytes written' % (self.server_name,stats['written_bytes'])
 
 
-        except BaseException , e:
+        except BaseException as e:
             stats['status']='ERROR'
             stats['log']=str(e)
             raise

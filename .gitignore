@@ -7,3 +7,10 @@
 /srvinstallation
 /tasks.sqlite-shm
 .idea
+/deb/builddir
+/deb/*.deb
+/lib
+/rpm/*.rpm
+/rpm/RPMS
+/rpm/BUILD
+/rpm/__VERSION__

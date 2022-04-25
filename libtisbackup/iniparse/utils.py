@@ -1,5 +1,6 @@
-import compat
-from ini import LineContainer, EmptyLine
+from . import compat
+from .ini import LineContainer, EmptyLine
+
 
 def tidy(cfg):
     """Clean up blank lines.
@@ -32,12 +33,12 @@ def tidy(cfg):
     if cont and not isinstance(cont[-1], EmptyLine):
         cont.append(EmptyLine())
 
+
 def tidy_section(lc):
     cont = lc.contents
     i = 1
     while i < len(cont):
-        if (isinstance(cont[i-1], EmptyLine) and
-            isinstance(cont[i], EmptyLine)):
+        if isinstance(cont[i-1], EmptyLine) and isinstance(cont[i], EmptyLine):
             del cont[i]
         else:
             i += 1

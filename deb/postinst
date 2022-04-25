@@ -10,3 +10,5 @@ if [ ! -f /etc/cron.d/tisbackup ]; then
     cp  /opt/tisbackup/samples/tisbackup.cron  /etc/cron.d/tisbackup
 fi
 
+find /opt/tisbackup -name "*.pyc" -exec rm -rf {} \;
+python3 -m compileall  /opt/tisbackup/

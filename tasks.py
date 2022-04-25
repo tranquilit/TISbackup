@@ -1,9 +1,9 @@
-from config import huey
+from huey import RedisHuey
 import os
 import logging
 from tisbackup import tis_backup
 
-
+huey = RedisHuey('tisbackup', host='localhost')
 @huey.task()
 def run_export_backup(base, config_file, mount_point, backup_sections):
     try:
