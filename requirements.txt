@@ -1,2 +1,4 @@
-huey==2.4.3
-iniparse
+six
+requests
+huey
+redis
