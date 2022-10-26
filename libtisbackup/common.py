@@ -199,7 +199,7 @@ def html_table(cur,callback=None):
         if iso is None:
             return None
         elif isinstance(iso, str):
-            return iso.decode('iso8859')
+            return iso #.decode()
         else:
             return iso
 
@@ -246,14 +246,14 @@ def monitor_stdout(aprocess, onoutputdata,context):
         # Reads one line from stdout
         if aprocess.stdout in rlist:
             data = os.read(aprocess.stdout.fileno(), 1)
-            data = data.decode('utf-8')
+            data = data.decode(errors='ignore')
             if data == "":
                 aprocess.stdout.close()
                 read_set.remove(aprocess.stdout)
             while data and not data in ('\n','\r'):
                 line += data
                 data = os.read(aprocess.stdout.fileno(), 1)
-                data = data.decode('utf-8')
+                data = data.decode(errors='ignore')
             if line or data in ('\n','\r'):
                 stdout.append(line)
                 if onoutputdata:
@@ -263,14 +263,14 @@ def monitor_stdout(aprocess, onoutputdata,context):
         # Reads one line from stderr
         if aprocess.stderr in rlist:
             data = os.read(aprocess.stderr.fileno(), 1)
-            data = data.decode('utf-8')
+            data = data.decode(errors='ignore')
             if data == "":
                 aprocess.stderr.close()
                 read_set.remove(aprocess.stderr)
             while data and not data in ('\n','\r'):
                 line += data
                 data = os.read(aprocess.stderr.fileno(), 1)
-                data = data.decode('utf-8')
+                data = data.decode(errors='ignore')
             if line or data in ('\n','\r'):
                 stdout.append(line)
                 if onoutputdata:
@@ -498,7 +498,7 @@ def ssh_exec(command,ssh=None,server_name='',remote_user='',private_key='',ssh_p
     chan.exec_command(command)
     stdout.flush()
     output_base = stdout.read()
-    output = output_base.decode(encoding='UTF-8').replace("'","")
+    output = output_base.decode(errors='ignore').replace("'","")
     exit_code = chan.recv_exit_status()
     return (exit_code,output)
 
