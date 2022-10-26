@@ -21,6 +21,7 @@ import os,sys
 from os.path import isfile, join
 tisbackup_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(os.path.join(tisbackup_root_dir,'lib'))
+sys.path.append(os.path.join(tisbackup_root_dir,'libtisbackup'))
 
 
 from shutil import *

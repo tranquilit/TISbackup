@@ -24,6 +24,7 @@ from os.path import isfile, join
 
 tisbackup_root_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0,os.path.join(tisbackup_root_dir,'lib'))
+sys.path.insert(0,os.path.join(tisbackup_root_dir,'libtisbackup'))
 
 from iniparse import ini,ConfigParser
 from optparse import OptionParser
