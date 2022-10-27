@@ -34,7 +34,7 @@ import json
 import glob
 import time
 
-from huey import *
+from config import huey
 from tasks import run_export_backup, get_task, set_task
 
 from tisbackup import tis_backup
