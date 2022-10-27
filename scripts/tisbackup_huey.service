@@ -3,7 +3,7 @@ Description=tisbackup
  
 [Service]
 Type=simple
-ExecStart=/opt/tisbackup/huey_consumer.py -n tisbackup_gui.huey
+ExecStart=huey_consumer.py -n tisbackup_gui.huey
 WorkingDirectory=/opt/tisbackup 
 [Install]
 WantedBy=multi-user.target
