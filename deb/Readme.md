@@ -32,6 +32,8 @@ Finalize the installation with:
     tisbackup -d backup
     systemctl enable tisbackup_gui
     systemctl start tisbackup_gui
+    systemctl enable tisbackup_huey
+    systemctl start tisbackup_huey
 ```
 
 You can then see the result in your browser: ```http://backup-server-name:8080```
