@@ -22,6 +22,8 @@ mkdir -p ./builddir/etc/tis
 mkdir -p ./builddir/etc/cron.d/
 
 pip3 install -r ../requirements.txt -t ./builddir/opt/tisbackup/lib
+pip3 install huey==0.4.9
+pip3 install redis
 
 rsync -aP --exclude "deb/" --exclude "doc/" --exclude "rpm/" --exclude ".git" ../ ./builddir/opt/tisbackup
 rsync -aP ../scripts/tisbackup_gui.service  ./builddir/usr/lib/systemd/system/
