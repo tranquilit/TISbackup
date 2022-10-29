@@ -1,4 +1,7 @@
 #!/bin/bash
+pip3 install huey=0.4.9
+pip3 install redis
+
 systemctl enable tisbackup_huey
 systemctl enable tisbackup_gui
 
