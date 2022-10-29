@@ -1,2 +1,4 @@
 six
 requests
+huey==0.4.9
+redis
