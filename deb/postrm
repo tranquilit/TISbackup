@@ -1,2 +1,7 @@
 #!/bin/bash
+systemctl stop tisbackup_huey
+systemctl stop tisbackup_gui
+systemctl disable tisbackup_huey
+systemctl disable tisbackup_gui
+
 rm -rf /opt/tisbackup
