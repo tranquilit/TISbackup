@@ -1,5 +1,7 @@
 ## tisbackup for python3  
 
+### Install
+
 Once the deb package is created, one can use it to install tisbackup on a debian machine. The command is:  
 ```
     apt install ./tis-tisbackup-1-2-0.170-deb11.deb
@@ -44,3 +46,11 @@ Finalize the installation with:
 You can then see the result in your browser: ```http://backup-server-name:8080```
 
 The documentation for tisbackup is here: [tisbackup doc](https://tisbackup.readthedocs.io/en/latest/index.html)
+
+### Uninstall
+```
+    dpkg --force-all --purge tis-tisbackup
+    apt autoremove
+ ```
+ 
+
