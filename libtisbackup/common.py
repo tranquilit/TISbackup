@@ -785,7 +785,7 @@ class backup_generic(ABC):
                             self.logger.info('[%s] removing directory "%s"',self.backup_name,oldbackup_location)
                             if not self.dry_run:
                                 if self.type =="rsync+btrfs+ssh" or self.type == "rsync+btrfs":
-                                    cmd = "/bin/btrfs subvolume delete %s"%oldbackup_location.encode('ascii')
+                                    cmd = "/bin/btrfs subvolume delete %s"%oldbackup_location
                                     process = subprocess.Popen(cmd, shell=True,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
                                     log = monitor_stdout(process,'',self)
                                     returncode = process.returncode
