@@ -173,7 +173,7 @@ class backup_rsync(backup_generic):
                     reg_total_files = re.compile('Number of files: (?P<file>\d+)')
                     reg_transferred_files = re.compile('Number of .*files transferred: (?P<file>\d+)')
                     for l in log.splitlines():
-                        line = l.replace(',','')
+                        line = l.replace(',','').replace('.','')
                         m = reg_total_files.match(line)
                         if m:
                             stats['total_files_count'] += int(m.groupdict()['file'])
