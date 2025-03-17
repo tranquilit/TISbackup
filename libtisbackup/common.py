@@ -894,9 +894,9 @@ class backup_generic(ABC):
                             l.startswith('Number of regular files transferred:')):
                             stats['written_files_count'] += int(l.replace(',','').split(':')[1])
                         if l.startswith('Total file size:'):
-                            stats['total_bytes'] += float(l.replace(',','').split(':')[1].split()[0])
+                            stats['total_bytes'] += int(l.replace(',','').split(':')[1].split()[0])
                         if l.startswith('Total transferred file size:'):
-                            stats['written_bytes'] += float(l.replace(',','').split(':')[1].split()[0])
+                            stats['written_bytes'] += int(l.replace(',','').split(':')[1].split()[0])
                     returncode = process.returncode
                     ## deal with exit code 24 (file vanished)
                     if (returncode == 24):
