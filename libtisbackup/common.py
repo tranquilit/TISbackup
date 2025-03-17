@@ -890,8 +890,9 @@ class backup_generic(ABC):
                     for l in log.splitlines():
                         if l.startswith('Number of files:'):
                             stats['total_files_count'] += int(re.findall('[0-9]+', l.split(':')[1])[0])
-                        if l.startswith('Number of files transferred:'):
-                            stats['written_files_count'] += int(l.split(':')[1])
+                        if (l.startswith('Number of files transferred:') or 
+                            l.startswith('Number of regular files transferred:')):
+                            stats['written_files_count'] += int(l.replace(',','').split(':')[1])
                         if l.startswith('Total file size:'):
                             stats['total_bytes'] += float(l.replace(',','').split(':')[1].split()[0])
                         if l.startswith('Total transferred file size:'):
