@@ -73,9 +73,11 @@ class backup_rsync(backup_generic):
                 else:
                     raise Exception('backup destination directory already exists : %s' % dest_dir)
 
-                options = ['-rt','--stats','--delete-excluded','--numeric-ids','--delete-after']
-                if self.logger.level:
-                    options.append('-P')
+                options = ['-rt','--stats','--delete-excluded','--numeric-ids','--delete-after', '--partial']
+                
+                if self.logger.level == logging.DEBUG:
+                    self.logger.warning(f"[{self.backup_name}] Note that stdout cannot be entire if it contains too much data and the server doesn't have enough RAM !")
+                    options.append('--progress')
 
                 if self.dry_run:
                     options.append('-d')
