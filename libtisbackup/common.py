@@ -862,9 +862,11 @@ class backup_generic(ABC):
                 if not os.path.isdir(backup_dest):
                     os.makedirs(backup_dest)
 
-                options = ['-aP','--stats','--delete-excluded','--numeric-ids','--delete-after']
-                if self.logger.level:
-                    options.append('-P')
+                options = ['-a', '--stats', '--delete-excluded', '--numeric-ids', '--delete-after', '--partial']
+
+                if self.logger.level == logging.DEBUG:
+                    self.logger.warning(f"[{self.backup_name}] Note that stdout cannot be entire if it contains too much data and the server doesn't have enough RAM !")
+                    options.append('--progress')
 
                 if self.dry_run:
                     options.append('-d')

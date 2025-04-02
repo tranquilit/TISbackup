@@ -80,11 +80,11 @@ class backup_rsync_btrfs(backup_generic):
                     else:
                         print(('btrfs subvolume create "%s"' %dest_dir))
 
+                options = ['-rt', '--stats', '--delete-excluded', '--numeric-ids', '--delete-after', '--partial']
 
-
-                options = ['-rt','--stats','--delete-excluded','--numeric-ids','--delete-after']
-                if self.logger.level:
-                    options.append('-P')
+                if self.logger.level == logging.DEBUG:
+                    self.logger.warning(f"[{self.backup_name}] Note that stdout cannot be entire if it contains too much data and the server doesn't have enough RAM !")
+                    options.append('--progress')
 
                 if self.dry_run:
                     options.append('-d')
