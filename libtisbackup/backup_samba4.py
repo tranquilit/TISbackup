@@ -139,7 +139,7 @@ class backup_samba4(backup_generic):
 
         filelist = os.listdir(self.backup_dir)
         filelist.sort()
-        p = re.compile('^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$')
+        p = re.compile(r'^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$')
         for item in filelist:
             if p.match(item):
                 dir_name = os.path.join(self.backup_dir,item)
