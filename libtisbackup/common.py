@@ -526,7 +526,7 @@ class backup_generic(ABC):
     ssh_port=22
 
     def __init__(self,backup_name, backup_dir,dbstat=None,dry_run=False):
-        if not re.match('^[A-Za-z0-9_\-\.]*$',backup_name):
+        if not re.match(r'^[A-Za-z0-9_\-\.]*$',backup_name):
             raise Exception('The backup name %s should contain only alphanumerical characters' % backup_name)
         self.backup_name = backup_name
         self.backup_dir = backup_dir
@@ -889,7 +889,7 @@ class backup_generic(ABC):
 
                     for l in log.splitlines():
                         if l.startswith('Number of files:'):
-                            stats['total_files_count'] += int(re.findall('[0-9]+', l.split(':')[1])[0])
+                            stats['total_files_count'] += int(re.findall(r'[0-9]+', l.split(':')[1])[0])
                         if l.startswith('Number of files transferred:'):
                             stats['written_files_count'] += int(l.split(':')[1])
                         if l.startswith('Total file size:'):

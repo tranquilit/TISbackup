@@ -357,7 +357,7 @@ class INISection(config.ConfigNamespace):
             else:
                 raise
         if del_empty:
-            value = re.sub('\n+', '\n', value)
+            value = re.sub(r'\n+', r'\n', value)
         return value
 
     def _getitem(self, key):
