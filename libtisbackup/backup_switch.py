@@ -199,7 +199,7 @@ class backup_switch(backup_generic):
         child.expect('#--')
         child.expect("#")
         child.close()
-        myre = re.compile("#--+")
+        myre = re.compile(r"#--+")
         config = myre.split(open(filename).read())[2]
         with open(filename,'w') as f:
             f.write(config)

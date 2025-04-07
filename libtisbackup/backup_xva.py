@@ -60,7 +60,7 @@ class backup_xva(backup_generic):
         tar = tarfile.open(filename)
         members = tar.getmembers()
         for tarinfo in members:
-            if re.search('^[0-9]*$',os.path.basename(tarinfo.name)):
+            if re.search(r'^[0-9]*$',os.path.basename(tarinfo.name)):
                 sha1sum = hashlib.sha1(tar.extractfile(tarinfo).read()).hexdigest()
                 sha1sum2 = tar.extractfile(tarinfo.name+'.checksum').read()
                 if not sha1sum == sha1sum2:

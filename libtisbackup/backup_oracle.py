@@ -86,7 +86,7 @@ class backup_oracle(backup_generic):
 
                 file = open(localpath)
                 for line in file:
-                    if re.search('EXP-[0-9]+:', line) and not re.match('EXP-[0-9]+:', line).group(0).replace(':','') in self.ignore_error_oracle_code:
+                    if re.search(r'EXP-[0-9]+:', line) and not re.match(r'EXP-[0-9]+:', line).group(0).replace(':','') in self.ignore_error_oracle_code:
                         stats['status']='RMTemp'
                         self.clean_dumpfiles(dumpfile,dumplog)
                         raise Exception('Aborting, Not null exit code (%s) for "%s"' % (re.match('EXP-[0-9]+:', line).group(0).replace(':',''),cmd))
