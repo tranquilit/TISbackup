@@ -130,8 +130,8 @@ class backup_rsync(backup_generic):
                 if (not self.rsync_module and not self.private_key):
                     raise Exception('If you don''t use SSH, you must specify a rsync module')
 
-                #rsync_re = re.compile('(?P<server>[^:]*)::(?P<export>[^/]*)/(?P<path>.*)')
-                #ssh_re = re.compile('((?P<user>.*)@)?(?P<server>[^:]*):(?P<path>/.*)')
+                #rsync_re = re.compile(r'(?P<server>[^:]*)::(?P<export>[^/]*)/(?P<path>.*)')
+                #ssh_re = re.compile(r'((?P<user>.*)@)?(?P<server>[^:]*):(?P<path>/.*)')
 
                 # Add ssh connection params
                 if self.rsync_module:
@@ -172,8 +172,8 @@ class backup_rsync(backup_generic):
 
                     log = monitor_stdout(process,ondata,self)
 
-                    reg_total_files = re.compile('Number of files: (?P<file>\d+)')
-                    reg_transferred_files = re.compile('Number of .*files transferred: (?P<file>\d+)')
+                    reg_total_files = re.compile(r'Number of files: (?P<file>\d+)')
+                    reg_transferred_files = re.compile(r'Number of .*files transferred: (?P<file>\d+)')
                     for l in log.splitlines():
                         line = l.replace(',','').replace('.','')
                         m = reg_total_files.match(line)
@@ -227,8 +227,8 @@ class backup_rsync(backup_generic):
         filelist.sort()
         filelist.reverse()
         full = ''
-        r_full = re.compile('^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$') 
-        r_partial = re.compile('^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}.rsync$') 
+        r_full = re.compile(r'^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$')
+        r_partial = re.compile(r'^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}.rsync$')
         # we take all latest partials younger than the latest full and the latest full
         for item in filelist:
             if r_partial.match(item) and item<current:
@@ -247,7 +247,7 @@ class backup_rsync(backup_generic):
 
         filelist = os.listdir(self.backup_dir)
         filelist.sort()
-        p = re.compile('^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$') 
+        p = re.compile(r'^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$')
         for item in filelist:
             if p.match(item):
                 dir_name = os.path.join(self.backup_dir,item)

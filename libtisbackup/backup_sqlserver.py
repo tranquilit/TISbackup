@@ -139,7 +139,7 @@ class backup_sqlserver(backup_generic):
 
         filelist = os.listdir(self.backup_dir)
         filelist.sort()
-        p = re.compile('^%s-(?P<date>\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}).bak.gz$' % self.db_name)
+        p = re.compile(r'^%s-(?P<date>\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}).bak.gz$' % self.db_name)
         for item in filelist:
             sr = p.match(item)
             if sr:

@@ -286,7 +286,7 @@ def check_usb_disk():
     usb_disk_list = []
     for name in glob.glob('/dev/sd[a-z]'):
         for line in os.popen("udevadm info -q env -n %s" % name):
-            if re.match("ID_PATH=.*usb.*", line):
+            if re.match(r"ID_PATH=.*usb.*", line):
                 usb_disk_list += [ name ]
 
     if len(usb_disk_list) == 0:

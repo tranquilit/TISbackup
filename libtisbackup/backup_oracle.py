@@ -86,7 +86,7 @@ class backup_oracle(backup_generic):
 
                 file = open(localpath)
                 for line in file:
-                    if re.search('EXP-[0-9]+:', line) and not re.match('EXP-[0-9]+:', line).group(0).replace(':','') in self.ignore_error_oracle_code:
+                    if re.search(r'EXP-[0-9]+:', line) and not re.match(r'EXP-[0-9]+:', line).group(0).replace(':','') in self.ignore_error_oracle_code:
                         stats['status']='RMTemp'
                         self.clean_dumpfiles(dumpfile,dumplog)
                         raise Exception('Aborting, Not null exit code (%s) for "%s"' % (re.match('EXP-[0-9]+:', line).group(0).replace(':',''),cmd))
@@ -131,7 +131,7 @@ class backup_oracle(backup_generic):
 
         filelist = os.listdir(self.backup_dir)
         filelist.sort()
-        p = re.compile('^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$') 
+        p = re.compile(r'^\d{8,8}-\d{2,2}h\d{2,2}m\d{2,2}$')
         for item in filelist:
             if p.match(item):
                 dir_name = os.path.join(self.backup_dir,item)
