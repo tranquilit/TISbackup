@@ -862,9 +862,11 @@ class backup_generic(ABC):
                 if not os.path.isdir(backup_dest):
                     os.makedirs(backup_dest)
 
-                options = ['-aP','--stats','--delete-excluded','--numeric-ids','--delete-after']
-                if self.logger.level:
-                    options.append('-P')
+                options = ['-a', '--stats', '--delete-excluded', '--numeric-ids', '--delete-after', '--partial']
+
+                if self.logger.level == logging.DEBUG:
+                    self.logger.warning(f"[{self.backup_name}] Note that stdout cannot be entire if it contains too much data and the server doesn't have enough RAM !")
+                    options.append('--progress')
 
                 if self.dry_run:
                     options.append('-d')
@@ -889,13 +891,14 @@ class backup_generic(ABC):
 
                     for l in log.splitlines():
                         if l.startswith('Number of files:'):
-                            stats['total_files_count'] += int(re.findall(r'[0-9]+', l.split(':')[1])[0])
-                        if l.startswith('Number of files transferred:'):
-                            stats['written_files_count'] += int(l.split(':')[1])
+                            stats['total_files_count'] += int(re.findall(r'[0-9]+', l.replace(',','').split(':')[1])[0])
+                        if (l.startswith('Number of files transferred:') or 
+                            l.startswith('Number of regular files transferred:')):
+                            stats['written_files_count'] += int(l.replace(',','').split(':')[1])
                         if l.startswith('Total file size:'):
-                            stats['total_bytes'] += float(l.replace(',','').split(':')[1].split()[0])
+                            stats['total_bytes'] += int(l.replace(',','').split(':')[1].split()[0])
                         if l.startswith('Total transferred file size:'):
-                            stats['written_bytes'] += float(l.replace(',','').split(':')[1].split()[0])
+                            stats['written_bytes'] += int(l.replace(',','').split(':')[1].split()[0])
                     returncode = process.returncode
                     ## deal with exit code 24 (file vanished)
                     if (returncode == 24):
