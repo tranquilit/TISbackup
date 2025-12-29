@@ -889,16 +889,21 @@ class backup_generic(ABC):
 
                     log = monitor_stdout(process,ondata,self)
 
+                    reg_total_files = re.compile(r'Number of files: (?P<file>\d+)')
+                    reg_transferred_files = re.compile(r'Number of .*files transferred: (?P<file>\d+)')
                     for l in log.splitlines():
-                        if l.startswith('Number of files:'):
-                            stats['total_files_count'] += int(re.findall(r'[0-9]+', l.replace(',','').split(':')[1])[0])
-                        if (l.startswith('Number of files transferred:') or 
-                            l.startswith('Number of regular files transferred:')):
-                            stats['written_files_count'] += int(l.replace(',','').split(':')[1])
-                        if l.startswith('Total file size:'):
-                            stats['total_bytes'] += int(l.replace(',','').split(':')[1].split()[0])
-                        if l.startswith('Total transferred file size:'):
-                            stats['written_bytes'] += int(l.replace(',','').split(':')[1].split()[0])
+                        line = l.replace(',','').replace('.','')
+                        m = reg_total_files.match(line)
+                        if m:
+                            stats['total_files_count'] += int(m.groupdict()['file'])
+                        m = reg_transferred_files.match(line)
+                        if m:
+                            stats['written_files_count'] += int(m.groupdict()['file'])
+                        if line.startswith('Total file size:'):
+                            stats['total_bytes'] += int(line.split(':')[1].split()[0])
+                        if line.startswith('Total transferred file size:'):
+                            stats['written_bytes'] += int(line.split(':')[1].split()[0])
+
                     returncode = process.returncode
                     ## deal with exit code 24 (file vanished)
                     if (returncode == 24):
