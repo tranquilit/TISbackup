@@ -862,7 +862,7 @@ class backup_generic(ABC):
                 if not os.path.isdir(backup_dest):
                     os.makedirs(backup_dest)
 
-                options = ['-a', '--stats', '--delete-excluded', '--numeric-ids', '--delete-after', '--partial']
+                options = ['-a', '--no-h', '--stats', '--delete-excluded', '--numeric-ids', '--delete-after', '--partial']
 
                 if self.logger.level == logging.DEBUG:
                     self.logger.warning(f"[{self.backup_name}] Note that stdout cannot be entire if it contains too much data and the server doesn't have enough RAM !")
